@@ -1,3 +1,4 @@
 User-agent: *
-Disallow:
-Sitemap: https://drslid.github.io/LYWSD02-BLE-Dashboard/sitemap.xml
+Allow: /
+
+Sitemap: https://drslid.github.io/LYWSD02_BLE_Dashboard/sitemap.xml

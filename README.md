@@ -1,112 +1,139 @@
-
-<a name="top"></a>
+<a id="top"></a>
 
 <p align="center">
-    <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/graphs/contributors">
-        <img src="https://img.shields.io/github/contributors/drslid/LYWSD02_BLE_Dashboard.svg?style=for-the-badge" alt="Contributors">
-    </a>
-    <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/stargazers">
-        <img src="https://img.shields.io/github/stars/drslid/LYWSD02_BLE_Dashboard.svg?style=for-the-badge" alt="Stargazers">
-    </a>
-    <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/network/members">
-        <img src="https://img.shields.io/github/forks/drslid/LYWSD02_BLE_Dashboard.svg?style=for-the-badge" alt="Forks">
-    </a>
-    <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/issues">
-        <img src="https://img.shields.io/github/issues/drslid/LYWSD02_BLE_Dashboard.svg?style=for-the-badge" alt="Issues">
-    </a>
+  <img src="img/logo.png" alt="LYWSD02 BLE Dashboard" width="88" height="88">
 </p>
 
-<h1 align="center"> 📡 LYWSD02 BLE Dashboard 🌡️💧🔋 </h1>
+<h1 align="center">📡 LYWSD02 BLE Dashboard 🌡️</h1>
 
 <p align="center">
-  A web interface to monitor and configure your <a target="_blank" href="https://www.mi.com/global/product/xiaomi-temperature-and-humidity-monitor-clock/"><strong>Xiaomi Mijia LYWSD02</strong></a> temperature and humidity sensor via Bluetooth Low Energy (BLE).
+  <strong>Get your Xiaomi Mijia LYWSD02 back on time.</strong><br>
+  Update its clock, choose your display settings and check your room’s temperature — straight from your browser.
 </p>
 
 <p align="center">
-  🌐 Official Website : <a target="_blank" href="https://drslid.github.io/LYWSD02_BLE_Dashboard/"><strong> https://drslid.github.io/LYWSD02_BLE_Dashboard/</strong> </a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/Tailwind%20CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-</p>
-
-<p align="center">
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/" target="_blank">
-    <img src="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/dashboard_lywsd02.jpg" alt="Dashboard lywsd02 Screenshot" width="600">
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">
+    <img src="https://img.shields.io/badge/OPEN_THE_DASHBOARD-008f91?style=for-the-badge&amp;logo=bluetooth&amp;logoColor=white" alt="Open the LYWSD02 dashboard">
   </a>
 </p>
 
-## 📖 Table of Contents  
-1. [🚀 Key Features](#key-features)
-2. [📋 How to Use](#how-to-use)
-3. [🤝 Contributing](#contributing)
-4. [👥 Contributors](#contributors)
+<p align="center">
+  💻 Use your computer · 📦 No app to install · 🔒 No account · 🌍 9 languages
+</p>
 
+<p align="center">
+  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/stargazers"><img src="https://img.shields.io/github/stars/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=0f3d44" alt="GitHub stars"></a>
+  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/network/members"><img src="https://img.shields.io/github/forks/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=0f3d44" alt="GitHub forks"></a>
+  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/issues"><img src="https://img.shields.io/github/issues/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=e76552" alt="GitHub issues"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f3d44?style=for-the-badge" alt="MIT license"></a>
+</p>
 
-## 🚀 **Key Features**
+<p align="center">
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">
+    <img src="img/dashboard_lywsd02.jpg" alt="Current LYWSD02 dashboard showing a connected Living room sensor, clock settings, temperature, humidity, battery and hourly history" width="1000">
+  </a><br>
+  <sub>Dashboard preview with example readings.</sub>
+</p>
 
-- 🔥 **Real-time Monitoring:**  
-  Display live temperature, humidity, and battery levels from your LYWSD02 sensor.
-- 📡 **BLE Connectivity:**  
-  Seamlessly connect to your sensor using Bluetooth Low Energy for quick data transmission.
-- ⏰ **Time Synchronization:**  
-  Synchronize the sensor's internal clock with your local time zone.
-- 🌡️ **Temperature Unit Configuration:**  
-  Easily switch between Celsius (°C) and Fahrenheit (°F) based on your preference.
-- 📝 **Detailed Logging:**  
-  Access comprehensive logs of device interactions and updates.
-- 💻 **User-Friendly Interface:**  
-  A modern, responsive dashboard built with HTML5, CSS3, and JavaScript.
+<p align="center">
+  <a href="#getting-started">📋 Getting started</a> ·
+  <a href="#features">✨ Features</a> ·
+  <a href="#languages">🌍 Languages</a> ·
+  <a href="#multiple-sensors">📡 Multiple sensors</a> ·
+  <a href="#connection-help">💬 Connection help</a>
+</p>
 
-## 📋 **How to Use**
+---
 
-1. 🔌 **Connect to Your Sensor:**
-   - Click the **Connect** button.
-   - Select your LYWSD02 sensor from the device chooser.
-2. ⏱️ **Synchronize Time:**
-   - Click the **Sync Device Time** button to update the sensor's internal clock with your local time.
-3. 🌡️ **Configure Temperature Unit:**
-   - Choose your preferred temperature unit (Celsius or Fahrenheit).
-   - Click the **Save Unit Preference** button.
-4. 📜 **Monitor Device Logs:**
-   - View real-time device interactions and updates in the **Device Logs** section.
+<a id="getting-started"></a>
 
+## 📋 Update your device in a few clicks
 
-## 🤝 Contributing
+You need a **Xiaomi Mijia LYWSD02** and a **Bluetooth-enabled Windows, Mac or Linux computer**. Open the dashboard in **Chrome, Edge or a compatible Chromium browser**; Bluetooth availability also depends on your operating system and adapter.
 
-I appreciate and encourage community contributions! If you'd like to help improve this project, here’s how you can get involved.
+1. **Open [the dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/)** and turn on your computer’s Bluetooth. Keep the sensor nearby.
+2. **Click “Find a sensor”** and select your LYWSD02 in the browser’s device list.
+3. **Update the clock.** Choose your time zone and 12- or 24-hour display, then click **“Sync clock”**.
+4. **Set the temperature unit.** Select **°C** or **°F**, then click **“Save unit”** to apply it to the device.
 
-### 🚀 How You Can Contribute
+Your temperature, humidity and battery level appear once connected. Click **“Rename”** to give the sensor a familiar name, such as *Living room* or *Bedroom*.
 
-- 🐛 **Report Issues:** Found a bug or an issue? Open a new issue in our GitHub repository.  
-- 💡 **Suggest Features:** Have an idea for improvement? Share it by opening an issue.  
-- 🛠️ **Contribute Code:** Fork the repository, make changes, and submit a pull request to help enhance the project.  
+> ⏰ Automatic clock correction is enabled by default: it corrects drift greater than 10 seconds when you connect. Turn it off if you prefer to synchronize manually.
 
-### 📌 Contribution Guide
+> 📱 Visiting from your phone? The site provides a link to copy and open on your computer. Safari and Firefox cannot connect through this dashboard.
 
-1. **Fork** the repository.  
-2. **Create a new branch** for your feature or bug fix :  
-   ```bash
-   git checkout -b my-feature-branch
-   ```
-2. **Make changes** and commit them with a clear message :  
-   ```bash
-   git commit -am "Add my new feature"
-   ```
-2. **Push your branch** to your forked repository :  
-   ```bash
-   git push origin my-feature-branch
-   ```
-5. **Open a pull request** to the main repository, describing your changes and why they should be merged.
+<a id="features"></a>
 
-## 👥 **Contributors**
+## ✨ What you can do
+
+| | What it does |
+| --- | --- |
+| ⏰ **Keep the right time** | Synchronize the clock with your computer, select your time zone and correct clock drift automatically. |
+| ⚙️ **Choose your display** | Switch between 12/24-hour time and Celsius/Fahrenheit. |
+| 🌡️ **Check your room** | See live temperature and humidity, plus the sensor’s battery level. |
+| 📊 **Read past measurements** | Retrieve up to 96 hourly records with minimum/maximum values and download them as CSV. |
+| 🏷️ **Find your sensors again** | Save local names and reconnect from your device history. |
+| 🔄 **Recover from a drop** | Retry automatically, up to 10 attempts. Stop a connection at any time. |
+
+The connection is local. Measurements and saved sensor names stay in your browser, with no account or cloud service required.
+
+<a id="languages"></a>
+
+## 🌍 Use the dashboard in your language
+
+English is the default. Choose your language in the dashboard or open it directly below. Your selection is remembered on that browser.
+
+<p align="center">
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">English</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=fr">Français</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=es">Español</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=it">Italiano</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=de">Deutsch</a><br>
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=ar">العربية</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=zh">中文</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=pt">Português</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=hi">हिन्दी</a>
+</p>
+
+Arabic includes a right-to-left layout.
+
+<a id="multiple-sensors"></a>
+
+## 📡 Have more than one sensor?
+
+Connect each sensor once and give it a name with **“Rename”**. Your **Device history** keeps its name, last connection and latest readings, so you can recognize it next time.
+
+- **Reconnect** connects directly to a saved sensor when your browser allows it.
+- **Select again** opens the browser’s device list. The dashboard checks that you chose the saved sensor before connecting.
+- The **trash icon** removes a sensor from your dashboard history.
+
+The names are saved in this browser. They do not rename entries in the browser’s Bluetooth chooser or follow you to another computer.
+
+<a id="connection-help"></a>
+
+## 💬 Need help connecting?
+
+- **The connection is taking too long:** click **“Stop connecting”**. It remains available during connection attempts and retry delays. If the browser’s device chooser is open, use its **Cancel** button.
+- **The connection drops:** leave **Automatic reconnection** enabled for up to **10 attempts**. Turning it off prevents further retries.
+- **Bluetooth is unavailable:** check that Bluetooth is turned on, use a compatible browser and open the [official dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/) on your computer.
+- **Something still looks wrong:** [report an issue](https://github.com/drslid/LYWSD02_BLE_Dashboard/issues/new) with your browser, operating system and the message shown in the activity log.
+
+<a id="contributing"></a>
+
+## 🤝 Help improve the dashboard
+
+Found a bug, have a feature idea or spotted a translation to improve? [Open an issue](https://github.com/drslid/LYWSD02_BLE_Dashboard/issues). Contributions and pull requests are welcome.
+
+For local setup, tests and device protocol details, see the [contributor and technical notes](docs/DEVELOPMENT.md).
+
+<a id="contributors"></a>
+
+## 👥 Contributors
 
 <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=drslid/LYWSD02_BLE_Dashboard" alt="LYWSD02_BLE_Dashboard Contributors"/>
+  <img src="https://contrib.rocks/image?repo=drslid/LYWSD02_BLE_Dashboard" alt="Contributors to LYWSD02 BLE Dashboard">
 </a>
 
-<p align="right"><a href="#top">⬆️ Back to top</a></p>
+Released under the [MIT License](LICENSE).
 
+<p align="right"><a href="#top">⬆️ Back to top</a></p>
