@@ -6,13 +6,17 @@ This page collects implementation details and the device research behind the das
 
 ## Run locally
 
-No build step or package installation is required.
+The generated pages are committed to the repository. No build step or package installation is required to serve them.
 
 ```bash
 python3 -m http.server 4173
 ```
 
 Open `http://127.0.0.1:4173/`. Real Web Bluetooth tests should use the HTTPS GitHub Pages deployment; localhost is accepted as a secure development context by Chromium.
+
+English is served at `/`; other languages have their own directories, such as `/fr/` for French and `/ar/` for Arabic.
+
+The page URL determines its language, even when a different preference was saved previously. Old `?lang=fr` links redirect to `/fr/` in the browser, preserving other query parameters and fragments.
 
 Run the connection regression checks with Node.js, without installing packages:
 
@@ -22,19 +26,57 @@ node tests/connection-regressions.cjs
 
 These checks simulate device switching, cancellation during connection setup, delayed Bluetooth responses and the retry limit. They do not replace validation with physical sensors.
 
+## Update pages and translations
+
+Edit `templates/index.html` for shared markup and `i18n.js` for translations. Then regenerate the static HTML pages and sitemap with Node.js, without installing packages:
+
+```bash
+node scripts/build-locales.cjs
+```
+
+The generator writes the English `index.html`, eight translated `index.html` files under `fr/`, `es/`, `it/`, `de/`, `ar/`, `zh/`, `pt/` and `hi/`, and `sitemap.xml`. Commit the generated files with their source changes. Each page includes its translated content and metadata before JavaScript runs; the shared scripts provide Bluetooth controls and language switching.
+
+Verify that generated files match their sources and check the SEO configuration:
+
+```bash
+node scripts/build-locales.cjs --check
+node --test tests/seo.test.cjs
+node --test tests/locale-routing.test.cjs
+```
+
+The locale-routing checks exercise language selection and legacy `?lang=` links under both localhost and the GitHub Pages project path, including unavailable browser storage.
+
+## Search indexing on GitHub Pages
+
+The sitemap lists the nine canonical language URLs. Each page identifies its canonical URL and links to the other languages with `hreflang`. Keep the deployment URL consistent in the generator and in `robots.txt` if hosting changes.
+
+GitHub Pages serves this project under `/LYWSD02_BLE_Dashboard/`. Its `robots.txt` is available at `/LYWSD02_BLE_Dashboard/robots.txt`, but Google only reads a robots file at the host root, `https://drslid.github.io/robots.txt`. The root URL returned HTTP 404 during the September 13, 2026 audit; Google treats that response as having no crawl restrictions. The project file therefore neither blocks crawling nor announces the sitemap to Google through the robots protocol. See [Google's robots.txt location and HTTP status rules](https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec).
+
+To announce the sitemap, submit `https://drslid.github.io/LYWSD02_BLE_Dashboard/sitemap.xml` in Google Search Console after verifying the site property. Alternatively, if you control the separate `drslid.github.io` repository that serves the host root, add this line to that site's root `robots.txt`, preserving any existing rules and sitemap entries:
+
+```text
+Sitemap: https://drslid.github.io/LYWSD02_BLE_Dashboard/sitemap.xml
+```
+
+Neither submitting a sitemap nor publishing it in robots.txt guarantees indexing. See [Google's sitemap submission guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap#addsitemap).
+
 ## Project structure
 
 ```text
-index.html          Semantic application shell and SEO metadata
-app.js              Bluetooth, reconnect, history and device persistence
-i18n.js             Nine language catalogs and localized metadata
-styles.css          Responsive LTR/RTL interface
-site.webmanifest    Installable app metadata
-robots.txt          Crawler policy and sitemap location
-sitemap.xml         English and eight localized URLs
-img/                Product, social preview and icon assets
-tests/              Connection and device-switching regression checks
-docs/               Contributor and technical documentation
+templates/index.html     Source markup for all language pages
+scripts/build-locales.cjs Static page and sitemap generator
+index.html               Generated English page
+fr/, es/, it/, de/       Generated French, Spanish, Italian and German pages
+ar/, zh/, pt/, hi/       Generated Arabic, Chinese, Portuguese and Hindi pages
+app.js                   Bluetooth, reconnect, history and device persistence
+i18n.js                  Nine language catalogs and localized metadata
+styles.css               Responsive LTR/RTL interface
+site.webmanifest         Installable app metadata
+robots.txt               Project robots file; see GitHub Pages scope above
+sitemap.xml              Generated English and eight localized URLs
+img/                     Product, social preview and icon assets
+tests/                   Connection and SEO regression checks
+docs/                    Contributor and technical documentation
 ```
 
 ## Protocol notes

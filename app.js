@@ -1110,10 +1110,7 @@
   }
 
   function localizedPublishedUrl() {
-    const url = new URL(BASE_URL);
-    const locale = window.LYWSD02_I18N?.locale() || 'en';
-    if (locale !== 'en') url.searchParams.set('lang', locale);
-    return url.href;
+    return window.LYWSD02_I18N?.publishedUrl() || BASE_URL;
   }
 
   async function copyCanonicalAddress() {

@@ -17,54 +17,63 @@
 
   const SEO = {
     en: {
+      imageAlt: 'Xiaomi Mijia LYWSD02 Bluetooth dashboard preview',
       title: 'LYWSD02 Bluetooth Dashboard: sync, monitor and configure',
       description: 'Connect your Xiaomi Mijia LYWSD02 by Bluetooth to monitor temperature, humidity and battery, sync its clock and export sensor history without cloud services.',
       ogTitle: 'Sync and get more from your Xiaomi Mijia LYWSD02',
       ogDescription: 'Live measurements, clock sync, display settings and internal history through local Web Bluetooth.'
     },
     fr: {
+      imageAlt: 'Aperçu du tableau de bord Bluetooth Xiaomi Mijia LYWSD02',
       title: 'Dashboard Bluetooth LYWSD02 : synchroniser et configurer',
       description: 'Connectez votre Xiaomi Mijia LYWSD02 en Bluetooth : température, humidité, batterie, synchronisation de l’horloge et export de l’historique, sans cloud.',
       ogTitle: 'Synchronisez et exploitez pleinement votre Xiaomi Mijia LYWSD02',
       ogDescription: 'Mesures en direct, horloge, réglages d’affichage et historique interne via Web Bluetooth local.'
     },
     es: {
+      imageAlt: 'Vista previa del panel Bluetooth Xiaomi Mijia LYWSD02',
       title: 'Panel Bluetooth LYWSD02: sincronizar, medir y configurar',
       description: 'Conecta tu Xiaomi Mijia LYWSD02 por Bluetooth para ver temperatura, humedad y batería, sincronizar el reloj y exportar el historial sin usar la nube.',
       ogTitle: 'Sincroniza y aprovecha al máximo tu Xiaomi Mijia LYWSD02',
       ogDescription: 'Mediciones en directo, reloj, ajustes de pantalla e historial interno mediante Web Bluetooth local.'
     },
     it: {
+      imageAlt: 'Anteprima della dashboard Bluetooth Xiaomi Mijia LYWSD02',
       title: 'Dashboard Bluetooth LYWSD02: sincronizza e configura',
       description: 'Collega Xiaomi Mijia LYWSD02 via Bluetooth per leggere temperatura, umidità e batteria, sincronizzare l’orologio ed esportare lo storico senza cloud.',
       ogTitle: 'Sincronizza e sfrutta al meglio Xiaomi Mijia LYWSD02',
       ogDescription: 'Misure in tempo reale, orologio, impostazioni display e storico interno tramite Web Bluetooth locale.'
     },
     de: {
+      imageAlt: 'Vorschau des Bluetooth-Dashboards für Xiaomi Mijia LYWSD02',
       title: 'LYWSD02 Bluetooth-Dashboard: synchronisieren und einstellen',
       description: 'Xiaomi Mijia LYWSD02 per Bluetooth verbinden: Temperatur, Luftfeuchte und Batterie ablesen, Uhr synchronisieren und Verlauf ohne Cloud exportieren.',
       ogTitle: 'Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen',
       ogDescription: 'Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.'
     },
     ar: {
+      imageAlt: 'معاينة لوحة تحكم بلوتوث Xiaomi Mijia LYWSD02',
       title: 'لوحة بلوتوث LYWSD02 للمزامنة والمراقبة والإعداد',
       description: 'اتصل بجهاز Xiaomi Mijia LYWSD02 عبر البلوتوث لعرض الحرارة والرطوبة والبطارية ومزامنة الساعة وتصدير السجل محليًا دون خدمات سحابية.',
       ogTitle: 'زامن جهاز Xiaomi Mijia LYWSD02 واستفد منه بالكامل',
       ogDescription: 'قياسات مباشرة ومزامنة الساعة وإعدادات الشاشة والسجل الداخلي عبر Web Bluetooth محلي.'
     },
     zh: {
+      imageAlt: 'Xiaomi Mijia LYWSD02 蓝牙控制面板预览',
       title: 'LYWSD02 蓝牙控制面板：同步、监测与设置',
       description: '通过蓝牙连接 Xiaomi Mijia LYWSD02，查看温度、湿度和电量，同步时钟并导出设备历史记录，全程无需云服务。',
       ogTitle: '同步并充分使用你的 Xiaomi Mijia LYWSD02',
       ogDescription: '通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。'
     },
     pt: {
+      imageAlt: 'Pré-visualização do painel Bluetooth Xiaomi Mijia LYWSD02',
       title: 'Painel Bluetooth LYWSD02: sincronizar, medir e configurar',
       description: 'Ligue o Xiaomi Mijia LYWSD02 por Bluetooth para ver temperatura, humidade e bateria, sincronizar o relógio e exportar o histórico sem cloud.',
       ogTitle: 'Sincronize e aproveite melhor o Xiaomi Mijia LYWSD02',
       ogDescription: 'Medições em direto, relógio, definições do ecrã e histórico interno através de Web Bluetooth local.'
     },
     hi: {
+      imageAlt: 'Xiaomi Mijia LYWSD02 ब्लूटूथ डैशबोर्ड का पूर्वावलोकन',
       title: 'LYWSD02 ब्लूटूथ डैशबोर्ड: सिंक, मॉनिटर और सेटिंग',
       description: 'Xiaomi Mijia LYWSD02 को ब्लूटूथ से जोड़कर तापमान, नमी और बैटरी देखें, घड़ी सिंक करें और बिना क्लाउड के इतिहास निर्यात करें।',
       ogTitle: 'अपने Xiaomi Mijia LYWSD02 को सिंक करें और पूरा उपयोग करें',
@@ -378,14 +387,29 @@
     }
   };
 
-  const urlLocale = new URLSearchParams(location.search).get('lang');
-  let storedLocale = null;
-  try {
-    storedLocale = localStorage.getItem(STORAGE_KEY);
-  } catch {
-    storedLocale = null;
+  // The static page generator uses the same catalogs as the browser.
+  if (typeof module === 'object' && module.exports) {
+    module.exports = { BASE_URL, LOCALES, SEO, MESSAGES };
+    return;
   }
-  let locale = LOCALES[urlLocale] ? urlLocale : LOCALES[storedLocale] ? storedLocale : 'en';
+
+  const appRoot = new URL('./', document.currentScript.src);
+  const pageLocale = document.documentElement.dataset.locale;
+  const locale = Object.hasOwn(LOCALES, pageLocale) ? pageLocale : 'en';
+  const urlLocale = new URLSearchParams(location.search).get('lang');
+
+  function navigationUrl(code) {
+    const url = new URL(code === 'en' ? './' : `${code}/`, appRoot);
+    url.search = location.search;
+    url.searchParams.delete('lang');
+    url.hash = location.hash;
+    return url;
+  }
+
+  // Keep previously shared query-string links working on GitHub Pages and localhost.
+  if (Object.hasOwn(LOCALES, urlLocale)) {
+    location.replace(navigationUrl(urlLocale));
+  }
 
   function interpolate(message, values = {}) {
     return message.replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match);
@@ -397,9 +421,7 @@
   }
 
   function localizedUrl(code) {
-    const url = new URL(BASE_URL);
-    if (code !== 'en') url.searchParams.set('lang', code);
-    return url.href;
+    return new URL(code === 'en' ? './' : `${code}/`, BASE_URL).href;
   }
 
   function setMeta(selector, value) {
@@ -444,10 +466,12 @@
     setMeta('meta[property="og:locale"]', config.og);
     setMeta('meta[name="twitter:title"]', seo.ogTitle);
     setMeta('meta[name="twitter:description"]', seo.ogDescription);
+    setMeta('meta[property="og:image:alt"]', seo.imageAlt);
+    setMeta('meta[name="twitter:image:alt"]', seo.imageAlt);
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', localizedUrl(locale));
 
     document.querySelectorAll('[data-i18n]').forEach((element) => {
-      element.textContent = t(element.dataset.i18n);
+      element.textContent = t(element.dataset.i18n, { count: 0 });
     });
     document.querySelectorAll('[data-i18n-title]').forEach((element) => {
       element.title = t(element.dataset.i18nTitle);
@@ -468,16 +492,13 @@
   }
 
   function setLocale(nextLocale) {
-    if (!LOCALES[nextLocale]) return;
+    if (!Object.hasOwn(LOCALES, nextLocale)) return;
     try {
       localStorage.setItem(STORAGE_KEY, nextLocale);
     } catch {
       // The URL still keeps the selected language stable.
     }
-    const nextUrl = new URL(location.href);
-    if (nextLocale === 'en') nextUrl.searchParams.delete('lang');
-    else nextUrl.searchParams.set('lang', nextLocale);
-    location.assign(nextUrl);
+    location.assign(navigationUrl(nextLocale));
   }
 
   window.LYWSD02_I18N = {
@@ -485,6 +506,7 @@
     locale: () => locale,
     localeTag: () => LOCALES[locale].tag,
     locales: LOCALES,
+    publishedUrl: () => localizedUrl(locale),
     setLocale,
     t
   };

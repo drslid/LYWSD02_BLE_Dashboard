@@ -81,18 +81,18 @@ The connection is local. Measurements and saved sensor names stay in your browse
 
 ## 🌍 Use the dashboard in your language
 
-English is the default. Choose your language in the dashboard or open it directly below. Your selection is remembered on that browser.
+English is the default. Choose your language in the dashboard or open it directly below. Bookmark your language’s link to open it directly next time.
 
 <p align="center">
   <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">English</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=fr">Français</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=es">Español</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=it">Italiano</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=de">Deutsch</a><br>
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=ar">العربية</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=zh">中文</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=pt">Português</a> ·
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/?lang=hi">हिन्दी</a>
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/fr/">Français</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/es/">Español</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/it/">Italiano</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/de/">Deutsch</a><br>
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/ar/">العربية</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/">中文</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/pt/">Português</a> ·
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/hi/">हिन्दी</a>
 </p>
 
 Arabic includes a right-to-left layout.

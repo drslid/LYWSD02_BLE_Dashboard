@@ -8,7 +8,6 @@
 	"start_url": "./",
 	"scope": "./",
 	"display": "standalone",
-	"display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
 	"orientation": "any",
 	"background_color": "#f3f5f1",
 	"theme_color": "#0f3d44",
@@ -25,7 +24,7 @@
 			"src": "img/android-chrome-512x512.png",
 			"sizes": "512x512",
 			"type": "image/png",
-			"purpose": "any maskable"
+			"purpose": "any"
 		}
 	]
 }
