@@ -1,0 +1,114 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "bluetooth_confirm": {
+        "description": "{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Den Zeitplan kannst du später unter Konfigurieren ändern."
+      },
+      "user": {
+        "description": "Wähle die LYWSD02-Uhr, die immer richtig gehen soll.",
+        "data": {
+          "address": "Uhr"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Diese Uhr ist bereits eingerichtet.",
+      "already_in_progress": "Diese Uhr wird bereits eingerichtet.",
+      "no_devices_found": "Keine LYWSD02-Uhr gefunden. Bring sie näher an deinen Bluetooth-Adapter oder -Proxy und versuche es erneut."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Automatische Synchronisierung",
+        "description": "Wann soll Home Assistant die Uhr stellen? Zeitumstellungen werden immer innerhalb einer Stunde korrigiert, und die Schaltfläche „Uhr synchronisieren“ funktioniert jederzeit.",
+        "data": {
+          "schedule": "Häufigkeit"
+        }
+      },
+      "daily": {
+        "title": "Jeden Tag",
+        "data": {
+          "time": "Uhrzeit"
+        },
+        "data_description": {
+          "time": "Am besten ein ruhiger Moment, zum Beispiel nachts."
+        }
+      },
+      "weekly": {
+        "title": "Jede Woche",
+        "data": {
+          "weekday": "Tag",
+          "time": "Uhrzeit"
+        }
+      },
+      "cron": {
+        "title": "Eigener Zeitplan",
+        "description": "Fünf Felder: Minute Stunde Tag Monat Wochentag. Beispiele: `0 4 * * *` jeden Tag um 04:00, `30 3 * * 1` jeden Montag um 03:30, `0 */6 * * *` alle 6 Stunden.",
+        "data": {
+          "cron": "Cron-Ausdruck"
+        }
+      }
+    },
+    "error": {
+      "invalid_cron": "Dieser Cron-Ausdruck ist ungültig.",
+      "too_frequent": "Lass mindestens eine Stunde zwischen zwei Synchronisierungen, um die Batterie zu schonen."
+    }
+  },
+  "selector": {
+    "schedule": {
+      "options": {
+        "daily": "Jeden Tag (empfohlen)",
+        "weekly": "Jede Woche",
+        "manual": "Keine geplante Synchronisierung",
+        "cron": "Benutzerdefiniert (Cron-Ausdruck)"
+      }
+    },
+    "weekday": {
+      "options": {
+        "mon": "Montag",
+        "tue": "Dienstag",
+        "wed": "Mittwoch",
+        "thu": "Donnerstag",
+        "fri": "Freitag",
+        "sat": "Samstag",
+        "sun": "Sonntag"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_clock": {
+        "name": "Uhr synchronisieren"
+      }
+    },
+    "sensor": {
+      "last_sync": {
+        "name": "Letzte Synchronisierung"
+      },
+      "next_sync": {
+        "name": "Nächste Synchronisierung"
+      },
+      "sync_status": {
+        "name": "Synchronisierungsstatus",
+        "state": {
+          "synced": "Pünktlich",
+          "waiting": "Warte auf die Uhr",
+          "failed": "Fehlgeschlagen, neuer Versuch folgt"
+        }
+      },
+      "clock_drift": {
+        "name": "Abweichung vor der letzten Synchronisierung"
+      }
+    }
+  },
+  "exceptions": {
+    "not_in_range": {
+      "message": "{name} ist außerhalb der Bluetooth-Reichweite. Die Uhr wird synchronisiert, sobald sie wieder erkannt wird."
+    },
+    "sync_failed": {
+      "message": "{name} konnte nicht synchronisiert werden: {error}"
+    }
+  }
+}

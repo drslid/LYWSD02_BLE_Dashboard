@@ -1,0 +1,28 @@
+{
+  "entity": {
+    "button": {
+      "sync_clock": {
+        "default": "mdi:clock-edit-outline"
+      }
+    },
+    "sensor": {
+      "last_sync": {
+        "default": "mdi:clock-check-outline"
+      },
+      "next_sync": {
+        "default": "mdi:clock-start"
+      },
+      "sync_status": {
+        "default": "mdi:clock-outline",
+        "state": {
+          "synced": "mdi:clock-check-outline",
+          "waiting": "mdi:clock-alert-outline",
+          "failed": "mdi:clock-remove-outline"
+        }
+      },
+      "clock_drift": {
+        "default": "mdi:timer-sand"
+      }
+    }
+  }
+}

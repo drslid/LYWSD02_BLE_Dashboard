@@ -1,0 +1,114 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "bluetooth_confirm": {
+        "description": "¿Mantener {name} en hora? Home Assistant ajusta su reloj ahora mismo, luego cada noche a las 04:00 y tras cada cambio de horario. Puedes cambiar la programación más tarde con Configurar."
+      },
+      "user": {
+        "description": "Elige el reloj LYWSD02 que quieres mantener en hora.",
+        "data": {
+          "address": "Reloj"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Este reloj ya está configurado.",
+      "already_in_progress": "Este reloj ya se está configurando.",
+      "no_devices_found": "No se ha encontrado ningún reloj LYWSD02. Acércalo a tu adaptador o proxy Bluetooth e inténtalo de nuevo."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sincronización automática",
+        "description": "¿Cuándo debe Home Assistant ajustar el reloj? Los cambios de horario siempre se corrigen en menos de una hora y el botón Sincronizar reloj funciona en cualquier momento.",
+        "data": {
+          "schedule": "Frecuencia"
+        }
+      },
+      "daily": {
+        "title": "Cada día",
+        "data": {
+          "time": "Hora"
+        },
+        "data_description": {
+          "time": "Mejor en un momento tranquilo, por ejemplo de noche."
+        }
+      },
+      "weekly": {
+        "title": "Cada semana",
+        "data": {
+          "weekday": "Día",
+          "time": "Hora"
+        }
+      },
+      "cron": {
+        "title": "Programación personalizada",
+        "description": "Cinco campos: minuto hora día mes día-de-la-semana. Ejemplos: `0 4 * * *` cada día a las 04:00, `30 3 * * 1` cada lunes a las 03:30, `0 */6 * * *` cada 6 horas.",
+        "data": {
+          "cron": "Expresión cron"
+        }
+      }
+    },
+    "error": {
+      "invalid_cron": "Esta expresión cron no es válida.",
+      "too_frequent": "Deja al menos una hora entre dos sincronizaciones para ahorrar batería."
+    }
+  },
+  "selector": {
+    "schedule": {
+      "options": {
+        "daily": "Cada día (recomendado)",
+        "weekly": "Cada semana",
+        "manual": "Sin sincronización programada",
+        "cron": "Personalizada (expresión cron)"
+      }
+    },
+    "weekday": {
+      "options": {
+        "mon": "Lunes",
+        "tue": "Martes",
+        "wed": "Miércoles",
+        "thu": "Jueves",
+        "fri": "Viernes",
+        "sat": "Sábado",
+        "sun": "Domingo"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_clock": {
+        "name": "Sincronizar reloj"
+      }
+    },
+    "sensor": {
+      "last_sync": {
+        "name": "Última sincronización"
+      },
+      "next_sync": {
+        "name": "Próxima sincronización"
+      },
+      "sync_status": {
+        "name": "Estado de la sincronización",
+        "state": {
+          "synced": "En hora",
+          "waiting": "Esperando al reloj",
+          "failed": "Error, se reintentará"
+        }
+      },
+      "clock_drift": {
+        "name": "Desfase antes de la última sincronización"
+      }
+    }
+  },
+  "exceptions": {
+    "not_in_range": {
+      "message": "{name} está fuera del alcance Bluetooth. Se sincronizará en cuanto se vuelva a detectar."
+    },
+    "sync_failed": {
+      "message": "No se pudo sincronizar {name}: {error}"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "config": {
+    "flow_title": "{name}",
+    "step": {
+      "bluetooth_confirm": {
+        "description": "Keep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. You can change the schedule later with Configure."
+      },
+      "user": {
+        "description": "Choose the LYWSD02 clock to keep on time.",
+        "data": {
+          "address": "Clock"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This clock is already set up.",
+      "already_in_progress": "This clock is already being set up.",
+      "no_devices_found": "No LYWSD02 clock found. Bring it closer to your Bluetooth adapter or proxy, then try again."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Automatic sync",
+        "description": "When should Home Assistant set the clock? Daylight saving changes are always corrected within the hour, and the Sync clock button works at any time.",
+        "data": {
+          "schedule": "Frequency"
+        }
+      },
+      "daily": {
+        "title": "Every day",
+        "data": {
+          "time": "Time"
+        },
+        "data_description": {
+          "time": "A quiet moment, such as the night, works best."
+        }
+      },
+      "weekly": {
+        "title": "Every week",
+        "data": {
+          "weekday": "Day",
+          "time": "Time"
+        }
+      },
+      "cron": {
+        "title": "Custom schedule",
+        "description": "Five fields: minute hour day month weekday. Examples: `0 4 * * *` every day at 04:00, `30 3 * * 1` every Monday at 03:30, `0 */6 * * *` every 6 hours.",
+        "data": {
+          "cron": "Cron expression"
+        }
+      }
+    },
+    "error": {
+      "invalid_cron": "This cron expression is not valid.",
+      "too_frequent": "Leave at least one hour between two syncs to save the battery."
+    }
+  },
+  "selector": {
+    "schedule": {
+      "options": {
+        "daily": "Every day (recommended)",
+        "weekly": "Every week",
+        "manual": "No scheduled sync",
+        "cron": "Custom (cron expression)"
+      }
+    },
+    "weekday": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "sync_clock": {
+        "name": "Sync clock"
+      }
+    },
+    "sensor": {
+      "last_sync": {
+        "name": "Last sync"
+      },
+      "next_sync": {
+        "name": "Next sync"
+      },
+      "sync_status": {
+        "name": "Sync status",
+        "state": {
+          "synced": "On time",
+          "waiting": "Waiting for the clock",
+          "failed": "Failed, retrying"
+        }
+      },
+      "clock_drift": {
+        "name": "Drift before last sync"
+      }
+    }
+  },
+  "exceptions": {
+    "not_in_range": {
+      "message": "{name} is out of Bluetooth range. It will be synchronized as soon as it is seen again."
+    },
+    "sync_failed": {
+      "message": "Could not sync {name}: {error}"
+    }
+  }
+}
