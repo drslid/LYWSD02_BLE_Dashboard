@@ -46,6 +46,20 @@ node --test tests/locale-routing.test.cjs
 
 The locale-routing checks exercise language selection and legacy `?lang=` links under both localhost and the GitHub Pages project path, including unavailable browser storage.
 
+## Test the Home Assistant integration
+
+The integration lives in `custom_components/lywsd02_sync` and is distributed through HACS from this repository (`hacs.json`). Its tests run the real Home Assistant with a simulated clock and Bluetooth presence, using [pytest-homeassistant-custom-component](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) in a dedicated virtual environment:
+
+```bash
+python3.14 -m venv .venv
+.venv/bin/pip install pytest-homeassistant-custom-component==0.13.367 aiousbwatcher==1.1.2 serialx==1.10.0
+.venv/bin/python -m pytest
+```
+
+This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time value, schedules and cron validation, discovery and options flows, out-of-range and failed syncs, daylight saving changes, restarts and translations.
+
+Home Assistant 2026.3 and later read the integration icon from `custom_components/lywsd02_sync/brand/`. Confirm Bluetooth behavior with a physical clock before publishing a release.
+
 ## Search indexing on GitHub Pages
 
 The sitemap lists the nine canonical language URLs. Each page identifies its canonical URL and links to the other languages with `hreflang`. Keep the deployment URL consistent in the generator and in `robots.txt` if hosting changes.
@@ -75,7 +89,9 @@ site.webmanifest         Installable app metadata
 robots.txt               Project robots file; see GitHub Pages scope above
 sitemap.xml              Generated English and eight localized URLs
 img/                     Product, social preview and icon assets
-tests/                   Connection and SEO regression checks
+custom_components/       Home Assistant integration installed by HACS
+hacs.json                HACS name and minimum Home Assistant version
+tests/                   Connection, SEO and Home Assistant checks
 docs/                    Contributor and technical documentation
 ```
 
@@ -94,6 +110,8 @@ The dashboard uses the Xiaomi service `EBE0CCB0-7A0A-4B0C-8A1A-6FF2997DA3A6` and
 | Battery | `EBE0CCC4-7A0A-4B0C-8A1A-6FF2997DA3A6` |
 
 Celsius is written as `0xFF`; Fahrenheit is `0x01`. Temperature notifications are decoded as signed little-endian values so negative readings remain valid.
+
+The time value has 5 bytes: the Unix time (unsigned 32-bit little-endian) and the UTC offset in whole hours (signed 8-bit). Fractional zones such as UTC+05:30 keep the whole hours in the offset byte and add the remaining minutes to the timestamp. The 12/24-hour display uses a 7-byte command on the same characteristic (`0xAA` in the last byte for 12 hours). Only the LYWSD02MMC accepts it; the plain LYWSD02 rejects its length. The dashboard therefore sends the time first and treats this command as optional, and the Home Assistant integration only writes the time.
 
 ## Widget audit
 
@@ -127,7 +145,7 @@ For most users, passive ESPHome/Home Assistant monitoring, clock synchronization
 - [Web Bluetooth connection cancellation](https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothremotegattserver-disconnect)
 - [h4/lywsd02](https://github.com/h4/lywsd02), stock protocol and history format
 - [ESPHome Xiaomi BLE](https://esphome.io/components/sensor/xiaomi_ble/#lywsd02)
-- [Home Assistant LYWSD02 Sync](https://github.com/ashald/home-assistant-lywsd02)
+- [Home Assistant LYWSD02 Sync](https://github.com/ashald/home-assistant-lywsd02), including [12/24-hour support on the LYWSD02MMC only](https://github.com/ashald/home-assistant-lywsd02/issues/10)
 - [PVVX ATC MiThermometer](https://github.com/pvvx/ATC_MiThermometer)
 - [fildunsky LYWSD02MMC widget](https://github.com/fildunsky/LYWSD02MMC-widget)
 

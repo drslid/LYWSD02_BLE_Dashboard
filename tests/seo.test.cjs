@@ -138,3 +138,24 @@ test('HTML generation escapes translation text and rejects nested markup in tran
   assert.throws(() => renderPage(template.replace('data-i18n="hero.title">', 'data-i18n="hero.title"><b>nested</b>'), 'en'),
     /only text/);
 });
+
+test('each page loads only the font families of its own script', () => {
+  const scripts = { ar: 'Noto+Sans+Arabic', zh: 'Noto+Sans+SC', hi: 'Noto+Sans+Devanagari' };
+  for (const code of codes) {
+    const fonts = tags(read(pagePath(code)), 'link').find((tag) => tag.href?.startsWith('https://fonts.googleapis.com/'));
+    const families = [...fonts.href.matchAll(/family=([^:&]+)/g)].map(([, family]) => family);
+    assert.deepEqual(families, ['JetBrains+Mono', 'Manrope', ...(scripts[code] ? [scripts[code]] : [])], code);
+  }
+});
+
+test('every page offers the Home Assistant integration from desktop and phone', () => {
+  const { domain } = JSON.parse(read('custom_components/lywsd02_sync/manifest.json'));
+  const hacs = 'https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&repository=LYWSD02_BLE_Dashboard&category=integration';
+  for (const code of codes) {
+    const html = read(pagePath(code));
+    const links = tags(html, 'a').map((tag) => tag.href);
+    assert.equal(links.filter((href) => href === hacs).length, 2, `${code}: desktop and phone HACS buttons`);
+    assert.ok(links.includes(`https://my.home-assistant.io/redirect/config_flow_start/?domain=${domain}`), code);
+    assert.ok(links.includes('#home-assistant') && /\sid="home-assistant"/.test(html), `${code}: header link and section`);
+  }
+});

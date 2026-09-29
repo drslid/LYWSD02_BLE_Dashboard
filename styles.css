@@ -299,6 +299,32 @@ html.is-phone .noscript-message {
   font-size: 0.9rem;
 }
 
+.phone-ha {
+  margin-top: 28px;
+  padding: 20px;
+  border: 1px solid rgba(110, 220, 224, 0.35);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.phone-ha h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
+.phone-ha p:not(.eyebrow) {
+  margin: 10px 0 16px;
+  color: #c8d7d7;
+  font-size: 0.88rem;
+}
+
+.phone-ha__button {
+  width: 100%;
+  color: var(--deep-2);
+  background: #6edce0;
+}
+
 .phone-product__features {
   display: grid;
   gap: 16px;
@@ -560,6 +586,7 @@ html.is-phone .noscript-message {
 
 .connection-panel,
 .tool-panel,
+.ha-panel,
 .logs-panel {
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -596,6 +623,7 @@ html.is-phone .noscript-message {
 
 .connection-heading h2,
 .tool-panel__header h2,
+.ha-panel h2,
 .logs-panel h2,
 .rename-dialog h2 {
   margin: 0;
@@ -778,6 +806,10 @@ html.is-phone .noscript-message {
   color: var(--ink-soft);
   border: 1px solid var(--line);
   background: #fff;
+}
+
+a.button {
+  text-decoration: none;
 }
 
 .connect-button {
@@ -1272,6 +1304,12 @@ input[type="range"] {
   background: #edf7f4;
 }
 
+.field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.64rem;
+}
+
 .count-badge {
   padding: 5px 8px;
   color: var(--teal-dark);
@@ -1356,6 +1394,117 @@ input[type="range"] {
 
 .history-table-wrap tbody tr:last-child td {
   border-bottom: 0;
+}
+
+.ha-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 20px 28px;
+  margin-top: 16px;
+  padding: 24px;
+  scroll-margin-top: 88px;
+}
+
+.ha-panel__intro {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ha-panel__intro p:last-child {
+  margin: 10px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+}
+
+.ha-steps,
+.ha-points {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ha-steps li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 58px;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f8faf8;
+}
+
+.ha-steps li > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  color: #fff;
+  background: var(--deep);
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.ha-steps p {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ha-steps .button {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+
+.ha-points {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ha-points li {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 11px 12px;
+  color: var(--ink-soft);
+  border: 1px solid #cfe0dc;
+  border-radius: 6px;
+  background: #edf7f4;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.ha-points svg {
+  color: var(--teal-dark);
+}
+
+.ha-note {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+  align-items: flex-start;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.ha-note svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-top: 1px;
+}
+
+.ha-note a {
+  color: var(--teal-dark);
+  font-weight: 800;
 }
 
 .logs-panel {
@@ -1567,6 +1716,14 @@ html[dir="rtl"] .site-footer .container > p:last-child {
     grid-template-columns: 1fr;
   }
 
+  .ha-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .ha-points {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .known-devices ul {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1647,6 +1804,19 @@ html[dir="rtl"] .site-footer .container > p:last-child {
 
   .history-toolbar > label {
     grid-column: 1 / -1;
+  }
+
+  .ha-steps li {
+    grid-template-columns: 28px minmax(0, 1fr);
+  }
+
+  .ha-steps .button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .ha-points {
+    grid-template-columns: 1fr;
   }
 
   .site-footer .container {

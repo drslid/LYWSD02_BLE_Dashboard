@@ -13,8 +13,8 @@
     })();
   </script>
 
-  <title>LYWSD02 蓝牙控制面板：同步、监测与设置</title>
-  <meta name="description" content="通过蓝牙连接 Xiaomi Mijia LYWSD02，查看温度、湿度和电量，同步时钟并导出设备历史记录，全程无需云服务。">
+  <title>Xiaomi LYWSD02 时间同步与蓝牙控制面板</title>
+  <meta name="description" content="通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。">
   <meta name="author" content="drslid">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#0f3d44">
@@ -67,7 +67,7 @@
   <link rel="preload" href="../img/lywsd02-product.webp" as="image" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@400;600;700;800&amp;family=Noto+Sans+Devanagari:wght@400;600;700;800&amp;family=Noto+Sans+SC:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans+SC:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
 
   <script id="structuredData" type="application/ld+json">
@@ -80,14 +80,14 @@
       "name": "同步并充分使用你的 Xiaomi Mijia LYWSD02",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/",
       "inLanguage": "zh-CN",
-      "description": "通过蓝牙连接 Xiaomi Mijia LYWSD02，查看温度、湿度和电量，同步时钟并导出设备历史记录，全程无需云服务。"
+      "description": "通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。"
     },
     {
       "@type": "WebApplication",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#app",
       "name": "同步并充分使用你的 Xiaomi Mijia LYWSD02",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/",
-      "description": "通过蓝牙连接 Xiaomi Mijia LYWSD02，查看温度、湿度和电量，同步时钟并导出设备历史记录，全程无需云服务。",
+      "description": "通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Windows, macOS, Linux",
       "browserRequirements": "A Chromium browser with Web Bluetooth and HTTPS",
@@ -100,7 +100,8 @@
         "同步时钟, 时钟偏差超过 10 秒时自动校正",
         "时间格式, 温度单位",
         "导出 CSV 历史",
-        "设备历史, 自动重连"
+        "设备历史, 自动重连",
+        "用 Home Assistant 让每个时钟保持准确"
       ],
       "author": {
         "@type": "Person",
@@ -154,6 +155,12 @@
       </div>
       <p id="copyAddressStatus" class="copy-status" aria-live="polite"></p>
       <p class="phone-gate__note"><i data-lucide="shield-check" aria-hidden="true"></i><span data-i18n="mobile.privacy">本地连接，无需账户，传感器数据不会发送到服务器。</span></p>
+      <section class="phone-ha" aria-labelledby="mobile-ha-title">
+        <p class="eyebrow" data-i18n="ha.kicker">自动化</p>
+        <h2 id="mobile-ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
+        <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成每晚自动校准时钟，跟随夏令时切换，并添加“同步时钟”按钮。无需 YAML，无需云服务。</p>
+        <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a>
+      </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
         <img src="../img/lywsd02-product.webp" width="1000" height="1000" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 蓝牙温湿度计与时钟">
         <h2 id="mobile-product-title" data-i18n="hero.title">同步、调校并充分使用你的 Xiaomi Mijia LYWSD02。</h2>
@@ -195,6 +202,9 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="zh" selected>中文</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
             </select>
           </label>
+          <a class="github-link" href="#home-assistant">
+            <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
+          </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
             <i data-lucide="github" aria-hidden="true"></i><span data-i18n="header.github">GitHub</span>
           </a>
@@ -287,7 +297,7 @@
           <header class="tool-panel__header"><span class="tool-panel__icon"><i data-lucide="sliders-horizontal" aria-hidden="true"></i></span><div><p class="section-kicker" data-i18n="settings.kicker">显示</p><h2 id="settings-title" data-i18n="settings.title">时钟与单位</h2></div></header>
           <div class="form-grid">
             <label class="field field--wide" for="timezone"><span data-i18n="settings.timezone">时区</span><select id="timezone" class="requires-connection" disabled><option value="0" data-i18n="settings.systemTimezone">系统时区</option></select></label>
-            <fieldset class="field-group"><legend data-i18n="settings.timeFormat">时间格式</legend><div class="segmented-control"><label><input class="requires-connection" type="radio" name="clockMode" value="24" checked disabled><span>24 h</span></label><label><input class="requires-connection" type="radio" name="clockMode" value="12" disabled><span>12 h</span></label></div></fieldset>
+            <fieldset class="field-group"><legend data-i18n="settings.timeFormat">时间格式</legend><div class="segmented-control"><label><input class="requires-connection" type="radio" name="clockMode" value="24" checked disabled><span>24 h</span></label><label><input class="requires-connection" type="radio" name="clockMode" value="12" disabled><span>12 h</span></label></div><p class="field-hint" data-i18n="settings.timeFormatHint">12 小时制显示：仅限 LYWSD02MMC。</p></fieldset>
             <fieldset class="field-group"><legend data-i18n="settings.unit">温度单位</legend><div class="segmented-control segmented-control--temperature"><label><input class="requires-connection" type="radio" name="unit" value="C" checked disabled><span>°C</span></label><label><input class="requires-connection" type="radio" name="unit" value="F" disabled><span>°F</span></label></div></fieldset>
             <label class="field field--wide" for="offsetMinutesRange"><span><span data-i18n="settings.correction">单次校正</span><output id="offsetOutput" for="offsetMinutesRange">0 min</output></span><div class="range-field"><input id="offsetMinutesRange" class="requires-connection" type="range" min="-120" max="120" value="0" disabled><input id="offsetMinutes" class="requires-connection" type="number" min="-120" max="120" value="0" aria-label="Correction in minutes" disabled></div></label>
           </div>
@@ -302,6 +312,29 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">连接传感器后读取其存储。</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">日期</th><th data-i18n="history.tempMin">最低温度</th><th data-i18n="history.tempMax">最高温度</th><th data-i18n="history.humidity">湿度</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">自动化</p>
+            <h2 id="ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
+            <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成每晚自动校准时钟，跟随夏令时切换，并添加“同步时钟”按钮。无需 YAML，无需云服务。</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">将 LYWSD02 Clock Sync 添加到 HACS。</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">下载后重启 Home Assistant。</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">确认自动发现的时钟，或手动添加。</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">添加时钟</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">默认每晚 04:00 同步</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">每天、每周或自定义 cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">夏令时切换一小时内校正</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">支持 ESPHome 蓝牙代理</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">需要 HACS 以及 Home Assistant 中可用的蓝牙：本地适配器或支持主动连接的代理。</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">阅读指南</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">

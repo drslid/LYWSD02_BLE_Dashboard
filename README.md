@@ -8,12 +8,15 @@
 
 <p align="center">
   <strong>Get your Xiaomi Mijia LYWSD02 back on time.</strong><br>
-  Update its clock, choose your display settings and check your room’s temperature — straight from your browser.
+  Update its clock, choose your display settings and check your room’s temperature — straight from your browser, or automatically with Home Assistant.
 </p>
 
 <p align="center">
   <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">
     <img src="https://img.shields.io/badge/OPEN_THE_DASHBOARD-008f91?style=for-the-badge&amp;logo=bluetooth&amp;logoColor=white" alt="Open the LYWSD02 dashboard">
+  </a>
+  <a href="#home-assistant">
+    <img src="https://img.shields.io/badge/HOME_ASSISTANT_·_HACS-0f3d44?style=for-the-badge&amp;logo=homeassistant&amp;logoColor=white" alt="Keep your clocks on time with Home Assistant">
   </a>
 </p>
 
@@ -38,6 +41,7 @@
 <p align="center">
   <a href="#getting-started">📋 Getting started</a> ·
   <a href="#features">✨ Features</a> ·
+  <a href="#home-assistant">🏠 Home Assistant</a> ·
   <a href="#languages">🌍 Languages</a> ·
   <a href="#multiple-sensors">📡 Multiple sensors</a> ·
   <a href="#connection-help">💬 Connection help</a>
@@ -53,7 +57,7 @@ You need a **Xiaomi Mijia LYWSD02** and a **Bluetooth-enabled Windows, Mac or Li
 
 1. **Open [the dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/)** and turn on your computer’s Bluetooth. Keep the sensor nearby.
 2. **Click “Find a sensor”** and select your LYWSD02 in the browser’s device list.
-3. **Update the clock.** Choose your time zone and 12- or 24-hour display, then click **“Sync clock”**.
+3. **Update the clock.** Choose your time zone, then click **“Sync clock”**. The 12-hour display is only available on the LYWSD02MMC; the plain LYWSD02 always shows 24 hours.
 4. **Set the temperature unit.** Select **°C** or **°F**, then click **“Save unit”** to apply it to the device.
 
 Your temperature, humidity and battery level appear once connected. Click **“Rename”** to give the sensor a familiar name, such as *Living room* or *Bedroom*.
@@ -69,13 +73,71 @@ Your temperature, humidity and battery level appear once connected. Click **“R
 | | What it does |
 | --- | --- |
 | ⏰ **Keep the right time** | Synchronize the clock with your computer, select your time zone and correct clock drift automatically. |
-| ⚙️ **Choose your display** | Switch between 12/24-hour time and Celsius/Fahrenheit. |
+| ⚙️ **Choose your display** | Switch between Celsius/Fahrenheit, and 12/24-hour time on the LYWSD02MMC. |
 | 🌡️ **Check your room** | See live temperature and humidity, plus the sensor’s battery level. |
 | 📊 **Read past measurements** | Retrieve up to 96 hourly records with minimum/maximum values and download them as CSV. |
 | 🏷️ **Find your sensors again** | Save local names and reconnect from your device history. |
 | 🔄 **Recover from a drop** | Retry automatically, up to 10 attempts. Stop a connection at any time. |
+| 🏠 **Automate it** | Let [Home Assistant](#home-assistant) set every clock each night and after daylight saving changes. |
 
 The connection is local. Measurements and saved sensor names stay in your browser, with no account or cloud service required.
+
+<a id="home-assistant"></a>
+
+## 🏠 Keep every clock on time with Home Assistant
+
+The **LYWSD02 Clock Sync** integration sets your clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. There is nothing to write in YAML.
+
+You need **Home Assistant 2025.2 or later**, **[HACS](https://www.hacs.xyz/)** and working **Bluetooth** in Home Assistant: a local adapter or an [ESPHome Bluetooth proxy](https://esphome.io/components/bluetooth_proxy/) with active connections.
+
+1. **Add the integration to HACS**, then select **Download**:
+
+   [![Open your Home Assistant instance and open this repository in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&repository=LYWSD02_BLE_Dashboard&category=integration)
+
+2. **Restart Home Assistant.**
+3. **Add your clocks.** Home Assistant discovers nearby LYWSD02 clocks: select **Add** on the notification. You can also add one yourself:
+
+   [![Open your Home Assistant instance and start setting up LYWSD02 Clock Sync.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync)
+
+That’s it: each clock is synchronized immediately.
+
+> Without HACS, copy `custom_components/lywsd02_sync` into the `custom_components` folder of your Home Assistant configuration, then restart.
+
+### Choose when clocks are synchronized
+
+Open **Settings → Devices & services → LYWSD02 Clock Sync → Configure** and pick a frequency. Only the settings of that frequency are asked next.
+
+| Frequency | Settings | Good for |
+| --- | --- | --- |
+| **Every day** *(recommended, default)* | Time, 04:00 by default | Most homes |
+| **Every week** | Day and time | Accurate clocks and saving battery |
+| **No scheduled sync** | — | Syncing only with the button or your own automations |
+| **Custom (cron expression)** | Five fields, e.g. `30 3 * * 1` every Monday at 03:30 | Advanced schedules |
+
+Whatever you choose:
+
+- **Daylight saving changes** are corrected within the hour.
+- **A clock out of range** is synchronized as soon as Home Assistant sees it again.
+- **A failed connection** is retried after 5, 15, 30 and then 60 minutes.
+- Custom schedules keep **at least one hour** between two syncs, because each connection uses coin-cell energy.
+
+### What you get
+
+| Entity | What it shows |
+| --- | --- |
+| **Sync clock** button | Sets the clock now. Use it in dashboards and automations with `button.press`. |
+| **Last sync** | When the clock was last set. |
+| **Next sync** | When the next scheduled sync runs. |
+| **Sync status** | *On time*, *Waiting for the clock* (out of range) or *Failed, retrying*. |
+| **Drift before last sync** *(diagnostic)* | How far the clock had drifted, in seconds. |
+
+The clock uses the time zone configured in Home Assistant. The integration speaks the nine languages of the dashboard.
+
+### If a clock is not synchronized
+
+- **Waiting for the clock:** move it closer to your Bluetooth adapter or add an ESPHome Bluetooth proxy with `bluetooth_proxy: active: true`.
+- **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button shows the exact error.
+- **12-hour display:** set it once from the [dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/) on a LYWSD02MMC. Home Assistant only sets the time, so your display choice is kept.
 
 <a id="languages"></a>
 

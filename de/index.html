@@ -13,8 +13,8 @@
     })();
   </script>
 
-  <title>LYWSD02 Bluetooth-Dashboard: synchronisieren und einstellen</title>
-  <meta name="description" content="Xiaomi Mijia LYWSD02 per Bluetooth verbinden: Temperatur, Luftfeuchte und Batterie ablesen, Uhr synchronisieren und Verlauf ohne Cloud exportieren.">
+  <title>Xiaomi LYWSD02 Uhrzeit einstellen: Bluetooth-Dashboard</title>
+  <meta name="description" content="Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud.">
   <meta name="author" content="drslid">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#0f3d44">
@@ -67,7 +67,7 @@
   <link rel="preload" href="../img/lywsd02-product.webp" as="image" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans+Arabic:wght@400;600;700;800&amp;family=Noto+Sans+Devanagari:wght@400;600;700;800&amp;family=Noto+Sans+SC:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&amp;family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../styles.css">
 
   <script id="structuredData" type="application/ld+json">
@@ -80,14 +80,14 @@
       "name": "Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/de/",
       "inLanguage": "de",
-      "description": "Xiaomi Mijia LYWSD02 per Bluetooth verbinden: Temperatur, Luftfeuchte und Batterie ablesen, Uhr synchronisieren und Verlauf ohne Cloud exportieren."
+      "description": "Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud."
     },
     {
       "@type": "WebApplication",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#app",
       "name": "Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/de/",
-      "description": "Xiaomi Mijia LYWSD02 per Bluetooth verbinden: Temperatur, Luftfeuchte und Batterie ablesen, Uhr synchronisieren und Verlauf ohne Cloud exportieren.",
+      "description": "Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Windows, macOS, Linux",
       "browserRequirements": "A Chromium browser with Web Bluetooth and HTTPS",
@@ -100,7 +100,8 @@
         "Uhr synchronisieren, Uhrabweichung über 10 Sekunden automatisch korrigieren",
         "Zeitformat, Temperatureinheit",
         "Verlauf als CSV exportieren",
-        "Geräteverlauf, Automatisch neu verbinden"
+        "Geräteverlauf, Automatisch neu verbinden",
+        "Jede Uhr pünktlich mit Home Assistant"
       ],
       "author": {
         "@type": "Person",
@@ -154,6 +155,12 @@
       </div>
       <p id="copyAddressStatus" class="copy-status" aria-live="polite"></p>
       <p class="phone-gate__note"><i data-lucide="shield-check" aria-hidden="true"></i><span data-i18n="mobile.privacy">Lokale Verbindung. Kein Konto und keine Übertragung an einen Server.</span></p>
+      <section class="phone-ha" aria-labelledby="mobile-ha-title">
+        <p class="eyebrow" data-i18n="ha.kicker">Automatisierung</p>
+        <h2 id="mobile-ha-title" data-i18n="ha.title">Jede Uhr pünktlich mit Home Assistant</h2>
+        <p data-i18n="ha.lead">Die kostenlose Integration LYWSD02 Clock Sync stellt deine Uhren jede Nacht, folgt der Zeitumstellung und ergänzt eine Schaltfläche „Uhr synchronisieren“. Ohne YAML, ohne Cloud.</p>
+        <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">In HACS öffnen</span></a>
+      </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
         <img src="../img/lywsd02-product.webp" width="1000" height="1000" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 Bluetooth-Thermometer, Hygrometer und Uhr">
         <h2 id="mobile-product-title" data-i18n="hero.title">Xiaomi Mijia LYWSD02 synchronisieren, einstellen und optimal nutzen.</h2>
@@ -195,6 +202,9 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="de" selected>Deutsch</option><option value="ar">العربية</option><option value="zh">中文</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
             </select>
           </label>
+          <a class="github-link" href="#home-assistant">
+            <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
+          </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
             <i data-lucide="github" aria-hidden="true"></i><span data-i18n="header.github">GitHub</span>
           </a>
@@ -287,7 +297,7 @@
           <header class="tool-panel__header"><span class="tool-panel__icon"><i data-lucide="sliders-horizontal" aria-hidden="true"></i></span><div><p class="section-kicker" data-i18n="settings.kicker">Anzeige</p><h2 id="settings-title" data-i18n="settings.title">Uhr und Einheit</h2></div></header>
           <div class="form-grid">
             <label class="field field--wide" for="timezone"><span data-i18n="settings.timezone">Zeitzone</span><select id="timezone" class="requires-connection" disabled><option value="0" data-i18n="settings.systemTimezone">Systemzeitzone</option></select></label>
-            <fieldset class="field-group"><legend data-i18n="settings.timeFormat">Zeitformat</legend><div class="segmented-control"><label><input class="requires-connection" type="radio" name="clockMode" value="24" checked disabled><span>24 h</span></label><label><input class="requires-connection" type="radio" name="clockMode" value="12" disabled><span>12 h</span></label></div></fieldset>
+            <fieldset class="field-group"><legend data-i18n="settings.timeFormat">Zeitformat</legend><div class="segmented-control"><label><input class="requires-connection" type="radio" name="clockMode" value="24" checked disabled><span>24 h</span></label><label><input class="requires-connection" type="radio" name="clockMode" value="12" disabled><span>12 h</span></label></div><p class="field-hint" data-i18n="settings.timeFormatHint">12-Stunden-Anzeige: nur LYWSD02MMC.</p></fieldset>
             <fieldset class="field-group"><legend data-i18n="settings.unit">Temperatureinheit</legend><div class="segmented-control segmented-control--temperature"><label><input class="requires-connection" type="radio" name="unit" value="C" checked disabled><span>°C</span></label><label><input class="requires-connection" type="radio" name="unit" value="F" disabled><span>°F</span></label></div></fieldset>
             <label class="field field--wide" for="offsetMinutesRange"><span><span data-i18n="settings.correction">Einmalige Korrektur</span><output id="offsetOutput" for="offsetMinutesRange">0 min</output></span><div class="range-field"><input id="offsetMinutesRange" class="requires-connection" type="range" min="-120" max="120" value="0" disabled><input id="offsetMinutes" class="requires-connection" type="number" min="-120" max="120" value="0" aria-label="Correction in minutes" disabled></div></label>
           </div>
@@ -302,6 +312,29 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">Sensor verbinden, um seinen Speicher zu lesen.</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">Datum</th><th data-i18n="history.tempMin">Temp. min.</th><th data-i18n="history.tempMax">Temp. max.</th><th data-i18n="history.humidity">Luftfeuchte</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">Automatisierung</p>
+            <h2 id="ha-title" data-i18n="ha.title">Jede Uhr pünktlich mit Home Assistant</h2>
+            <p data-i18n="ha.lead">Die kostenlose Integration LYWSD02 Clock Sync stellt deine Uhren jede Nacht, folgt der Zeitumstellung und ergänzt eine Schaltfläche „Uhr synchronisieren“. Ohne YAML, ohne Cloud.</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">LYWSD02 Clock Sync zu HACS hinzufügen.</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">In HACS öffnen</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">Herunterladen und Home Assistant neu starten.</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">Die erkannte Uhr bestätigen oder selbst hinzufügen.</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">Uhr hinzufügen</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">Standardmäßig jede Nacht um 04:00</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">Täglich, wöchentlich oder per Cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">Zeitumstellung innerhalb einer Stunde korrigiert</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Funktioniert mit ESPHome-Bluetooth-Proxys</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Erfordert HACS und Bluetooth in Home Assistant: einen lokalen Adapter oder einen Proxy mit aktiven Verbindungen.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Anleitung lesen</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">
