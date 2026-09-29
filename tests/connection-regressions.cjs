@@ -27,7 +27,7 @@ function createNode() {
   };
 }
 
-function setup(t, { fakeTimers = false } = {}) {
+function setup(t, { fakeTimers = false, clockMode = '24' } = {}) {
   const nodes = new Map();
   const storage = new Map();
   const timers = new Set();
@@ -41,7 +41,7 @@ function setup(t, { fakeTimers = false } = {}) {
         if (!nodes.has(id)) nodes.set(id, createNode());
         return nodes.get(id);
       },
-      querySelector() { return { value: '24' }; },
+      querySelector(selector) { return { value: selector.includes('clockMode') ? clockMode : '24' }; },
       querySelectorAll() { return []; }
     },
     navigator: {
@@ -75,17 +75,20 @@ function setup(t, { fakeTimers = false } = {}) {
     renderDeviceHistory = () => {};
     renderDeviceIdentity = () => {};
     refreshIcons = () => {};
-    log = () => {};
+    const auditLogs = [];
+    log = (message, type = 'info') => auditLogs.push({ message, type });
     readInitialValues = async () => {};
     refreshGrantedDevices = async () => {};
     globalThis.audit = {
       state, elements, connectToDevice, chooseDevice, cancelConnection, setConnectionControls, handleMeasurement,
-      loadHistory, disconnectManually, readDeviceTime, readBattery, syncTime, collectHistory
+      loadHistory, disconnectManually, readDeviceTime, readBattery, syncTime, collectHistory, logs: auditLogs
     };
   })();`), context);
   assert.ok(context.audit, 'The app harness must be initialized');
   return {
     ...context.audit, storage, bluetooth: context.navigator.bluetooth,
+    // Copy into this realm so deepEqual does not compare the vm's Array prototype.
+    get logs() { return Array.from(context.audit.logs, ({ type, message }) => `${type}:${message}`); },
     scheduler: {
       get pending() { return scheduled.size; },
       runNext() {
@@ -113,6 +116,22 @@ function device(id) {
     }
   };
   return { dev, data, service };
+}
+
+// The plain LYWSD02 time characteristic only accepts its 5-byte value; the LYWSD02MMC also accepts the 7-byte 12/24 h command.
+function clockCharacteristic({ acceptsClockFormat }) {
+  const writes = [];
+  let stored = new Uint8Array(5);
+  return {
+    writes,
+    async writeValueWithResponse(value) {
+      const bytes = (ArrayBuffer.isView(value) ? new Uint8Array(value.buffer, value.byteOffset, value.byteLength) : new Uint8Array(value)).slice();
+      writes.push(bytes);
+      if (bytes.length === 5) stored = bytes;
+      else if (!acceptsClockFormat) throw Object.assign(new Error('GATT Error: invalid attribute length.'), { name: 'InvalidModificationError' });
+    },
+    async readValue() { return new DataView(stored.slice().buffer); }
+  };
 }
 
 function install(app, sensor) {
@@ -279,6 +298,62 @@ test('switching sensors during clock sync stops follow-up writes and clears the 
   assert.equal(writes, 1);
   assert.equal(app.state.deviceTimezoneMinutes, null);
   assert.equal(app.elements.syncBtn.classList.contains('is-loading'), false);
+});
+
+for (const clockMode of ['24', '12']) {
+  test(`clock sync succeeds when a plain LYWSD02 rejects the ${clockMode} h format command`, { timeout: 2000 }, async (t) => {
+    const app = setup(t, { clockMode });
+    const sensor = device('plain');
+    const clock = clockCharacteristic({ acceptsClockFormat: false });
+    sensor.service.getCharacteristic = async () => clock;
+    install(app, sensor);
+    app.elements.timezone.value = '120';
+    app.elements.offsetMinutes.value = '0';
+
+    await app.syncTime();
+
+    assert.deepEqual(clock.writes.map((bytes) => bytes.length), [5, 7]);
+    assert.equal(new DataView(clock.writes[0].buffer).getInt8(4), 2);
+    assert.equal(app.state.deviceTimezoneMinutes, 120);
+    assert.ok(Math.abs(app.state.clockDrift) <= 2, 'The device time is read back after the sync');
+    assert.deepEqual(app.logs, [
+      'success:log.timeSyncedNoFormat',
+      ...(clockMode === '12' ? ['warning:log.clockFormatUnsupported'] : [])
+    ]);
+    assert.equal(app.elements.syncBtn.classList.contains('is-loading'), false);
+    assert.equal(app.elements.syncBtn.disabled, false);
+  });
+}
+
+test('clock sync applies the 12 h format on sensors that accept it', { timeout: 2000 }, async (t) => {
+  const app = setup(t, { clockMode: '12' });
+  const sensor = device('mmc');
+  const clock = clockCharacteristic({ acceptsClockFormat: true });
+  sensor.service.getCharacteristic = async () => clock;
+  install(app, sensor);
+  app.elements.timezone.value = '120';
+
+  await app.syncTime();
+
+  assert.deepEqual(clock.writes.map((bytes) => bytes.length), [5, 7]);
+  assert.equal(clock.writes[1][6], 0xaa);
+  assert.deepEqual(app.logs, ['success:log.timeSynced']);
+});
+
+test('a rejected time write still reports the clock sync failure', async (t) => {
+  const app = setup(t);
+  const sensor = device('failing');
+  let writes = 0;
+  sensor.service.getCharacteristic = async () => ({
+    async writeValueWithResponse() { writes += 1; throw Object.assign(new Error('Write failed'), { name: 'NetworkError' }); }
+  });
+  install(app, sensor);
+
+  await app.syncTime();
+
+  assert.equal(writes, 1);
+  assert.equal(app.state.deviceTimezoneMinutes, null);
+  assert.deepEqual(app.logs, ['error:log.timeSyncFailed']);
 });
 
 test('reconnecting the same sensor rejects reads from its previous connection', async (t) => {

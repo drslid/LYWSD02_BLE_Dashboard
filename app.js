@@ -797,10 +797,16 @@
       const clockMode = document.querySelector('input[name="clockMode"]:checked')?.value || '24';
       const modePayload = new Uint8Array(7);
       modePayload[6] = clockMode === '12' ? 0xaa : 0x00;
-      await writeCharacteristic(characteristic, modePayload);
+      let formatApplied = true;
+      // Only the LYWSD02MMC accepts this 12/24 h command; the plain LYWSD02 rejects it after the time is set.
+      try { await writeCharacteristic(characteristic, modePayload); }
+      catch { formatApplied = false; }
       if (!isCurrentConnection(context)) return;
       state.deviceTimezoneMinutes = desiredOffset;
-      log(automatic ? t('log.autoTimeSynced') : t('log.timeSynced', { mode: clockMode, timezone: formatTimezone(desiredOffset) }), 'success');
+      const timezone = formatTimezone(desiredOffset);
+      if (automatic) log(t('log.autoTimeSynced'), 'success');
+      else log(formatApplied ? t('log.timeSynced', { mode: clockMode, timezone }) : t('log.timeSyncedNoFormat', { timezone }), 'success');
+      if (!formatApplied && clockMode === '12') log(t('log.clockFormatUnsupported'), 'warning');
       await wait(250);
       await readDeviceTime(false, context);
     } catch (error) {
