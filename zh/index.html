@@ -158,7 +158,7 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">自动化</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
-        <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成每晚自动校准时钟，跟随夏令时切换，并添加“同步时钟”按钮。无需 YAML，无需云服务。</p>
+        <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成自动校准时钟，跟随夏令时切换，并可选择 °C/°F、12/24 小时制和时间校正。无需 YAML，无需云服务。</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
@@ -202,7 +202,7 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="zh" selected>中文</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
             </select>
           </label>
-          <a class="github-link" href="#home-assistant">
+          <a class="github-link github-link--ha" href="#home-assistant">
             <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
           </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
@@ -227,6 +227,29 @@
         <figure class="intro__visual">
           <img class="intro__device intro__product" src="../img/lywsd02-product.webp" width="1000" height="1000" fetchpriority="high" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 蓝牙温湿度计与时钟">
         </figure>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">自动化</p>
+            <h2 id="ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
+            <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成自动校准时钟，跟随夏令时切换，并可选择 °C/°F、12/24 小时制和时间校正。无需 YAML，无需云服务。</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">将 LYWSD02 Clock Sync 添加到 HACS。</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">下载后重启 Home Assistant。</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">确认自动发现的时钟，或手动添加。</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">添加时钟</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">默认每晚 04:00 同步</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">每天、每周、每月或自定义 cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">夏令时切换一小时内校正</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">支持 ESPHome 蓝牙代理</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">需要 HACS 以及 Home Assistant 中可用的蓝牙：本地适配器或支持主动连接的代理。</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">阅读指南</a></span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -312,29 +335,6 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">连接传感器后读取其存储。</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">日期</th><th data-i18n="history.tempMin">最低温度</th><th data-i18n="history.tempMax">最高温度</th><th data-i18n="history.humidity">湿度</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
-      </section>
-
-      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
-        <div class="ha-panel__intro">
-          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
-          <div>
-            <p class="section-kicker" data-i18n="ha.kicker">自动化</p>
-            <h2 id="ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
-            <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成每晚自动校准时钟，跟随夏令时切换，并添加“同步时钟”按钮。无需 YAML，无需云服务。</p>
-          </div>
-        </div>
-        <ol class="ha-steps">
-          <li><span>1</span><p data-i18n="ha.step1">将 LYWSD02 Clock Sync 添加到 HACS。</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a></li>
-          <li><span>2</span><p data-i18n="ha.step2">下载后重启 Home Assistant。</p></li>
-          <li><span>3</span><p data-i18n="ha.step3">确认自动发现的时钟，或手动添加。</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">添加时钟</span></a></li>
-        </ol>
-        <ul class="ha-points">
-          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">默认每晚 04:00 同步</span></li>
-          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">每天、每周或自定义 cron</span></li>
-          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">夏令时切换一小时内校正</span></li>
-          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">支持 ESPHome 蓝牙代理</span></li>
-        </ul>
-        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">需要 HACS 以及 Home Assistant 中可用的蓝牙：本地适配器或支持主动连接的代理。</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">阅读指南</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">

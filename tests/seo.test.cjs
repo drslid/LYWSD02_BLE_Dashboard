@@ -159,3 +159,11 @@ test('every page offers the Home Assistant integration from desktop and phone', 
     assert.ok(links.includes('#home-assistant') && /\sid="home-assistant"/.test(html), `${code}: header link and section`);
   }
 });
+
+test('the Home Assistant section comes right after the introduction', () => {
+  for (const code of codes) {
+    const dashboard = read(pagePath(code)).split('<main id="dashboard">')[1];
+    const sections = [...dashboard.matchAll(/<section\b[^>]*class="([^"]+)"/g)].map(([, classes]) => classes.split(' ')[0]);
+    assert.deepEqual(sections.slice(0, 3), ['intro', 'ha-panel', 'compatibility-notice'], code);
+  }
+});

@@ -158,7 +158,7 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">Automazione</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">Tieni ogni orologio all’ora esatta con Home Assistant</h2>
-        <p data-i18n="ha.lead">L’integrazione gratuita LYWSD02 Clock Sync regola gli orologi ogni notte, segue i cambi dell’ora legale e aggiunge un pulsante Sincronizza orologio. Niente YAML, niente cloud.</p>
+        <p data-i18n="ha.lead">L’integrazione gratuita LYWSD02 Clock Sync regola gli orologi automaticamente, segue i cambi dell’ora legale e ti fa scegliere °C/°F, 12/24 h e una correzione dell’ora. Niente YAML, niente cloud.</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Apri in HACS</span></a>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
@@ -202,7 +202,7 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it" selected>Italiano</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="zh">中文</option><option value="pt">Português</option><option value="hi">हिन्दी</option>
             </select>
           </label>
-          <a class="github-link" href="#home-assistant">
+          <a class="github-link github-link--ha" href="#home-assistant">
             <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
           </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
@@ -227,6 +227,29 @@
         <figure class="intro__visual">
           <img class="intro__device intro__product" src="../img/lywsd02-product.webp" width="1000" height="1000" fetchpriority="high" data-i18n-alt="hero.imageAlt" alt="Termometro, igrometro e orologio Bluetooth Xiaomi Mijia LYWSD02">
         </figure>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">Automazione</p>
+            <h2 id="ha-title" data-i18n="ha.title">Tieni ogni orologio all’ora esatta con Home Assistant</h2>
+            <p data-i18n="ha.lead">L’integrazione gratuita LYWSD02 Clock Sync regola gli orologi automaticamente, segue i cambi dell’ora legale e ti fa scegliere °C/°F, 12/24 h e una correzione dell’ora. Niente YAML, niente cloud.</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">Aggiungi LYWSD02 Clock Sync a HACS.</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Apri in HACS</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">Scaricala, poi riavvia Home Assistant.</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">Accetta l’orologio rilevato o aggiungilo tu.</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">Aggiungi un orologio</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">Ogni notte alle 04:00 per impostazione predefinita</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">Giornaliera, settimanale, mensile o cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">Ora legale corretta entro un’ora</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Compatibile con i proxy Bluetooth ESPHome</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Richiede HACS e il Bluetooth in Home Assistant: un adattatore locale o un proxy con connessioni attive.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Leggi la guida</a></span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -312,29 +335,6 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">Collega un sensore per leggerne la memoria.</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">Data</th><th data-i18n="history.tempMin">Temp. min</th><th data-i18n="history.tempMax">Temp. max</th><th data-i18n="history.humidity">Umidità</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
-      </section>
-
-      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
-        <div class="ha-panel__intro">
-          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
-          <div>
-            <p class="section-kicker" data-i18n="ha.kicker">Automazione</p>
-            <h2 id="ha-title" data-i18n="ha.title">Tieni ogni orologio all’ora esatta con Home Assistant</h2>
-            <p data-i18n="ha.lead">L’integrazione gratuita LYWSD02 Clock Sync regola gli orologi ogni notte, segue i cambi dell’ora legale e aggiunge un pulsante Sincronizza orologio. Niente YAML, niente cloud.</p>
-          </div>
-        </div>
-        <ol class="ha-steps">
-          <li><span>1</span><p data-i18n="ha.step1">Aggiungi LYWSD02 Clock Sync a HACS.</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Apri in HACS</span></a></li>
-          <li><span>2</span><p data-i18n="ha.step2">Scaricala, poi riavvia Home Assistant.</p></li>
-          <li><span>3</span><p data-i18n="ha.step3">Accetta l’orologio rilevato o aggiungilo tu.</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">Aggiungi un orologio</span></a></li>
-        </ol>
-        <ul class="ha-points">
-          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">Ogni notte alle 04:00 per impostazione predefinita</span></li>
-          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">Giornaliera, settimanale o cron</span></li>
-          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">Ora legale corretta entro un’ora</span></li>
-          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Compatibile con i proxy Bluetooth ESPHome</span></li>
-        </ul>
-        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Richiede HACS e il Bluetooth in Home Assistant: un adattatore locale o un proxy con connessioni attive.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Leggi la guida</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">

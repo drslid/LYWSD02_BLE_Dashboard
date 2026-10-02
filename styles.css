@@ -480,6 +480,19 @@ html.is-phone .noscript-message {
   align-items: center;
 }
 
+.site-actions .github-link--ha {
+  min-height: 38px;
+  padding: 0 12px;
+  color: #fff;
+  border-radius: 6px;
+  background: var(--deep);
+}
+
+.site-actions .github-link--ha:hover {
+  color: #fff;
+  background: var(--teal-dark);
+}
+
 .intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
@@ -1400,21 +1413,48 @@ input[type="range"] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 20px 28px;
-  margin-top: 16px;
-  padding: 24px;
+  margin-bottom: 22px;
+  padding: 28px;
+  color: #fff;
+  border-color: var(--deep-2);
+  background: linear-gradient(135deg, var(--deep-2), var(--deep));
+  box-shadow: var(--shadow);
   scroll-margin-top: 88px;
+  animation: reveal 480ms 40ms ease both;
+}
+
+.ha-panel h2 {
+  margin-top: 8px;
+  font-size: 1.5rem;
+}
+
+.ha-panel .section-kicker {
+  display: inline-block;
+  margin: 0;
+  padding: 3px 10px;
+  color: var(--deep-2);
+  background: #6edce0;
+  border-radius: 999px;
+}
+
+.ha-panel .tool-panel__icon {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+  color: var(--deep-2);
+  background: #6edce0;
 }
 
 .ha-panel__intro {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: flex-start;
 }
 
 .ha-panel__intro p:last-child {
   margin: 10px 0 0;
-  color: var(--ink-soft);
-  font-size: 0.8rem;
+  color: #c8d7d7;
+  font-size: 0.88rem;
 }
 
 .ha-steps,
@@ -1433,9 +1473,9 @@ input[type="range"] {
   align-items: center;
   min-height: 58px;
   padding: 9px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 6px;
-  background: #f8faf8;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .ha-steps li > span {
@@ -1443,8 +1483,8 @@ input[type="range"] {
   width: 28px;
   height: 28px;
   place-items: center;
-  color: #fff;
-  background: var(--deep);
+  color: var(--deep-2);
+  background: #6edce0;
   border-radius: 50%;
   font-family: var(--font-mono);
   font-size: 0.7rem;
@@ -1453,7 +1493,7 @@ input[type="range"] {
 
 .ha-steps p {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -1462,6 +1502,27 @@ input[type="range"] {
   padding: 8px 14px;
   font-size: 0.74rem;
   white-space: nowrap;
+}
+
+.ha-steps .button--primary {
+  color: var(--deep-2);
+  background: #6edce0;
+  box-shadow: none;
+}
+
+.ha-steps .button--primary:hover:not(:disabled) {
+  background: #a5eef0;
+}
+
+.ha-steps .button--secondary {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  background: transparent;
+}
+
+.ha-steps .button--secondary:hover:not(:disabled) {
+  border-color: #fff;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .ha-points {
@@ -1474,16 +1535,17 @@ input[type="range"] {
   gap: 9px;
   align-items: center;
   padding: 11px 12px;
-  color: var(--ink-soft);
-  border: 1px solid #cfe0dc;
+  color: #e3f1f1;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 6px;
-  background: #edf7f4;
-  font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.74rem;
   font-weight: 700;
 }
 
 .ha-points svg {
-  color: var(--teal-dark);
+  flex: 0 0 auto;
+  color: #6edce0;
 }
 
 .ha-note {
@@ -1492,8 +1554,8 @@ input[type="range"] {
   gap: 8px;
   align-items: flex-start;
   margin: 0;
-  color: var(--muted);
-  font-size: 0.7rem;
+  color: #c8d7d7;
+  font-size: 0.72rem;
 }
 
 .ha-note svg {
@@ -1503,7 +1565,7 @@ input[type="range"] {
 }
 
 .ha-note a {
-  color: var(--teal-dark);
+  color: #6edce0;
   font-weight: 800;
 }
 

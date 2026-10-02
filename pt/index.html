@@ -158,7 +158,7 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">Automação</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">Mantenha todos os relógios à hora certa com o Home Assistant</h2>
-        <p data-i18n="ha.lead">A integração gratuita LYWSD02 Clock Sync acerta os relógios todas as noites, acompanha as mudanças de hora e adiciona um botão Sincronizar relógio. Sem YAML e sem cloud.</p>
+        <p data-i18n="ha.lead">A integração gratuita LYWSD02 Clock Sync acerta os relógios automaticamente, acompanha as mudanças de hora e permite escolher °C/°F, 12/24 h e uma correção da hora. Sem YAML e sem cloud.</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Abrir no HACS</span></a>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
@@ -202,7 +202,7 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="zh">中文</option><option value="pt" selected>Português</option><option value="hi">हिन्दी</option>
             </select>
           </label>
-          <a class="github-link" href="#home-assistant">
+          <a class="github-link github-link--ha" href="#home-assistant">
             <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
           </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
@@ -227,6 +227,29 @@
         <figure class="intro__visual">
           <img class="intro__device intro__product" src="../img/lywsd02-product.webp" width="1000" height="1000" fetchpriority="high" data-i18n-alt="hero.imageAlt" alt="Termómetro, higrómetro e relógio Bluetooth Xiaomi Mijia LYWSD02">
         </figure>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">Automação</p>
+            <h2 id="ha-title" data-i18n="ha.title">Mantenha todos os relógios à hora certa com o Home Assistant</h2>
+            <p data-i18n="ha.lead">A integração gratuita LYWSD02 Clock Sync acerta os relógios automaticamente, acompanha as mudanças de hora e permite escolher °C/°F, 12/24 h e uma correção da hora. Sem YAML e sem cloud.</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">Adicione o LYWSD02 Clock Sync ao HACS.</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Abrir no HACS</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">Transfira-o e reinicie o Home Assistant.</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">Aceite o relógio detetado ou adicione-o manualmente.</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">Adicionar um relógio</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">Todas as noites às 04:00 por predefinição</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">Diária, semanal, mensal ou cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">Mudança de hora corrigida em menos de uma hora</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Funciona com proxies Bluetooth ESPHome</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Requer o HACS e Bluetooth no Home Assistant: um adaptador local ou um proxy com ligações ativas.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Ler o guia</a></span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -312,29 +335,6 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">Ligue um sensor para ler a memória.</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">Data</th><th data-i18n="history.tempMin">Temp. mín.</th><th data-i18n="history.tempMax">Temp. máx.</th><th data-i18n="history.humidity">Humidade</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
-      </section>
-
-      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
-        <div class="ha-panel__intro">
-          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
-          <div>
-            <p class="section-kicker" data-i18n="ha.kicker">Automação</p>
-            <h2 id="ha-title" data-i18n="ha.title">Mantenha todos os relógios à hora certa com o Home Assistant</h2>
-            <p data-i18n="ha.lead">A integração gratuita LYWSD02 Clock Sync acerta os relógios todas as noites, acompanha as mudanças de hora e adiciona um botão Sincronizar relógio. Sem YAML e sem cloud.</p>
-          </div>
-        </div>
-        <ol class="ha-steps">
-          <li><span>1</span><p data-i18n="ha.step1">Adicione o LYWSD02 Clock Sync ao HACS.</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">Abrir no HACS</span></a></li>
-          <li><span>2</span><p data-i18n="ha.step2">Transfira-o e reinicie o Home Assistant.</p></li>
-          <li><span>3</span><p data-i18n="ha.step3">Aceite o relógio detetado ou adicione-o manualmente.</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">Adicionar um relógio</span></a></li>
-        </ol>
-        <ul class="ha-points">
-          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">Todas as noites às 04:00 por predefinição</span></li>
-          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">Diária, semanal ou cron</span></li>
-          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">Mudança de hora corrigida em menos de uma hora</span></li>
-          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Funciona com proxies Bluetooth ESPHome</span></li>
-        </ul>
-        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Requer o HACS e Bluetooth no Home Assistant: um adaptador local ou um proxy com ligações ativas.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Ler o guia</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">

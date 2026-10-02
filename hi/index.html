@@ -158,7 +158,7 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">ऑटोमेशन</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">Home Assistant से हर घड़ी को सही समय पर रखें</h2>
-        <p data-i18n="ha.lead">मुफ़्त LYWSD02 Clock Sync इंटीग्रेशन हर रात आपकी घड़ियाँ सेट करता है, डेलाइट सेविंग के बदलावों का पालन करता है और घड़ी सिंक करें बटन जोड़ता है। बिना YAML, बिना क्लाउड।</p>
+        <p data-i18n="ha.lead">मुफ़्त LYWSD02 Clock Sync इंटीग्रेशन आपकी घड़ियाँ अपने-आप सेट करता है, डेलाइट सेविंग के बदलावों का पालन करता है और °C/°F, 12/24 घंटे और समय सुधार चुनने देता है। बिना YAML, बिना क्लाउड।</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">HACS में खोलें</span></a>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
@@ -202,7 +202,7 @@
               <option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="it">Italiano</option><option value="de">Deutsch</option><option value="ar">العربية</option><option value="zh">中文</option><option value="pt">Português</option><option value="hi" selected>हिन्दी</option>
             </select>
           </label>
-          <a class="github-link" href="#home-assistant">
+          <a class="github-link github-link--ha" href="#home-assistant">
             <i data-lucide="house" aria-hidden="true"></i><span data-i18n="header.homeAssistant">Home Assistant</span>
           </a>
           <a class="github-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard" target="_blank" rel="noopener noreferrer">
@@ -227,6 +227,29 @@
         <figure class="intro__visual">
           <img class="intro__device intro__product" src="../img/lywsd02-product.webp" width="1000" height="1000" fetchpriority="high" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 Bluetooth तापमान, नमी और घड़ी सेंसर">
         </figure>
+      </section>
+
+      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
+        <div class="ha-panel__intro">
+          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
+          <div>
+            <p class="section-kicker" data-i18n="ha.kicker">ऑटोमेशन</p>
+            <h2 id="ha-title" data-i18n="ha.title">Home Assistant से हर घड़ी को सही समय पर रखें</h2>
+            <p data-i18n="ha.lead">मुफ़्त LYWSD02 Clock Sync इंटीग्रेशन आपकी घड़ियाँ अपने-आप सेट करता है, डेलाइट सेविंग के बदलावों का पालन करता है और °C/°F, 12/24 घंटे और समय सुधार चुनने देता है। बिना YAML, बिना क्लाउड।</p>
+          </div>
+        </div>
+        <ol class="ha-steps">
+          <li><span>1</span><p data-i18n="ha.step1">LYWSD02 Clock Sync को HACS में जोड़ें।</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">HACS में खोलें</span></a></li>
+          <li><span>2</span><p data-i18n="ha.step2">इसे डाउनलोड करें, फिर Home Assistant रीस्टार्ट करें।</p></li>
+          <li><span>3</span><p data-i18n="ha.step3">खोजी गई घड़ी स्वीकार करें या स्वयं जोड़ें।</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">घड़ी जोड़ें</span></a></li>
+        </ol>
+        <ul class="ha-points">
+          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">डिफ़ॉल्ट रूप से हर रात 04:00 बजे</span></li>
+          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">रोज़, साप्ताहिक, मासिक या कस्टम cron</span></li>
+          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">डेलाइट सेविंग एक घंटे के भीतर ठीक</span></li>
+          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">ESPHome Bluetooth प्रॉक्सी के साथ काम करता है</span></li>
+        </ul>
+        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Home Assistant में HACS और Bluetooth ज़रूरी है: लोकल एडैप्टर या सक्रिय कनेक्शन वाला प्रॉक्सी।</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">गाइड पढ़ें</a></span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -312,29 +335,6 @@
           <div id="historyEmpty" class="history-empty"><i data-lucide="database" aria-hidden="true"></i><p data-i18n="history.emptyConnect">मेमोरी पढ़ने के लिए सेंसर कनेक्ट करें।</p></div>
           <div id="historyTableWrap" class="history-table-wrap" hidden><table><thead><tr><th data-i18n="history.date">तारीख</th><th data-i18n="history.tempMin">न्यूनतम तापमान</th><th data-i18n="history.tempMax">अधिकतम तापमान</th><th data-i18n="history.humidity">नमी</th></tr></thead><tbody id="historyTableBody"></tbody></table></div>
         </article>
-      </section>
-
-      <section id="home-assistant" class="ha-panel container" aria-labelledby="ha-title">
-        <div class="ha-panel__intro">
-          <span class="tool-panel__icon"><i data-lucide="house" aria-hidden="true"></i></span>
-          <div>
-            <p class="section-kicker" data-i18n="ha.kicker">ऑटोमेशन</p>
-            <h2 id="ha-title" data-i18n="ha.title">Home Assistant से हर घड़ी को सही समय पर रखें</h2>
-            <p data-i18n="ha.lead">मुफ़्त LYWSD02 Clock Sync इंटीग्रेशन हर रात आपकी घड़ियाँ सेट करता है, डेलाइट सेविंग के बदलावों का पालन करता है और घड़ी सिंक करें बटन जोड़ता है। बिना YAML, बिना क्लाउड।</p>
-          </div>
-        </div>
-        <ol class="ha-steps">
-          <li><span>1</span><p data-i18n="ha.step1">LYWSD02 Clock Sync को HACS में जोड़ें।</p><a class="button button--primary" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">HACS में खोलें</span></a></li>
-          <li><span>2</span><p data-i18n="ha.step2">इसे डाउनलोड करें, फिर Home Assistant रीस्टार्ट करें।</p></li>
-          <li><span>3</span><p data-i18n="ha.step3">खोजी गई घड़ी स्वीकार करें या स्वयं जोड़ें।</p><a class="button button--secondary" href="https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync" target="_blank" rel="noopener noreferrer"><i data-lucide="circle-plus" aria-hidden="true"></i><span data-i18n="ha.addButton">घड़ी जोड़ें</span></a></li>
-        </ol>
-        <ul class="ha-points">
-          <li><i data-lucide="moon-star" aria-hidden="true"></i><span data-i18n="ha.point1">डिफ़ॉल्ट रूप से हर रात 04:00 बजे</span></li>
-          <li><i data-lucide="calendar-clock" aria-hidden="true"></i><span data-i18n="ha.point2">रोज़, साप्ताहिक या कस्टम cron</span></li>
-          <li><i data-lucide="sun-moon" aria-hidden="true"></i><span data-i18n="ha.point3">डेलाइट सेविंग एक घंटे के भीतर ठीक</span></li>
-          <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">ESPHome Bluetooth प्रॉक्सी के साथ काम करता है</span></li>
-        </ul>
-        <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Home Assistant में HACS और Bluetooth ज़रूरी है: लोकल एडैप्टर या सक्रिय कनेक्शन वाला प्रॉक्सी।</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">गाइड पढ़ें</a></span></p>
       </section>
 
       <section class="logs-panel container" aria-labelledby="logs-title">
