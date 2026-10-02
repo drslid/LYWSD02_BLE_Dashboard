@@ -15,6 +15,9 @@ from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResu
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
     SelectSelector,
     SelectSelectorConfig,
     SelectSelectorMode,
@@ -25,16 +28,20 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_CRON,
+    CONF_DAY,
     CONF_SCHEDULE,
     CONF_TIME,
     CONF_WEEKDAY,
+    DEFAULT_DAY,
     DEFAULT_OPTIONS,
     DEFAULT_TIME,
     DEFAULT_WEEKDAY,
     DOMAIN,
     LOCAL_NAME_PREFIX,
+    MAX_DAY,
     SCHEDULE_CRON,
     SCHEDULE_DAILY,
+    SCHEDULE_MONTHLY,
     SCHEDULE_WEEKLY,
     SCHEDULES,
     WEEKDAYS,
@@ -125,21 +132,22 @@ class LYWSD02OptionsFlow(OptionsFlow):
     """Choose a frequency first, then only the settings it needs."""
 
     def __init__(self) -> None:
-        """Start from the saved options."""
-        self._options: dict[str, Any] = {}
+        """Start without a chosen frequency."""
+        self._schedule = SCHEDULE_DAILY
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Choose how often the clock is synchronized."""
         if user_input is not None:
-            self._options = {**self.config_entry.options, **user_input}
-            schedule = user_input[CONF_SCHEDULE]
-            if schedule == SCHEDULE_DAILY:
+            self._schedule = user_input[CONF_SCHEDULE]
+            if self._schedule == SCHEDULE_DAILY:
                 return await self.async_step_daily()
-            if schedule == SCHEDULE_WEEKLY:
+            if self._schedule == SCHEDULE_WEEKLY:
                 return await self.async_step_weekly()
-            if schedule == SCHEDULE_CRON:
+            if self._schedule == SCHEDULE_MONTHLY:
+                return await self.async_step_monthly()
+            if self._schedule == SCHEDULE_CRON:
                 return await self.async_step_cron()
-            return self.async_create_entry(data=self._options)
+            return self._save({})
 
         current = self.config_entry.options.get(CONF_SCHEDULE, SCHEDULE_DAILY)
         return self.async_show_form(
@@ -160,7 +168,7 @@ class LYWSD02OptionsFlow(OptionsFlow):
     async def async_step_daily(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Choose the time of the daily sync."""
         if user_input is not None:
-            return self.async_create_entry(data={**self._options, **user_input})
+            return self._save(user_input)
         return self.async_show_form(
             step_id="daily",
             data_schema=vol.Schema({vol.Required(CONF_TIME, default=self._time()): TimeSelector()}),
@@ -169,15 +177,34 @@ class LYWSD02OptionsFlow(OptionsFlow):
     async def async_step_weekly(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Choose the day and time of the weekly sync."""
         if user_input is not None:
-            return self.async_create_entry(data={**self._options, **user_input})
+            return self._save(user_input)
         return self.async_show_form(
             step_id="weekly",
             data_schema=vol.Schema(
                 {
                     vol.Required(
-                        CONF_WEEKDAY, default=self._options.get(CONF_WEEKDAY, DEFAULT_WEEKDAY)
+                        CONF_WEEKDAY,
+                        default=self.config_entry.options.get(CONF_WEEKDAY, DEFAULT_WEEKDAY),
                     ): SelectSelector(
                         SelectSelectorConfig(options=list(WEEKDAYS), translation_key=CONF_WEEKDAY)
+                    ),
+                    vol.Required(CONF_TIME, default=self._time()): TimeSelector(),
+                }
+            ),
+        )
+
+    async def async_step_monthly(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Choose the day and time of the monthly sync."""
+        if user_input is not None:
+            return self._save({**user_input, CONF_DAY: round(user_input[CONF_DAY])})
+        return self.async_show_form(
+            step_id="monthly",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_DAY, default=self.config_entry.options.get(CONF_DAY, DEFAULT_DAY)
+                    ): NumberSelector(
+                        NumberSelectorConfig(min=1, max=MAX_DAY, step=1, mode=NumberSelectorMode.BOX)
                     ),
                     vol.Required(CONF_TIME, default=self._time()): TimeSelector(),
                 }
@@ -192,14 +219,24 @@ class LYWSD02OptionsFlow(OptionsFlow):
             if error := cron_error(expression, dt_util.now()):
                 errors[CONF_CRON] = error
             else:
-                return self.async_create_entry(data={**self._options, CONF_CRON: expression})
+                return self._save({CONF_CRON: expression})
         return self.async_show_form(
             step_id="cron",
             data_schema=vol.Schema(
-                {vol.Required(CONF_CRON, default=self._options.get(CONF_CRON, "0 4 * * *")): TextSelector()}
+                {
+                    vol.Required(
+                        CONF_CRON, default=self.config_entry.options.get(CONF_CRON, "0 4 * * *")
+                    ): TextSelector()
+                }
             ),
             errors=errors,
         )
 
     def _time(self) -> str:
-        return self._options.get(CONF_TIME, DEFAULT_TIME)
+        return self.config_entry.options.get(CONF_TIME, DEFAULT_TIME)
+
+    def _save(self, changes: dict[str, Any]) -> ConfigFlowResult:
+        # Merge into the current options: device page settings may have changed meanwhile.
+        return self.async_create_entry(
+            data={**self.config_entry.options, CONF_SCHEDULE: self._schedule, **changes}
+        )

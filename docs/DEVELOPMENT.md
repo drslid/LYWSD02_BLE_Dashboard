@@ -48,7 +48,7 @@ The locale-routing checks exercise language selection and legacy `?lang=` links 
 
 ## Test the Home Assistant integration
 
-The integration lives in `custom_components/lywsd02_sync` and is distributed through HACS from this repository (`hacs.json`). Its tests run the real Home Assistant with a simulated clock and Bluetooth presence, using [pytest-homeassistant-custom-component](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) in a dedicated virtual environment:
+The integration lives in `custom_components/lywsd02_sync` and is distributed through HACS from this repository (`hacs.json`). Its tests run the real Home Assistant and its real Bluetooth manager, fed by simulated connectable and passive proxies; only the final connection reaches a simulated clock. They use [pytest-homeassistant-custom-component](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) in a dedicated virtual environment:
 
 ```bash
 python3.14 -m venv .venv
@@ -56,7 +56,9 @@ python3.14 -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time value, schedules and cron validation, discovery and options flows, out-of-range and failed syncs, daylight saving changes, restarts and translations.
+This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, daylight saving changes, restarts and translations.
+
+Home Assistant does not call integrations back for every advertisement: identical advertisements are skipped, and when a passive proxy owns a device, a connectable proxy can make it reachable silently. The integration therefore never waits for an advertisement alone. It retries on timers and looks the clock up at each attempt; advertisements only shorten the wait.
 
 Home Assistant 2026.3 and later read the integration icon from `custom_components/lywsd02_sync/brand/`. Confirm Bluetooth behavior with a physical clock before publishing a release.
 
@@ -111,7 +113,7 @@ The dashboard uses the Xiaomi service `EBE0CCB0-7A0A-4B0C-8A1A-6FF2997DA3A6` and
 
 Celsius is written as `0xFF`; Fahrenheit is `0x01`. Temperature notifications are decoded as signed little-endian values so negative readings remain valid.
 
-The time value has 5 bytes: the Unix time (unsigned 32-bit little-endian) and the UTC offset in whole hours (signed 8-bit). Fractional zones such as UTC+05:30 keep the whole hours in the offset byte and add the remaining minutes to the timestamp. The 12/24-hour display uses a 7-byte command on the same characteristic (`0xAA` in the last byte for 12 hours). Only the LYWSD02MMC accepts it; the plain LYWSD02 rejects its length. The dashboard therefore sends the time first and treats this command as optional, and the Home Assistant integration only writes the time.
+The time value has 5 bytes: the Unix time (unsigned 32-bit little-endian) and the UTC offset in whole hours (signed 8-bit). Fractional zones such as UTC+05:30 keep the whole hours in the offset byte and add the remaining minutes to the timestamp. The 12/24-hour display uses a 7-byte command on the same characteristic (`0xAA` in the last byte for 12 hours). Only the LYWSD02MMC accepts it; the plain LYWSD02 rejects its length. The dashboard therefore sends the time first and treats this command as optional. The Home Assistant integration does the same, after the temperature unit, and only when a time format was chosen in Home Assistant.
 
 ## Widget audit
 

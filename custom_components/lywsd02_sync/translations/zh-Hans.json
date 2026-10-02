@@ -3,7 +3,7 @@
     "flow_title": "{name}",
     "step": {
       "bluetooth_confirm": {
-        "description": "要让 {name} 保持准确时间吗？Home Assistant 会立即校准时钟，之后每晚 04:00 以及每次夏令时切换后自动校准。稍后可在“配置”中修改计划。"
+        "description": "要让 {name} 保持准确时间吗？Home Assistant 会立即校准时钟，之后每晚 04:00 以及每次夏令时切换后自动校准。计划、温度单位、时间格式和时间校正稍后可在设备页面中修改。"
       },
       "user": {
         "description": "选择要保持准确时间的 LYWSD02 时钟。",
@@ -22,7 +22,7 @@
     "step": {
       "init": {
         "title": "自动同步",
-        "description": "Home Assistant 应在何时校准时钟？夏令时切换总会在一小时内自动校正，“同步时钟”按钮也可随时使用。",
+        "description": "Home Assistant 应在何时校准时钟？夏令时切换总会在一小时内自动校正，“同步时钟”按钮也可随时使用。温度单位、时间格式和时间校正位于设备页面。",
         "data": {
           "schedule": "频率"
         }
@@ -43,6 +43,16 @@
           "time": "时间"
         }
       },
+      "monthly": {
+        "title": "每月",
+        "data": {
+          "day": "每月几号",
+          "time": "时间"
+        },
+        "data_description": {
+          "day": "1 到 28 号，确保每个月都有这一天。"
+        }
+      },
       "cron": {
         "title": "自定义计划",
         "description": "五个字段：分 时 日 月 星期。示例：`0 4 * * *` 每天 04:00，`30 3 * * 1` 每周一 03:30，`0 */6 * * *` 每 6 小时。",
@@ -61,6 +71,7 @@
       "options": {
         "daily": "每天（推荐）",
         "weekly": "每周",
+        "monthly": "每月",
         "manual": "不按计划同步",
         "cron": "自定义（Cron 表达式）"
       }
@@ -83,6 +94,52 @@
         "name": "同步时钟"
       }
     },
+    "number": {
+      "sync_day": {
+        "name": "每月同步日"
+      },
+      "time_correction": {
+        "name": "时间校正"
+      }
+    },
+    "select": {
+      "sync_frequency": {
+        "name": "自动同步",
+        "state": {
+          "daily": "每天",
+          "weekly": "每周",
+          "monthly": "每月",
+          "manual": "仅手动",
+          "cron": "自定义（Cron）"
+        }
+      },
+      "sync_weekday": {
+        "name": "每周同步日",
+        "state": {
+          "mon": "星期一",
+          "tue": "星期二",
+          "wed": "星期三",
+          "thu": "星期四",
+          "fri": "星期五",
+          "sat": "星期六",
+          "sun": "星期日"
+        }
+      },
+      "temperature_unit": {
+        "name": "温度单位",
+        "state": {
+          "celsius": "°C",
+          "fahrenheit": "°F"
+        }
+      },
+      "clock_format": {
+        "name": "时间格式",
+        "state": {
+          "24h": "24 小时制",
+          "12h": "12 小时制（仅 LYWSD02MMC）"
+        }
+      }
+    },
     "sensor": {
       "last_sync": {
         "name": "上次同步"
@@ -94,12 +151,17 @@
         "name": "同步状态",
         "state": {
           "synced": "时间准确",
-          "waiting": "等待时钟",
+          "waiting": "正在查找时钟",
           "failed": "失败，将重试"
         }
       },
       "clock_drift": {
         "name": "上次同步前的偏差"
+      }
+    },
+    "time": {
+      "sync_time": {
+        "name": "同步时间"
       }
     }
   },
@@ -107,8 +169,24 @@
     "not_in_range": {
       "message": "{name} 超出蓝牙范围。再次检测到后将立即同步。"
     },
+    "passive_only": {
+      "message": "只有无法连接的蓝牙代理能听到 {name}。请在时钟附近的代理上启用连接，或将蓝牙适配器移近。"
+    },
+    "no_connectable_adapter": {
+      "message": "Home Assistant 的蓝牙适配器和代理都无法连接到 {name}。"
+    },
     "sync_failed": {
       "message": "无法同步 {name}：{error}"
+    }
+  },
+  "issues": {
+    "passive_only": {
+      "title": "只有被动蓝牙代理能听到 {name}",
+      "description": "Home Assistant 能听到 {name}，但只能通过无法连接设备的蓝牙代理，因此无法校准时钟。\n\n请任选其一：\n- 在时钟附近的 ESPHome 蓝牙代理上，于 `bluetooth_proxy:` 下设置 `active: true` 启用连接，然后安装更新。\n- 或将 Home Assistant 的蓝牙适配器移近时钟。\n\n一旦可以连接，时钟就会同步，此消息也会消失。"
+    },
+    "no_connectable_adapter": {
+      "title": "没有蓝牙适配器能连接到 {name}",
+      "description": "Home Assistant 没有任何能连接设备的蓝牙适配器或代理，因此无法校准 {name} 的时钟。被动代理和 Shelly 设备只能监听。\n\n请为 Home Assistant 添加蓝牙适配器，或添加在 `bluetooth_proxy:` 下设置了 `active: true` 的 ESPHome 蓝牙代理。一旦可以连接，时钟就会同步，此消息也会消失。"
     }
   }
 }

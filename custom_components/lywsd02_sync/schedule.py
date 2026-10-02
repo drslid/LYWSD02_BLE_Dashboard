@@ -12,15 +12,18 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_CRON,
+    CONF_DAY,
     CONF_SCHEDULE,
     CONF_TIME,
     CONF_WEEKDAY,
+    DEFAULT_DAY,
     DEFAULT_TIME,
     DEFAULT_WEEKDAY,
     MIN_CRON_INTERVAL,
     SCHEDULE_CRON,
     SCHEDULE_DAILY,
     SCHEDULE_MANUAL,
+    SCHEDULE_MONTHLY,
     SCHEDULE_WEEKLY,
     WEEKDAYS,
 )
@@ -34,8 +37,9 @@ def cron_expression(options: Mapping[str, Any]) -> str | None:
     if schedule == SCHEDULE_CRON:
         return str(options[CONF_CRON]).strip()
     at = dt_util.parse_time(options.get(CONF_TIME, DEFAULT_TIME)) or time(4)
-    day = WEEKDAYS[options.get(CONF_WEEKDAY, DEFAULT_WEEKDAY)] if schedule == SCHEDULE_WEEKLY else "*"
-    return f"{at.minute} {at.hour} * * {day}"
+    day = int(options.get(CONF_DAY, DEFAULT_DAY)) if schedule == SCHEDULE_MONTHLY else "*"
+    weekday = WEEKDAYS[options.get(CONF_WEEKDAY, DEFAULT_WEEKDAY)] if schedule == SCHEDULE_WEEKLY else "*"
+    return f"{at.minute} {at.hour} {day} * {weekday}"
 
 
 def next_run(expression: str, after: datetime) -> datetime:

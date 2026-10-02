@@ -5,6 +5,32 @@
         "default": "mdi:clock-edit-outline"
       }
     },
+    "number": {
+      "sync_day": {
+        "default": "mdi:calendar-month-outline"
+      },
+      "time_correction": {
+        "default": "mdi:clock-plus-outline"
+      }
+    },
+    "select": {
+      "sync_frequency": {
+        "default": "mdi:calendar-sync-outline"
+      },
+      "sync_weekday": {
+        "default": "mdi:calendar-week-outline"
+      },
+      "temperature_unit": {
+        "default": "mdi:thermometer",
+        "state": {
+          "celsius": "mdi:temperature-celsius",
+          "fahrenheit": "mdi:temperature-fahrenheit"
+        }
+      },
+      "clock_format": {
+        "default": "mdi:hours-24"
+      }
+    },
     "sensor": {
       "last_sync": {
         "default": "mdi:clock-check-outline"
@@ -22,6 +48,11 @@
       },
       "clock_drift": {
         "default": "mdi:timer-sand"
+      }
+    },
+    "time": {
+      "sync_time": {
+        "default": "mdi:clock-time-four-outline"
       }
     }
   }

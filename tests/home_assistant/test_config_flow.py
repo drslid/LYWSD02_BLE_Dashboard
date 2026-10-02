@@ -94,6 +94,12 @@ async def entry(hass: HomeAssistant) -> MockConfigEntry:
             {"schedule": "weekly", "time": "03:15:00", "weekday": "mon"},
         ),
         (
+            "monthly",
+            "monthly",
+            {"day": 15.0, "time": "02:45:00"},
+            {"schedule": "monthly", "time": "02:45:00", "weekday": "sun", "day": 15},
+        ),
+        (
             "cron",
             "cron",
             {"cron": " 0 */6 * * * "},
@@ -128,6 +134,19 @@ async def test_manual_schedule_needs_no_other_setting(hass: HomeAssistant, entry
     result = await hass.config_entries.options.async_configure(result["flow_id"], {"schedule": "manual"})
     assert result["type"] is FlowResultType.CREATE_ENTRY
     assert entry.options["schedule"] == "manual"
+
+
+async def test_options_keep_settings_changed_on_the_device_page(
+    hass: HomeAssistant, entry: MockConfigEntry
+) -> None:
+    """A setting saved by an entity while the form is open is kept."""
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"schedule": "daily"})
+    hass.config_entries.async_update_entry(entry, options={**entry.options, "temperature_unit": "fahrenheit"})
+
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"time": "05:00:00"})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.options == {**DEFAULT_OPTIONS, "time": "05:00:00", "temperature_unit": "fahrenheit"}
 
 
 @pytest.mark.parametrize(("expression", "error"), [("every day", "invalid_cron"), ("*/10 * * * *", "too_frequent")])

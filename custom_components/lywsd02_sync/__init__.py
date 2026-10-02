@@ -8,7 +8,13 @@ from homeassistant.core import HomeAssistant
 
 from .manager import ClockSyncManager, async_remove_storage
 
-PLATFORMS: list[Platform] = [Platform.BUTTON, Platform.SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.BUTTON,
+    Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
+    Platform.TIME,
+]
 
 type LYWSD02ConfigEntry = ConfigEntry[ClockSyncManager]
 
@@ -24,7 +30,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: LYWSD02ConfigEntry) -> b
 
 
 async def _async_options_updated(hass: HomeAssistant, entry: LYWSD02ConfigEntry) -> None:
-    await hass.config_entries.async_reload(entry.entry_id)
+    # Applied in place: a reload would interrupt a sync in progress.
+    entry.runtime_data.async_apply_options()
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: LYWSD02ConfigEntry) -> bool:

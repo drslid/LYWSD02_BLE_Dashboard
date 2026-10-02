@@ -86,7 +86,7 @@ The connection is local. Measurements and saved sensor names stay in your browse
 
 ## 🏠 Keep every clock on time with Home Assistant
 
-The **LYWSD02 Clock Sync** integration sets your clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. There is nothing to write in YAML.
+The **LYWSD02 Clock Sync** integration sets your clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. Every setting is on the device page; there is nothing to write in YAML.
 
 You need **Home Assistant 2025.2 or later**, **[HACS](https://www.hacs.xyz/)** and working **Bluetooth** in Home Assistant: a local adapter or an [ESPHome Bluetooth proxy](https://esphome.io/components/bluetooth_proxy/) with active connections.
 
@@ -103,23 +103,29 @@ That’s it: each clock is synchronized immediately.
 
 > Without HACS, copy `custom_components/lywsd02_sync` into the `custom_components` folder of your Home Assistant configuration, then restart.
 
-### Choose when clocks are synchronized
+### Set each clock from its device page
 
-Open **Settings → Devices & services → LYWSD02 Clock Sync → Configure** and pick a frequency. Only the settings of that frequency are asked next.
+Open **Settings → Devices & services → LYWSD02 Clock Sync**, then select a clock. Its **Configuration** card holds every setting. Changes reach the clock right away, or as soon as it is in range.
 
-| Frequency | Settings | Good for |
-| --- | --- | --- |
-| **Every day** *(recommended, default)* | Time, 04:00 by default | Most homes |
-| **Every week** | Day and time | Accurate clocks and saving battery |
-| **No scheduled sync** | — | Syncing only with the button or your own automations |
-| **Custom (cron expression)** | Five fields, e.g. `30 3 * * 1` every Monday at 03:30 | Advanced schedules |
+| Setting | Choices |
+| --- | --- |
+| **Automatic sync** | **Every day** *(default)*, **Every week**, **Every month** or **Manual only** |
+| **Sync time** | Time of the automatic sync, 04:00 by default |
+| **Weekly sync day** | Day of the weekly sync |
+| **Monthly sync day** | 1 to 28, so that every month has it |
+| **Temperature unit** | °C or °F on the clock screen |
+| **Time format** | 24 h or 12 h, on the LYWSD02MMC only |
+| **Time correction** | Keeps the clock ahead (+) or behind (−) by up to 120 minutes |
+
+Until you choose a temperature unit or time format here, the clock keeps its own.
+
+For an advanced schedule, select **Configure** on the integration, then **Custom (cron expression)**: five fields, e.g. `30 3 * * 1` for every Monday at 03:30. Custom schedules keep **at least one hour** between two syncs, because each connection uses coin-cell energy.
 
 Whatever you choose:
 
 - **Daylight saving changes** are corrected within the hour.
-- **A clock out of range** is synchronized as soon as Home Assistant sees it again.
+- **A clock out of range** is looked for every minute and synchronized as soon as an adapter can reach it.
 - **A failed connection** is retried after 5, 15, 30 and then 60 minutes.
-- Custom schedules keep **at least one hour** between two syncs, because each connection uses coin-cell energy.
 
 ### What you get
 
@@ -128,16 +134,19 @@ Whatever you choose:
 | **Sync clock** button | Sets the clock now. Use it in dashboards and automations with `button.press`. |
 | **Last sync** | When the clock was last set. |
 | **Next sync** | When the next scheduled sync runs. |
-| **Sync status** | *On time*, *Waiting for the clock* (out of range) or *Failed, retrying*. |
+| **Sync status** | *On time*, *Searching for the clock* or *Failed, retrying*. |
 | **Drift before last sync** *(diagnostic)* | How far the clock had drifted, in seconds. |
 
-The clock uses the time zone configured in Home Assistant. The integration speaks the nine languages of the dashboard.
+The settings are entities too, so automations can change them. The clock uses the time zone configured in Home Assistant. The integration speaks the nine languages of the dashboard.
 
 ### If a clock is not synchronized
 
-- **Waiting for the clock:** move it closer to your Bluetooth adapter or add an ESPHome Bluetooth proxy with `bluetooth_proxy: active: true`.
+- **Searching for the clock:** no Bluetooth adapter can reach it right now. After 5 minutes the log explains why, and **Settings → Repairs** shows what to do when the setup is the cause:
+  - *Only heard by passive Bluetooth proxies*: enable connections on an ESPHome proxy near the clock with `active: true` under `bluetooth_proxy:`, or bring a Bluetooth adapter closer. Shelly devices only listen; they cannot set a clock.
+  - *No Bluetooth adapter can connect*: add a Bluetooth adapter, or an ESPHome proxy with `active: true`.
+  - Without a repair, the clock is out of range: move it closer to an adapter or proxy.
 - **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button shows the exact error.
-- **12-hour display:** set it once from the [dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/) on a LYWSD02MMC. Home Assistant only sets the time, so your display choice is kept.
+- **12 h has no effect:** only the LYWSD02MMC supports it. A plain LYWSD02 stays in 24 h and its time is still set.
 
 <a id="languages"></a>
 

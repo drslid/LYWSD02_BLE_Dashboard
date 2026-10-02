@@ -3,7 +3,7 @@
     "flow_title": "{name}",
     "step": {
       "bluetooth_confirm": {
-        "description": "Keep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. You can change the schedule later with Configure."
+        "description": "Keep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. The schedule, temperature unit, time format and time correction can be changed later on the device page."
       },
       "user": {
         "description": "Choose the LYWSD02 clock to keep on time.",
@@ -22,7 +22,7 @@
     "step": {
       "init": {
         "title": "Automatic sync",
-        "description": "When should Home Assistant set the clock? Daylight saving changes are always corrected within the hour, and the Sync clock button works at any time.",
+        "description": "When should Home Assistant set the clock? Daylight saving changes are always corrected within the hour, and the Sync clock button works at any time. The temperature unit, time format and time correction are on the device page.",
         "data": {
           "schedule": "Frequency"
         }
@@ -43,6 +43,16 @@
           "time": "Time"
         }
       },
+      "monthly": {
+        "title": "Every month",
+        "data": {
+          "day": "Day of the month",
+          "time": "Time"
+        },
+        "data_description": {
+          "day": "From 1 to 28, so that every month has this day."
+        }
+      },
       "cron": {
         "title": "Custom schedule",
         "description": "Five fields: minute hour day month weekday. Examples: `0 4 * * *` every day at 04:00, `30 3 * * 1` every Monday at 03:30, `0 */6 * * *` every 6 hours.",
@@ -61,6 +71,7 @@
       "options": {
         "daily": "Every day (recommended)",
         "weekly": "Every week",
+        "monthly": "Every month",
         "manual": "No scheduled sync",
         "cron": "Custom (cron expression)"
       }
@@ -83,6 +94,52 @@
         "name": "Sync clock"
       }
     },
+    "number": {
+      "sync_day": {
+        "name": "Monthly sync day"
+      },
+      "time_correction": {
+        "name": "Time correction"
+      }
+    },
+    "select": {
+      "sync_frequency": {
+        "name": "Automatic sync",
+        "state": {
+          "daily": "Every day",
+          "weekly": "Every week",
+          "monthly": "Every month",
+          "manual": "Manual only",
+          "cron": "Custom (cron)"
+        }
+      },
+      "sync_weekday": {
+        "name": "Weekly sync day",
+        "state": {
+          "mon": "Monday",
+          "tue": "Tuesday",
+          "wed": "Wednesday",
+          "thu": "Thursday",
+          "fri": "Friday",
+          "sat": "Saturday",
+          "sun": "Sunday"
+        }
+      },
+      "temperature_unit": {
+        "name": "Temperature unit",
+        "state": {
+          "celsius": "°C",
+          "fahrenheit": "°F"
+        }
+      },
+      "clock_format": {
+        "name": "Time format",
+        "state": {
+          "24h": "24 h",
+          "12h": "12 h (LYWSD02MMC only)"
+        }
+      }
+    },
     "sensor": {
       "last_sync": {
         "name": "Last sync"
@@ -94,12 +151,17 @@
         "name": "Sync status",
         "state": {
           "synced": "On time",
-          "waiting": "Waiting for the clock",
+          "waiting": "Searching for the clock",
           "failed": "Failed, retrying"
         }
       },
       "clock_drift": {
         "name": "Drift before last sync"
+      }
+    },
+    "time": {
+      "sync_time": {
+        "name": "Sync time"
       }
     }
   },
@@ -107,8 +169,24 @@
     "not_in_range": {
       "message": "{name} is out of Bluetooth range. It will be synchronized as soon as it is seen again."
     },
+    "passive_only": {
+      "message": "{name} is only heard by Bluetooth proxies that cannot connect. Enable connections on a proxy near the clock, or bring a Bluetooth adapter closer."
+    },
+    "no_connectable_adapter": {
+      "message": "No Bluetooth adapter or proxy of Home Assistant can connect to {name}."
+    },
     "sync_failed": {
       "message": "Could not sync {name}: {error}"
+    }
+  },
+  "issues": {
+    "passive_only": {
+      "title": "{name} is only heard by passive Bluetooth proxies",
+      "description": "Home Assistant hears {name}, but only through Bluetooth proxies that cannot connect to devices, so it cannot set the clock.\n\nDo one of these:\n- On an ESPHome Bluetooth proxy near the clock, enable connections with `active: true` under `bluetooth_proxy:`, then install the update.\n- Or bring a Bluetooth adapter of Home Assistant closer to the clock.\n\nThe clock is synchronized as soon as it can be reached, and this message disappears."
+    },
+    "no_connectable_adapter": {
+      "title": "No Bluetooth adapter can connect to {name}",
+      "description": "Home Assistant has no Bluetooth adapter or proxy that can connect to devices, so it cannot set the clock of {name}. Passive proxies and Shelly devices only listen.\n\nAdd a Bluetooth adapter to Home Assistant, or an ESPHome Bluetooth proxy with `active: true` under `bluetooth_proxy:`. The clock is synchronized as soon as it can be reached, and this message disappears."
     }
   }
 }

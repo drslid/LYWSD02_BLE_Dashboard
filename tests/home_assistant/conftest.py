@@ -2,17 +2,24 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Generator
+from collections.abc import AsyncGenerator, Callable
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
+from bleak.backends.client import BaseBleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from bleak.exc import BleakError
+from bluetooth_data_tools import monotonic_time_coarse
+from habluetooth import BaseHaRemoteScanner, HaBluetoothConnector
 import pytest
 
-from homeassistant.components.bluetooth import BluetoothChange, BluetoothServiceInfoBleak
+from homeassistant.components import bluetooth
+from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
 from homeassistant.core import HomeAssistant
+from homeassistant.setup import async_setup_component
+
+from custom_components.lywsd02_sync.const import TIME_CHARACTERISTIC, UNIT_CHARACTERISTIC
 
 ADDRESS = "E7:2E:01:AB:CD:EF"
 TITLE = "LYWSD02 (CDEF)"
@@ -37,61 +44,81 @@ def service_info(address: str = ADDRESS, name: str = "LYWSD02") -> BluetoothServ
 
 
 class FakeClock:
-    """Time characteristic of a plain LYWSD02: 5-byte values only."""
+    """GATT values of a plain LYWSD02; set mmc for the LYWSD02MMC and its 12/24 h command."""
 
     def __init__(self) -> None:
+        self.mmc = False
         self.value = bytes(5)
+        self.unit = bytes([0xFF])
         self.writes: list[bytes] = []
+        self.units: list[bytes] = []
+        self.formats: list[bytes] = []
         self.disconnects = 0
+        self.on_time_write: Callable[[], None] | None = None
 
     async def read_gatt_char(self, uuid: str) -> bytearray:
-        return bytearray(self.value)
+        return bytearray(self.unit if uuid == UNIT_CHARACTERISTIC else self.value)
 
     async def write_gatt_char(self, uuid: str, data: bytes, response: bool) -> None:
         assert response is True
+        if uuid == UNIT_CHARACTERISTIC:
+            self.units.append(bytes(data))
+            self.unit = bytes(data)
+            return
+        assert uuid == TIME_CHARACTERISTIC
+        if len(data) == 7 and self.mmc:
+            self.formats.append(bytes(data))
+            return
         if len(data) != 5:
             raise BleakError("Invalid attribute length")
         self.writes.append(bytes(data))
         self.value = bytes(data)
+        if self.on_time_write:
+            self.on_time_write()
 
     async def disconnect(self) -> None:
         self.disconnects += 1
 
 
-class BluetoothHarness:
-    """Controls whether the clock is in range and delivers its advertisements."""
+class Proxy(BaseHaRemoteScanner):
+    """Bluetooth proxy; only connectable ones (ESPHome active: true) can reach the clock."""
 
-    def __init__(self, clock: FakeClock) -> None:
+    def hear(self, address: str = ADDRESS, name: str = "LYWSD02") -> None:
+        """Deliver one advertisement, always identical, as a real clock does."""
+        self._async_on_advertisement(address, -60, name, [], {}, {}, None, {}, monotonic_time_coarse())
+
+
+class BluetoothHarness:
+    """Real Home Assistant Bluetooth manager fed by fake proxies; connections reach the fake clock."""
+
+    def __init__(self, hass: HomeAssistant, clock: FakeClock) -> None:
+        self.hass = hass
         self.clock = clock
-        self.in_range = True
         self.connect_error: Exception | None = None
         self.connections = 0
-        self._callbacks: list[Callable[[BluetoothServiceInfoBleak, BluetoothChange], None]] = []
+        self._cleanups: list[Callable[[], None]] = []
 
-    def device(self, hass: HomeAssistant, address: str, connectable: bool = True) -> BLEDevice | None:
-        return BLEDevice(address, "LYWSD02", None) if self.in_range else None
-
-    def present(self, hass: HomeAssistant, address: str, connectable: bool = True) -> bool:
-        return self.in_range
+    def proxy(self, connectable: bool = True) -> Proxy:
+        """Add a Bluetooth proxy to Home Assistant."""
+        source = f"proxy-{len(self._cleanups)}"
+        connector = HaBluetoothConnector(BaseBleakClient, source, lambda: True) if connectable else None
+        scanner = Proxy(source, source, connector, connectable)
+        self._cleanups.append(scanner.async_setup())
+        self._cleanups.append(
+            bluetooth.async_register_scanner(self.hass, scanner, connection_slots=3 if connectable else None)
+        )
+        return scanner
 
     async def connect(self, client_class: Any, device: BLEDevice, name: str, **kwargs: Any) -> FakeClock:
+        assert device.address == ADDRESS
         self.connections += 1
         if self.connect_error:
             raise self.connect_error
         return self.clock
 
-    def register(self, hass: HomeAssistant, callback: Any, matcher: Any, mode: Any, **kwargs: Any) -> Callable[[], None]:
-        assert matcher["address"] == ADDRESS and matcher["connectable"] is True
-        self._callbacks.append(callback)
-        return lambda: self._callbacks.remove(callback)
-
-    @property
-    def listening(self) -> bool:
-        return bool(self._callbacks)
-
-    def advertise(self) -> None:
-        for callback in list(self._callbacks):
-            callback(service_info(), BluetoothChange.ADVERTISEMENT)
+    def close(self) -> None:
+        for cleanup in reversed(self._cleanups):
+            cleanup()
 
 
 @pytest.fixture(autouse=True)
@@ -117,13 +144,13 @@ def clock() -> FakeClock:
 
 
 @pytest.fixture
-def ble(clock: FakeClock) -> Generator[BluetoothHarness]:
-    """Route Bluetooth calls of the integration to the simulated clock."""
-    harness = BluetoothHarness(clock)
+async def ble(hass: HomeAssistant, clock: FakeClock) -> AsyncGenerator[BluetoothHarness]:
+    """Run the real Bluetooth integration; only the final connection is simulated."""
+    assert await async_setup_component(hass, "bluetooth", {})
+    harness = BluetoothHarness(hass, clock)
     with (
         patch("custom_components.lywsd02_sync.manager.establish_connection", side_effect=harness.connect),
-        patch("homeassistant.components.bluetooth.async_ble_device_from_address", side_effect=harness.device),
-        patch("homeassistant.components.bluetooth.async_address_present", side_effect=harness.present),
-        patch("homeassistant.components.bluetooth.async_register_callback", side_effect=harness.register),
+        patch("custom_components.lywsd02_sync.manager.close_stale_connections_by_address", AsyncMock()),
     ):
         yield harness
+    harness.close()

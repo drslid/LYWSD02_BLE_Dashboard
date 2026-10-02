@@ -3,7 +3,7 @@
     "flow_title": "{name}",
     "step": {
       "bluetooth_confirm": {
-        "description": "Garder {name} à l’heure ? Home Assistant règle son horloge tout de suite, puis chaque nuit à 04:00 et après chaque changement d’heure. Vous pourrez modifier la planification avec Configurer."
+        "description": "Garder {name} à l’heure ? Home Assistant règle son horloge tout de suite, puis chaque nuit à 04:00 et après chaque changement d’heure. La planification, l’unité de température, le format de l’heure et la correction de l’heure se règlent ensuite sur la page de l’appareil."
       },
       "user": {
         "description": "Choisissez l’horloge LYWSD02 à garder à l’heure.",
@@ -22,7 +22,7 @@
     "step": {
       "init": {
         "title": "Synchronisation automatique",
-        "description": "Quand Home Assistant doit-il régler l’horloge ? Les changements d’heure sont toujours corrigés dans l’heure, et le bouton Synchroniser l’heure fonctionne à tout moment.",
+        "description": "Quand Home Assistant doit-il régler l’horloge ? Les changements d’heure sont toujours corrigés dans l’heure, et le bouton Synchroniser l’heure fonctionne à tout moment. L’unité de température, le format de l’heure et la correction de l’heure se trouvent sur la page de l’appareil.",
         "data": {
           "schedule": "Fréquence"
         }
@@ -43,6 +43,16 @@
           "time": "Heure"
         }
       },
+      "monthly": {
+        "title": "Tous les mois",
+        "data": {
+          "day": "Jour du mois",
+          "time": "Heure"
+        },
+        "data_description": {
+          "day": "De 1 à 28, pour que chaque mois ait ce jour."
+        }
+      },
       "cron": {
         "title": "Planification personnalisée",
         "description": "Cinq champs : minute heure jour mois jour-de-semaine. Exemples : `0 4 * * *` chaque jour à 04:00, `30 3 * * 1` chaque lundi à 03:30, `0 */6 * * *` toutes les 6 heures.",
@@ -61,6 +71,7 @@
       "options": {
         "daily": "Tous les jours (recommandé)",
         "weekly": "Toutes les semaines",
+        "monthly": "Tous les mois",
         "manual": "Aucune synchronisation planifiée",
         "cron": "Personnalisée (expression cron)"
       }
@@ -83,6 +94,52 @@
         "name": "Synchroniser l’heure"
       }
     },
+    "number": {
+      "sync_day": {
+        "name": "Jour de synchronisation mensuelle"
+      },
+      "time_correction": {
+        "name": "Correction de l’heure"
+      }
+    },
+    "select": {
+      "sync_frequency": {
+        "name": "Synchronisation automatique",
+        "state": {
+          "daily": "Tous les jours",
+          "weekly": "Toutes les semaines",
+          "monthly": "Tous les mois",
+          "manual": "Manuelle uniquement",
+          "cron": "Personnalisée (cron)"
+        }
+      },
+      "sync_weekday": {
+        "name": "Jour de synchronisation hebdomadaire",
+        "state": {
+          "mon": "Lundi",
+          "tue": "Mardi",
+          "wed": "Mercredi",
+          "thu": "Jeudi",
+          "fri": "Vendredi",
+          "sat": "Samedi",
+          "sun": "Dimanche"
+        }
+      },
+      "temperature_unit": {
+        "name": "Unité de température",
+        "state": {
+          "celsius": "°C",
+          "fahrenheit": "°F"
+        }
+      },
+      "clock_format": {
+        "name": "Format de l’heure",
+        "state": {
+          "24h": "24 h",
+          "12h": "12 h (LYWSD02MMC uniquement)"
+        }
+      }
+    },
     "sensor": {
       "last_sync": {
         "name": "Dernière synchronisation"
@@ -94,12 +151,17 @@
         "name": "État de la synchronisation",
         "state": {
           "synced": "À l’heure",
-          "waiting": "En attente de l’horloge",
+          "waiting": "Recherche de l’horloge",
           "failed": "Échec, nouvel essai prévu"
         }
       },
       "clock_drift": {
         "name": "Écart avant synchronisation"
+      }
+    },
+    "time": {
+      "sync_time": {
+        "name": "Heure de synchronisation"
       }
     }
   },
@@ -107,8 +169,24 @@
     "not_in_range": {
       "message": "{name} est hors de portée Bluetooth. L’heure sera réglée dès qu’elle sera de nouveau détectée."
     },
+    "passive_only": {
+      "message": "{name} n’est entendue que par des proxys Bluetooth qui ne peuvent pas s’y connecter. Activez les connexions sur un proxy proche de l’horloge, ou rapprochez un adaptateur Bluetooth."
+    },
+    "no_connectable_adapter": {
+      "message": "Aucun adaptateur ni proxy Bluetooth de Home Assistant ne peut se connecter à {name}."
+    },
     "sync_failed": {
       "message": "Impossible de synchroniser {name} : {error}"
+    }
+  },
+  "issues": {
+    "passive_only": {
+      "title": "{name} n’est entendue que par des proxys Bluetooth passifs",
+      "description": "Home Assistant entend {name}, mais uniquement par des proxys Bluetooth qui ne peuvent pas se connecter aux appareils : il ne peut donc pas régler l’horloge.\n\nAu choix :\n- Sur un proxy Bluetooth ESPHome proche de l’horloge, activez les connexions avec `active: true` sous `bluetooth_proxy:`, puis installez la mise à jour.\n- Ou rapprochez de l’horloge un adaptateur Bluetooth de Home Assistant.\n\nL’horloge est synchronisée dès qu’elle peut être jointe, et ce message disparaît."
+    },
+    "no_connectable_adapter": {
+      "title": "Aucun adaptateur Bluetooth ne peut se connecter à {name}",
+      "description": "Home Assistant n’a aucun adaptateur ni proxy Bluetooth capable de se connecter aux appareils : il ne peut donc pas régler l’horloge de {name}. Les proxys passifs et les appareils Shelly ne font qu’écouter.\n\nAjoutez un adaptateur Bluetooth à Home Assistant, ou un proxy Bluetooth ESPHome avec `active: true` sous `bluetooth_proxy:`. L’horloge est synchronisée dès qu’elle peut être jointe, et ce message disparaît."
     }
   }
 }

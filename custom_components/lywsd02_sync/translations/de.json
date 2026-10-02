@@ -3,7 +3,7 @@
     "flow_title": "{name}",
     "step": {
       "bluetooth_confirm": {
-        "description": "{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Den Zeitplan kannst du später unter Konfigurieren ändern."
+        "description": "{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Zeitplan, Temperatureinheit, Zeitformat und Zeitkorrektur kannst du später auf der Geräteseite ändern."
       },
       "user": {
         "description": "Wähle die LYWSD02-Uhr, die immer richtig gehen soll.",
@@ -22,7 +22,7 @@
     "step": {
       "init": {
         "title": "Automatische Synchronisierung",
-        "description": "Wann soll Home Assistant die Uhr stellen? Zeitumstellungen werden immer innerhalb einer Stunde korrigiert, und die Schaltfläche „Uhr synchronisieren“ funktioniert jederzeit.",
+        "description": "Wann soll Home Assistant die Uhr stellen? Zeitumstellungen werden immer innerhalb einer Stunde korrigiert, und die Schaltfläche „Uhr synchronisieren“ funktioniert jederzeit. Temperatureinheit, Zeitformat und Zeitkorrektur findest du auf der Geräteseite.",
         "data": {
           "schedule": "Häufigkeit"
         }
@@ -43,6 +43,16 @@
           "time": "Uhrzeit"
         }
       },
+      "monthly": {
+        "title": "Jeden Monat",
+        "data": {
+          "day": "Tag des Monats",
+          "time": "Uhrzeit"
+        },
+        "data_description": {
+          "day": "Von 1 bis 28, damit jeder Monat diesen Tag hat."
+        }
+      },
       "cron": {
         "title": "Eigener Zeitplan",
         "description": "Fünf Felder: Minute Stunde Tag Monat Wochentag. Beispiele: `0 4 * * *` jeden Tag um 04:00, `30 3 * * 1` jeden Montag um 03:30, `0 */6 * * *` alle 6 Stunden.",
@@ -61,6 +71,7 @@
       "options": {
         "daily": "Jeden Tag (empfohlen)",
         "weekly": "Jede Woche",
+        "monthly": "Jeden Monat",
         "manual": "Keine geplante Synchronisierung",
         "cron": "Benutzerdefiniert (Cron-Ausdruck)"
       }
@@ -83,6 +94,52 @@
         "name": "Uhr synchronisieren"
       }
     },
+    "number": {
+      "sync_day": {
+        "name": "Tag der monatlichen Synchronisierung"
+      },
+      "time_correction": {
+        "name": "Zeitkorrektur"
+      }
+    },
+    "select": {
+      "sync_frequency": {
+        "name": "Automatische Synchronisierung",
+        "state": {
+          "daily": "Jeden Tag",
+          "weekly": "Jede Woche",
+          "monthly": "Jeden Monat",
+          "manual": "Nur manuell",
+          "cron": "Benutzerdefiniert (Cron)"
+        }
+      },
+      "sync_weekday": {
+        "name": "Tag der wöchentlichen Synchronisierung",
+        "state": {
+          "mon": "Montag",
+          "tue": "Dienstag",
+          "wed": "Mittwoch",
+          "thu": "Donnerstag",
+          "fri": "Freitag",
+          "sat": "Samstag",
+          "sun": "Sonntag"
+        }
+      },
+      "temperature_unit": {
+        "name": "Temperatureinheit",
+        "state": {
+          "celsius": "°C",
+          "fahrenheit": "°F"
+        }
+      },
+      "clock_format": {
+        "name": "Zeitformat",
+        "state": {
+          "24h": "24 h",
+          "12h": "12 h (nur LYWSD02MMC)"
+        }
+      }
+    },
     "sensor": {
       "last_sync": {
         "name": "Letzte Synchronisierung"
@@ -94,12 +151,17 @@
         "name": "Synchronisierungsstatus",
         "state": {
           "synced": "Pünktlich",
-          "waiting": "Warte auf die Uhr",
+          "waiting": "Suche nach der Uhr",
           "failed": "Fehlgeschlagen, neuer Versuch folgt"
         }
       },
       "clock_drift": {
         "name": "Abweichung vor der letzten Synchronisierung"
+      }
+    },
+    "time": {
+      "sync_time": {
+        "name": "Uhrzeit der Synchronisierung"
       }
     }
   },
@@ -107,8 +169,24 @@
     "not_in_range": {
       "message": "{name} ist außerhalb der Bluetooth-Reichweite. Die Uhr wird synchronisiert, sobald sie wieder erkannt wird."
     },
+    "passive_only": {
+      "message": "{name} wird nur von Bluetooth-Proxys gehört, die keine Verbindung herstellen können. Aktiviere Verbindungen auf einem Proxy in der Nähe der Uhr oder bring einen Bluetooth-Adapter näher heran."
+    },
+    "no_connectable_adapter": {
+      "message": "Kein Bluetooth-Adapter oder -Proxy von Home Assistant kann sich mit {name} verbinden."
+    },
     "sync_failed": {
       "message": "{name} konnte nicht synchronisiert werden: {error}"
+    }
+  },
+  "issues": {
+    "passive_only": {
+      "title": "{name} wird nur von passiven Bluetooth-Proxys gehört",
+      "description": "Home Assistant hört {name}, aber nur über Bluetooth-Proxys, die sich nicht mit Geräten verbinden können. Deshalb kann es die Uhr nicht stellen.\n\nTu eines davon:\n- Aktiviere auf einem ESPHome-Bluetooth-Proxy in der Nähe der Uhr Verbindungen mit `active: true` unter `bluetooth_proxy:` und installiere das Update.\n- Oder bring einen Bluetooth-Adapter von Home Assistant näher an die Uhr.\n\nDie Uhr wird synchronisiert, sobald sie erreichbar ist, und diese Meldung verschwindet."
+    },
+    "no_connectable_adapter": {
+      "title": "Kein Bluetooth-Adapter kann sich mit {name} verbinden",
+      "description": "Home Assistant hat keinen Bluetooth-Adapter oder -Proxy, der sich mit Geräten verbinden kann. Deshalb kann es die Uhr von {name} nicht stellen. Passive Proxys und Shelly-Geräte hören nur zu.\n\nFüge Home Assistant einen Bluetooth-Adapter hinzu oder einen ESPHome-Bluetooth-Proxy mit `active: true` unter `bluetooth_proxy:`. Die Uhr wird synchronisiert, sobald sie erreichbar ist, und diese Meldung verschwindet."
     }
   }
 }

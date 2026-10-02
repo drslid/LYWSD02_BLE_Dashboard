@@ -10,7 +10,18 @@ from typing import Any
 from PIL import Image
 import pytest
 
-from custom_components.lywsd02_sync.const import DOMAIN, SCHEDULES, STATUSES, WEEKDAYS
+from custom_components.lywsd02_sync.const import (
+    CLOCK_FORMATS,
+    DOMAIN,
+    ISSUE_NO_CONNECTABLE_ADAPTER,
+    ISSUE_PASSIVE_ONLY,
+    SCHEDULES,
+    STATUSES,
+    UNITS,
+    WEEKDAYS,
+)
+from custom_components.lywsd02_sync.number import NUMBERS
+from custom_components.lywsd02_sync.select import SELECTS
 from custom_components.lywsd02_sync.sensor import SENSORS
 
 ROOT = Path(__file__).parents[2]
@@ -50,16 +61,27 @@ def test_hacs_can_install_the_integration() -> None:
 
 
 def test_english_names_every_key_used_by_the_code() -> None:
-    """Selectors, entities, states and icons use the same keys as the code."""
+    """Selectors, entities, states, issues and icons use the same keys as the code."""
     english = load(INTEGRATION / "translations" / "en.json")
+    entities = english["entity"]
     assert list(english["selector"]["schedule"]["options"]) == SCHEDULES
     assert list(english["selector"]["weekday"]["options"]) == list(WEEKDAYS)
-    assert list(english["entity"]["sensor"]) == [description.translation_key for description in SENSORS]
-    assert list(english["entity"]["sensor"]["sync_status"]["state"]) == STATUSES
-    assert list(english["entity"]["button"]) == ["sync_clock"]
+    assert list(entities["button"]) == ["sync_clock"]
+    assert list(entities["number"]) == [description.translation_key for description in NUMBERS]
+    assert list(entities["select"]) == [description.translation_key for description in SELECTS]
+    assert list(entities["sensor"]) == [description.translation_key for description in SENSORS]
+    assert list(entities["time"]) == ["sync_time"]
+    assert list(entities["sensor"]["sync_status"]["state"]) == STATUSES
+    assert list(entities["select"]["sync_frequency"]["state"]) == SCHEDULES
+    assert list(entities["select"]["sync_weekday"]["state"]) == list(WEEKDAYS)
+    assert list(entities["select"]["temperature_unit"]["state"]) == UNITS
+    assert list(entities["select"]["clock_format"]["state"]) == CLOCK_FORMATS
+    assert set(english["issues"]) == {ISSUE_PASSIVE_ONLY, ISSUE_NO_CONNECTABLE_ADAPTER}
+    assert set(english["exceptions"]) == {"not_in_range", "sync_failed", *english["issues"]}
     icons = load(INTEGRATION / "icons.json")["entity"]
-    assert icons.keys() == english["entity"].keys()
-    assert icons["sensor"].keys() == english["entity"]["sensor"].keys()
+    assert icons.keys() == entities.keys()
+    for platform, translated in entities.items():
+        assert icons[platform].keys() == translated.keys(), platform
 
 
 @pytest.mark.parametrize("path", TRANSLATIONS, ids=lambda path: path.stem)
