@@ -86,7 +86,7 @@ The connection is local. Measurements and saved sensor names stay in your browse
 
 ## 🏠 Keep every clock on time with Home Assistant
 
-The **LYWSD02 Clock Sync** integration sets your clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. Every setting is on the device page; there is nothing to write in YAML.
+The **LYWSD02 Clock Sync** integration sets your clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. Each sync also brings back what the clock measured: temperature, humidity, battery and its hourly records. Every setting is on the device page; there is nothing to write in YAML.
 
 You need **Home Assistant 2025.2 or later**, **[HACS](https://www.hacs.xyz/)** and working **Bluetooth** in Home Assistant: a local adapter or an [ESPHome Bluetooth proxy](https://esphome.io/components/bluetooth_proxy/) with active connections.
 
@@ -135,7 +135,15 @@ Whatever you choose:
 | **Last sync** | When the clock was last set. |
 | **Next sync** | When the next scheduled sync runs. |
 | **Sync status** | *On time*, *Searching for the clock* or *Failed, retrying*. |
+| **Temperature** and **Humidity** | What the clock measured during the last sync. The temperature follows the unit system of Home Assistant. |
+| **Minimum** and **Maximum temperature (24 h)**, **Minimum** and **Maximum humidity (24 h)** | Extremes of the hourly records the clock kept during the 24 hours before the last sync. |
+| **Battery** *(diagnostic)* | Battery level read during the last sync. |
+| **Clock time** *(diagnostic)* | The time the clock showed right after the last sync, time correction included. |
 | **Drift before last sync** *(diagnostic)* | How far the clock had drifted, in seconds. |
+
+These readings change at each sync, so they follow the schedule you chose. For live values between syncs, the [Xiaomi BLE](https://www.home-assistant.io/integrations/xiaomi_ble/) integration of Home Assistant listens to what the clock broadcasts.
+
+The clock keeps the minimum and maximum temperature and humidity of every hour. Each sync reads the hours recorded since the previous one (up to a week the first time) and adds them to the statistics of Home Assistant, even the hours between two syncs. To see them, add a **Statistics graph** card and choose **LYWSD02 (…) Temperature records** or **Humidity records**: each hour has its minimum, its maximum and, as the clock keeps no average, the midpoint between them as mean. Each record is placed on the hour it covers with the gap measured between the clock and Home Assistant before the time is set.
 
 The settings are entities too, so automations can change them. The clock uses the time zone configured in Home Assistant. The integration speaks the nine languages of the dashboard.
 

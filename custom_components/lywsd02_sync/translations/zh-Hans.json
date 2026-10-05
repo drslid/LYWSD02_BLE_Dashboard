@@ -157,6 +157,27 @@
       },
       "clock_drift": {
         "name": "上次同步前的偏差"
+      },
+      "clock_time": {
+        "name": "时钟时间"
+      },
+      "temperature_min_24h": {
+        "name": "最低温度（24 小时）"
+      },
+      "temperature_max_24h": {
+        "name": "最高温度（24 小时）"
+      },
+      "humidity_min_24h": {
+        "name": "最低湿度（24 小时）"
+      },
+      "humidity_max_24h": {
+        "name": "最高湿度（24 小时）"
+      },
+      "temperature_records": {
+        "name": "温度记录"
+      },
+      "humidity_records": {
+        "name": "湿度记录"
       }
     },
     "time": {

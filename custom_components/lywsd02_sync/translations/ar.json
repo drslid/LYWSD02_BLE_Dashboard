@@ -157,6 +157,27 @@
       },
       "clock_drift": {
         "name": "الانحراف قبل آخر مزامنة"
+      },
+      "clock_time": {
+        "name": "وقت الساعة"
+      },
+      "temperature_min_24h": {
+        "name": "أدنى درجة حرارة (24 ساعة)"
+      },
+      "temperature_max_24h": {
+        "name": "أعلى درجة حرارة (24 ساعة)"
+      },
+      "humidity_min_24h": {
+        "name": "أدنى رطوبة (24 ساعة)"
+      },
+      "humidity_max_24h": {
+        "name": "أعلى رطوبة (24 ساعة)"
+      },
+      "temperature_records": {
+        "name": "سجلات درجة الحرارة"
+      },
+      "humidity_records": {
+        "name": "سجلات الرطوبة"
       }
     },
     "time": {

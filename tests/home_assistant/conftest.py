@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncGenerator, Callable
+import struct
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
@@ -19,7 +21,16 @@ from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 
-from custom_components.lywsd02_sync.const import TIME_CHARACTERISTIC, UNIT_CHARACTERISTIC
+from custom_components.lywsd02_sync.const import (
+    BATTERY_CHARACTERISTIC,
+    MEASUREMENT_CHARACTERISTIC,
+    RECORD_COUNT_CHARACTERISTIC,
+    RECORD_INDEX_CHARACTERISTIC,
+    RECORDS_CHARACTERISTIC,
+    TIME_CHARACTERISTIC,
+    UNIT_CHARACTERISTIC,
+)
+from custom_components.lywsd02_sync.protocol import HourlyRecord
 
 ADDRESS = "E7:2E:01:AB:CD:EF"
 TITLE = "LYWSD02 (CDEF)"
@@ -50,6 +61,13 @@ class FakeClock:
         self.mmc = False
         self.value = bytes(5)
         self.unit = bytes([0xFF])
+        self.battery = bytes([87])
+        # Sent once notifications are on; None for a clock that never sends one.
+        self.measurement: tuple[float, int] | None = (22.4, 48)
+        # Kept oldest first, stamped with the clock's own time.
+        self.records: list[HourlyRecord] = []
+        self.first_record_sent: int | None = None
+        self.unreadable: set[str] = set()
         self.writes: list[bytes] = []
         self.units: list[bytes] = []
         self.formats: list[bytes] = []
@@ -59,13 +77,22 @@ class FakeClock:
         self.on_time_write: Callable[[], None] | None = None
 
     async def read_gatt_char(self, uuid: str) -> bytearray:
-        return bytearray(self.unit if uuid == UNIT_CHARACTERISTIC else self.value)
+        if uuid in self.unreadable:
+            raise BleakError("Read not permitted")
+        if uuid == RECORD_COUNT_CHARACTERISTIC:
+            newest = self.records[-1].index if self.records else 0
+            return bytearray(struct.pack("<II", newest, len(self.records)))
+        values = {UNIT_CHARACTERISTIC: self.unit, BATTERY_CHARACTERISTIC: self.battery, TIME_CHARACTERISTIC: self.value}
+        return bytearray(values[uuid])
 
     async def write_gatt_char(self, uuid: str, data: bytes, response: bool) -> None:
         assert response is True
         if self.drops:
             self.drops -= 1
             raise BleakError("Disconnected")
+        if uuid == RECORD_INDEX_CHARACTERISTIC:
+            self.first_record_sent = struct.unpack("<I", data)[0]
+            return
         if uuid == UNIT_CHARACTERISTIC:
             self.units.append(bytes(data))
             self.unit = bytes(data)
@@ -80,6 +107,31 @@ class FakeClock:
         self.value = bytes(data)
         if self.on_time_write:
             self.on_time_write()
+
+    async def start_notify(self, uuid: str, callback: Callable[[Any, bytearray], None]) -> None:
+        """Send the measurement, or the records from the index written before, as the clock does."""
+        loop = asyncio.get_running_loop()
+        if uuid == MEASUREMENT_CHARACTERISTIC:
+            if self.measurement:
+                temperature, humidity = self.measurement
+                loop.call_soon(callback, None, bytearray(struct.pack("<hB", round(temperature * 100), humidity)))
+            return
+        assert uuid == RECORDS_CHARACTERISTIC
+        for record in self.records:
+            if record.index >= (self.first_record_sent or 0):
+                value = struct.pack(
+                    "<IIhBhB",
+                    record.index,
+                    record.timestamp,
+                    round(record.max_temperature * 100),
+                    record.max_humidity,
+                    round(record.min_temperature * 100),
+                    record.min_humidity,
+                )
+                loop.call_soon(callback, None, bytearray(value))
+
+    async def stop_notify(self, uuid: str) -> None:
+        """Stop sending notifications."""
 
     async def disconnect(self) -> None:
         self.disconnects += 1

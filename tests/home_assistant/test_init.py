@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 import logging
 import struct
 from typing import Any
@@ -24,6 +24,7 @@ from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
 from custom_components.lywsd02_sync.const import (
+    BATTERY_CHARACTERISTIC,
     DEFAULT_OPTIONS,
     DOMAIN,
     FORCE_POLL_INTERVAL,
@@ -32,6 +33,7 @@ from custom_components.lywsd02_sync.const import (
     RETRY_DELAYS,
     SEARCH_INTERVAL,
 )
+from custom_components.lywsd02_sync.protocol import HourlyRecord
 
 from .conftest import ADDRESS, TITLE, BluetoothHarness, FakeClock
 
@@ -40,6 +42,14 @@ LAST_SYNC = "sensor.lywsd02_cdef_last_sync"
 NEXT_SYNC = "sensor.lywsd02_cdef_next_sync"
 STATUS = "sensor.lywsd02_cdef_sync_status"
 DRIFT = "sensor.lywsd02_cdef_drift_before_last_sync"
+CLOCK_TIME = "sensor.lywsd02_cdef_clock_time"
+TEMPERATURE = "sensor.lywsd02_cdef_temperature"
+HUMIDITY = "sensor.lywsd02_cdef_humidity"
+BATTERY = "sensor.lywsd02_cdef_battery"
+TEMPERATURE_MIN = "sensor.lywsd02_cdef_minimum_temperature_24_h"
+TEMPERATURE_MAX = "sensor.lywsd02_cdef_maximum_temperature_24_h"
+HUMIDITY_MIN = "sensor.lywsd02_cdef_minimum_humidity_24_h"
+HUMIDITY_MAX = "sensor.lywsd02_cdef_maximum_humidity_24_h"
 FREQUENCY = "select.lywsd02_cdef_automatic_sync"
 WEEKDAY = "select.lywsd02_cdef_weekly_sync_day"
 UNIT = "select.lywsd02_cdef_temperature_unit"
@@ -737,3 +747,106 @@ async def test_removal_forgets_history_and_repair_issue(
     await settle(hass)
     assert key not in hass_storage
     assert issue(hass, entry) is None
+
+
+async def test_each_sync_reads_what_the_clock_measured(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """Once its time is set, the clock gives the time it shows, its battery and its measurement."""
+    freezer.move_to("2026-09-29 10:00:00+00:00")
+    ble.proxy().hear()
+    await setup_clock(hass, {**DEFAULT_OPTIONS, "time_correction": 5})
+
+    assert hass.states.get(CLOCK_TIME).state == "2026-09-29T10:05:00+00:00"
+    assert hass.states.get(BATTERY).state == "87"
+    assert hass.states.get(TEMPERATURE).state == "22.4"
+    assert hass.states.get(TEMPERATURE).attributes["unit_of_measurement"] == "°C"
+    assert hass.states.get(HUMIDITY).state == "48"
+    assert hass.states.get(TEMPERATURE_MIN).state == STATE_UNKNOWN
+
+    clock.measurement = (19.87, 61)
+    clock.battery = bytes([86])
+    await press(hass)
+    assert hass.states.get(BATTERY).state == "86"
+    assert hass.states.get(TEMPERATURE).state == "19.87"
+    assert hass.states.get(HUMIDITY).state == "61"
+
+
+async def test_readings_that_fail_keep_their_last_value(
+    hass: HomeAssistant, ble: BluetoothHarness, clock: FakeClock, caplog: pytest.LogCaptureFixture
+) -> None:
+    """The time comes first: a clock that refuses a reading or stays silent is still synchronized."""
+    ble.proxy().hear()
+    await setup_clock(hass)
+    clock.unreadable = {BATTERY_CHARACTERISTIC}
+    clock.measurement = None
+
+    with patch("custom_components.lywsd02_sync.manager.MEASUREMENT_TIMEOUT", 0):
+        await press(hass)
+
+    assert len(clock.writes) == 2
+    assert hass.states.get(STATUS).state == "synced"
+    assert hass.states.get(BATTERY).state == "87"
+    assert hass.states.get(TEMPERATURE).state == "22.4"
+    # Bluetooth reads fail now and then: no error in the log for that.
+    assert not [record for record in caplog.records if record.levelno >= logging.ERROR]
+
+
+def hourly_record(index: int, hour: datetime, clock_ahead: int, rise: int) -> HourlyRecord:
+    """Return the record of an hour, stamped with the clock's own time; values rise with rise."""
+    low = 20 + rise / 10
+    return HourlyRecord(index, int(hour.timestamp()) + clock_ahead, low + 0.5, 50 + rise, low, 40 + rise)
+
+
+async def test_restart_keeps_the_readings_and_the_next_record(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    hass_storage: dict[str, Any],
+    ble: BluetoothHarness,
+    clock: FakeClock,
+) -> None:
+    """Readings stay until the next sync, which goes on from the first record not read yet."""
+    freezer.move_to("2026-09-29 10:00:00+00:00")
+    ble.proxy().hear()
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id=ADDRESS, title=TITLE, data={CONF_ADDRESS: ADDRESS}, options=DEFAULT_OPTIONS
+    )
+    hass_storage[f"{DOMAIN}.{entry.entry_id}"] = {
+        "version": 1,
+        "minor_version": 1,
+        "key": f"{DOMAIN}.{entry.entry_id}",
+        "data": {
+            "last_sync": "2026-09-29T05:00:00+02:00",
+            "offset": 120,
+            "applied": DEFAULT_APPLIED,
+            "clock_time": "2026-09-29T03:00:01+00:00",
+            "battery": 64,
+            "temperature": 21.5,
+            "humidity": 55,
+            "recent": [["2026-09-29T02:00:00+00:00", 7, 1790560800, 21.9, 58, 21.1, 52]],
+            "next_record": 8,
+        },
+    }
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await settle(hass)
+
+    assert clock.writes == []
+    assert hass.states.get(CLOCK_TIME).state == "2026-09-29T03:00:01+00:00"
+    assert hass.states.get(BATTERY).state == "64"
+    assert hass.states.get(TEMPERATURE).state == "21.5"
+    assert hass.states.get(HUMIDITY).state == "55"
+    assert [hass.states.get(extreme).state for extreme in (TEMPERATURE_MIN, TEMPERATURE_MAX)] == ["21.1", "21.9"]
+    assert [hass.states.get(extreme).state for extreme in (HUMIDITY_MIN, HUMIDITY_MAX)] == ["52", "58"]
+
+    clock.value = struct.pack("<Ib", now_timestamp(), 2)
+    hours = [datetime(2026, 9, 29, hour, tzinfo=UTC) for hour in (7, 8, 9)]
+    clock.records = [hourly_record(index, hour, 0, 1) for index, hour in zip((7, 8, 9), hours, strict=True)]
+    await press(hass)
+    assert clock.first_record_sent == 8
+    assert hass_storage[f"{DOMAIN}.{entry.entry_id}"]["data"]["next_record"] == 10
+
+    # A clock that numbers its records from 1 again is read from its oldest one.
+    clock.records = [hourly_record(index, hours[index], 0, 1) for index in (1, 2)]
+    await press(hass)
+    assert clock.first_record_sent == 1

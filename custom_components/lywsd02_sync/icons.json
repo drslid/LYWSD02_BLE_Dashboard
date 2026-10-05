@@ -48,6 +48,21 @@
       },
       "clock_drift": {
         "default": "mdi:timer-sand"
+      },
+      "clock_time": {
+        "default": "mdi:clock-digital"
+      },
+      "temperature_min_24h": {
+        "default": "mdi:thermometer-chevron-down"
+      },
+      "temperature_max_24h": {
+        "default": "mdi:thermometer-chevron-up"
+      },
+      "humidity_min_24h": {
+        "default": "mdi:water-minus"
+      },
+      "humidity_max_24h": {
+        "default": "mdi:water-plus"
       }
     },
     "time": {

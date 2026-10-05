@@ -157,6 +157,27 @@
       },
       "clock_drift": {
         "name": "पिछले सिंक से पहले का अंतर"
+      },
+      "clock_time": {
+        "name": "घड़ी का समय"
+      },
+      "temperature_min_24h": {
+        "name": "न्यूनतम तापमान (24 घंटे)"
+      },
+      "temperature_max_24h": {
+        "name": "अधिकतम तापमान (24 घंटे)"
+      },
+      "humidity_min_24h": {
+        "name": "न्यूनतम आर्द्रता (24 घंटे)"
+      },
+      "humidity_max_24h": {
+        "name": "अधिकतम आर्द्रता (24 घंटे)"
+      },
+      "temperature_records": {
+        "name": "तापमान रिकॉर्ड"
+      },
+      "humidity_records": {
+        "name": "आर्द्रता रिकॉर्ड"
       }
     },
     "time": {

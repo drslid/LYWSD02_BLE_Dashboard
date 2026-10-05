@@ -157,6 +157,27 @@
       },
       "clock_drift": {
         "name": "Desvio antes da última sincronização"
+      },
+      "clock_time": {
+        "name": "Hora do relógio"
+      },
+      "temperature_min_24h": {
+        "name": "Temperatura mínima (24 h)"
+      },
+      "temperature_max_24h": {
+        "name": "Temperatura máxima (24 h)"
+      },
+      "humidity_min_24h": {
+        "name": "Humidade mínima (24 h)"
+      },
+      "humidity_max_24h": {
+        "name": "Humidade máxima (24 h)"
+      },
+      "temperature_records": {
+        "name": "Registos de temperatura"
+      },
+      "humidity_records": {
+        "name": "Registos de humidade"
       }
     },
     "time": {

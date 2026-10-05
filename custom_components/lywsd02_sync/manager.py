@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Mapping
+from dataclasses import astuple, dataclass, field
 from datetime import datetime, timedelta
 import logging
 from typing import Any
 
 from bleak import BleakClient
+from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak.backends.device import BLEDevice
 from bleak.exc import BleakError
 from bleak_retry_connector import (
@@ -33,6 +35,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
 from .const import (
+    BATTERY_CHARACTERISTIC,
     CONF_CLOCK_FORMAT,
     CONF_CORRECTION,
     CONF_UNIT,
@@ -42,6 +45,14 @@ from .const import (
     FORCE_TIMEOUT,
     ISSUE_NO_CONNECTABLE_ADAPTER,
     ISSUE_PASSIVE_ONLY,
+    MAX_RECORDS,
+    MEASUREMENT_CHARACTERISTIC,
+    MEASUREMENT_TIMEOUT,
+    READINGS_TIMEOUT,
+    RECORD_COUNT_CHARACTERISTIC,
+    RECORD_IDLE_TIMEOUT,
+    RECORD_INDEX_CHARACTERISTIC,
+    RECORDS_CHARACTERISTIC,
     REPORT_MISSING_AFTER,
     RETRY_DELAYS,
     SEARCH_INTERVAL,
@@ -53,13 +64,22 @@ from .const import (
     UNIT_CHARACTERISTIC,
 )
 from .protocol import (
+    HourlyRecord,
     clock_drift,
+    clock_offset,
+    decode_battery,
+    decode_measurement,
+    decode_record,
+    decode_record_count,
     decode_unit,
     encode_clock_format,
+    encode_record_index,
     encode_time,
     encode_unit,
+    record_hour,
     utc_offset_minutes,
 )
+from .records import async_import_records
 from .schedule import cron_expression, next_run, previous_run
 
 _LOGGER = logging.getLogger(__name__)
@@ -113,6 +133,22 @@ class _ConnectionFailed(Exception):
         self.error = error
 
 
+@dataclass
+class _Session:
+    """What one connection wrote to the clock and read from it."""
+
+    unit: str | None
+    drift: float | None = None
+    offset: float | None = None
+    newest_record: int | None = None
+    stored_records: int = 0
+    clock_time: datetime | None = None
+    battery: int | None = None
+    temperature: float | None = None
+    humidity: int | None = None
+    records: dict[int, HourlyRecord] = field(default_factory=dict)
+
+
 class ClockSyncManager:
     """Synchronize one clock and share the result with its entities."""
 
@@ -127,6 +163,14 @@ class ClockSyncManager:
         self.drift: float | None = None
         # Unit displayed by the clock at the last sync.
         self.unit: str | None = None
+        # Read at each sync, after the time is set.
+        self.clock_time: datetime | None = None
+        self.battery: int | None = None
+        self.temperature: float | None = None
+        self.humidity: int | None = None
+        # Hourly records of the 24 hours before the last sync, by the UTC hour they cover.
+        self.recent: dict[datetime, HourlyRecord] = {}
+        self._next_record = 0
         self.status = STATUS_WAITING
         self._synced_offset: int | None = None
         self._applied: dict[str, Any] | None = None
@@ -152,6 +196,15 @@ class ClockSyncManager:
             self.last_sync = dt_util.parse_datetime(stored["last_sync"])
             self.drift = stored.get("drift")
             self.unit = stored.get("unit")
+            if clock_time := stored.get("clock_time"):
+                self.clock_time = dt_util.parse_datetime(clock_time)
+            self.battery = stored.get("battery")
+            self.temperature = stored.get("temperature")
+            self.humidity = stored.get("humidity")
+            self.recent = {
+                datetime.fromisoformat(hour): HourlyRecord(*values) for hour, *values in stored.get("recent", [])
+            }
+            self._next_record = stored.get("next_record", 0)
             self._synced_offset = stored.get("offset")
             self._applied = stored.get("applied")
             self.status = STATUS_SYNCED
@@ -279,8 +332,7 @@ class ClockSyncManager:
         self._async_found()
         settings = device_settings(self.entry.options)
         try:
-            async with asyncio.timeout(SYNC_TIMEOUT):
-                drift, unit = await self._async_write_clock(ble_device, settings)
+            session = await self._async_write_clock(ble_device, settings)
         except (*BLEAK_RETRY_EXCEPTIONS, TimeoutError) as err:
             raise _ConnectionFailed(err) from err
         except Exception as err:
@@ -289,8 +341,13 @@ class ClockSyncManager:
             raise _ConnectionFailed(err) from err
         now = dt_util.now()
         self.last_sync = now
-        self.drift = drift
-        self.unit = unit
+        self.drift = session.drift
+        self.unit = session.unit
+        for reading in ("clock_time", "battery", "temperature", "humidity"):
+            # A reading that failed this time keeps its last value.
+            if (value := getattr(session, reading)) is not None:
+                setattr(self, reading, value)
+        hours = self._async_place_records(session, now)
         self._synced_offset = utc_offset_minutes(now)
         self._applied = settings
         self._failures = 0
@@ -302,46 +359,156 @@ class ClockSyncManager:
         await self._store.async_save(
             {
                 "last_sync": now.isoformat(),
-                "drift": drift,
+                "drift": session.drift,
                 "offset": self._synced_offset,
-                "unit": unit,
+                "unit": session.unit,
                 "applied": settings,
+                "clock_time": self.clock_time.isoformat() if self.clock_time else None,
+                "battery": self.battery,
+                "temperature": self.temperature,
+                "humidity": self.humidity,
+                "recent": [[hour.isoformat(), *astuple(record)] for hour, record in self.recent.items()],
+                "next_record": self._next_record,
             }
         )
+        await async_import_records(self.hass, self.address, self.name, hours)
 
-    async def _async_write_clock(
-        self, ble_device: BLEDevice, settings: Mapping[str, Any]
-    ) -> tuple[float | None, str | None]:
-        """Connect once to set the time and display settings; return the drift and unit found."""
-        await close_stale_connections_by_address(self.address)
-        client = await establish_connection(
-            BleakClientWithServiceCache, ble_device, self.name, max_attempts=3
-        )
-        correction = settings[CONF_CORRECTION]
-        unit: str | None = settings[CONF_UNIT]
-        try:
-            try:
-                value = await client.read_gatt_char(TIME_CHARACTERISTIC)
-                drift: float | None = round(clock_drift(value, dt_util.now()) - correction * 60, 1)
-            except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
-                # The write below still corrects a clock whose value cannot be read.
-                drift = None
-            await client.write_gatt_char(
-                TIME_CHARACTERISTIC, encode_time(dt_util.now(), correction), response=True
+    @callback
+    def _async_place_records(self, session: _Session, now: datetime) -> dict[datetime, HourlyRecord]:
+        """Return the new records by the UTC hour they cover, and keep those of the last 24 hours."""
+        if session.records:
+            self._next_record = max(session.records) + 1
+        hours: dict[datetime, HourlyRecord] = {}
+        if session.offset is not None:
+            # Hours outside this range were recorded by a clock that was not on time then.
+            oldest = now - timedelta(hours=MAX_RECORDS + 1)
+            for index in sorted(session.records):
+                hour = record_hour(session.records[index], session.offset)
+                if oldest <= hour <= now:
+                    hours[hour] = session.records[index]
+        since = dt_util.as_utc(now).replace(minute=0, second=0, microsecond=0) - timedelta(hours=24)
+        self.recent = {hour: record for hour, record in (self.recent | hours).items() if hour >= since}
+        return hours
+
+    async def _async_write_clock(self, ble_device: BLEDevice, settings: Mapping[str, Any]) -> _Session:
+        """Connect once to set the time and display settings, then read what the clock measured."""
+        deadline = self.hass.loop.time() + SYNC_TIMEOUT
+        async with asyncio.timeout_at(deadline):
+            await close_stale_connections_by_address(self.address)
+            client = await establish_connection(
+                BleakClientWithServiceCache, ble_device, self.name, max_attempts=3
             )
-            if unit is not None:
-                await client.write_gatt_char(UNIT_CHARACTERISTIC, encode_unit(unit), response=True)
-            else:
-                try:
-                    unit = decode_unit(await client.read_gatt_char(UNIT_CHARACTERISTIC))
-                except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
-                    # Only shown in Home Assistant; the clock is already on time.
-                    unit = self.unit
-            if settings[CONF_CLOCK_FORMAT] is not None:
-                await self._async_write_clock_format(client, settings[CONF_CLOCK_FORMAT])
+        try:
+            async with asyncio.timeout_at(deadline):
+                session = await self._async_set_clock(client, settings)
+            await self._async_read_clock(client, session)
         finally:
             await client.disconnect()
-        return drift, unit
+        return session
+
+    async def _async_set_clock(self, client: BleakClient, settings: Mapping[str, Any]) -> _Session:
+        """Write the time and display settings; return what was read on the way."""
+        session = _Session(unit=settings[CONF_UNIT])
+        correction = settings[CONF_CORRECTION]
+        try:
+            value = await client.read_gatt_char(TIME_CHARACTERISTIC)
+            now = dt_util.now()
+            session.drift = round(clock_drift(value, now) - correction * 60, 1)
+            # Records carry the time the clock kept before this sync.
+            session.offset = clock_offset(value, now)
+            session.newest_record, session.stored_records = decode_record_count(
+                await client.read_gatt_char(RECORD_COUNT_CHARACTERISTIC)
+            )
+        except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
+            # The write below still corrects a clock whose value cannot be read.
+            pass
+        await client.write_gatt_char(
+            TIME_CHARACTERISTIC, encode_time(dt_util.now(), correction), response=True
+        )
+        if session.unit is not None:
+            await client.write_gatt_char(UNIT_CHARACTERISTIC, encode_unit(session.unit), response=True)
+        else:
+            try:
+                session.unit = decode_unit(await client.read_gatt_char(UNIT_CHARACTERISTIC))
+            except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
+                # Only shown in Home Assistant; the clock is already on time.
+                session.unit = self.unit
+        if settings[CONF_CLOCK_FORMAT] is not None:
+            await self._async_write_clock_format(client, settings[CONF_CLOCK_FORMAT])
+        return session
+
+    async def _async_read_clock(self, client: BleakClient, session: _Session) -> None:
+        """Read the time shown, battery, measurement and new records; failures only cost readings."""
+        try:
+            async with asyncio.timeout(READINGS_TIMEOUT):
+                for read in (
+                    self._async_read_time_shown,
+                    self._async_read_battery,
+                    self._async_read_measurement,
+                    self._async_read_records,
+                ):
+                    try:
+                        await read(client, session)
+                    except (*BLEAK_RETRY_EXCEPTIONS, ValueError) as err:
+                        _LOGGER.debug("%s could not complete %s: %s", self.name, read.__name__, err)
+                    except Exception:
+                        _LOGGER.exception("Unexpected error while reading %s", self.name)
+        except TimeoutError:
+            _LOGGER.debug("%s took more than %s s to send its readings", self.name, READINGS_TIMEOUT)
+
+    async def _async_read_time_shown(self, client: BleakClient, session: _Session) -> None:
+        value = await client.read_gatt_char(TIME_CHARACTERISTIC)
+        now = dt_util.now()
+        session.clock_time = (now + timedelta(seconds=round(clock_drift(value, now)))).replace(microsecond=0)
+
+    async def _async_read_battery(self, client: BleakClient, session: _Session) -> None:
+        session.battery = decode_battery(await client.read_gatt_char(BATTERY_CHARACTERISTIC))
+
+    async def _async_read_measurement(self, client: BleakClient, session: _Session) -> None:
+        measured: asyncio.Future[bytearray] = self.hass.loop.create_future()
+
+        def _measured(_characteristic: BleakGATTCharacteristic, data: bytearray) -> None:
+            if not measured.done():
+                measured.set_result(data)
+
+        await client.start_notify(MEASUREMENT_CHARACTERISTIC, _measured)
+        try:
+            async with asyncio.timeout(MEASUREMENT_TIMEOUT):
+                session.temperature, session.humidity = decode_measurement(await measured)
+        finally:
+            await client.stop_notify(MEASUREMENT_CHARACTERISTIC)
+
+    async def _async_read_records(self, client: BleakClient, session: _Session) -> None:
+        if session.offset is None or session.newest_record is None:
+            return
+        newest = session.newest_record
+        # A clock whose numbering went back, after a reset, is read from its oldest record again.
+        first = self._next_record if self._next_record <= newest + 1 else 0
+        first = max(first, newest - min(session.stored_records, MAX_RECORDS) + 1)
+        if first > newest:
+            return
+        received = asyncio.Event()
+
+        def _recorded(_characteristic: BleakGATTCharacteristic, data: bytearray) -> None:
+            try:
+                record = decode_record(data)
+            except ValueError:
+                return
+            # Records after the newest one were stamped after this sync set the time.
+            if first <= record.index <= newest:
+                session.records[record.index] = record
+            received.set()
+
+        await client.write_gatt_char(RECORD_INDEX_CHARACTERISTIC, encode_record_index(first), response=True)
+        await client.start_notify(RECORDS_CHARACTERISTIC, _recorded)
+        try:
+            # The clock sends them oldest first and stops after the newest one.
+            while newest not in session.records:
+                received.clear()
+                async with asyncio.timeout(RECORD_IDLE_TIMEOUT):
+                    await received.wait()
+        finally:
+            await client.stop_notify(RECORDS_CHARACTERISTIC)
 
     async def _async_write_clock_format(self, client: BleakClient, clock_format: str) -> None:
         try:

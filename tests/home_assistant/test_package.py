@@ -21,6 +21,7 @@ from custom_components.lywsd02_sync.const import (
     WEEKDAYS,
 )
 from custom_components.lywsd02_sync.number import NUMBERS
+from custom_components.lywsd02_sync.records import RECORD_STATISTICS
 from custom_components.lywsd02_sync.select import SELECTS
 from custom_components.lywsd02_sync.sensor import SENSORS
 
@@ -61,15 +62,20 @@ def test_hacs_can_install_the_integration() -> None:
 
 
 def test_english_names_every_key_used_by_the_code() -> None:
-    """Selectors, entities, states, issues and icons use the same keys as the code."""
+    """Selectors, entities, states, issues and icons use the same keys as the code.
+
+    Sensors with a device class and no translation key take Home Assistant's name for it; the
+    record statistics are named from sensor translations but have no entity, hence no icon.
+    """
     english = load(INTEGRATION / "translations" / "en.json")
     entities = english["entity"]
+    named_sensors = [description.translation_key for description in SENSORS if description.translation_key]
     assert list(english["selector"]["schedule"]["options"]) == SCHEDULES
     assert list(english["selector"]["weekday"]["options"]) == list(WEEKDAYS)
     assert list(entities["button"]) == ["sync_clock"]
     assert list(entities["number"]) == [description.translation_key for description in NUMBERS]
     assert list(entities["select"]) == [description.translation_key for description in SELECTS]
-    assert list(entities["sensor"]) == [description.translation_key for description in SENSORS]
+    assert list(entities["sensor"]) == [*named_sensors, *RECORD_STATISTICS]
     assert list(entities["time"]) == ["sync_time"]
     assert list(entities["sensor"]["sync_status"]["state"]) == STATUSES
     assert list(entities["select"]["sync_frequency"]["state"]) == SCHEDULES
@@ -81,7 +87,8 @@ def test_english_names_every_key_used_by_the_code() -> None:
     icons = load(INTEGRATION / "icons.json")["entity"]
     assert icons.keys() == entities.keys()
     for platform, translated in entities.items():
-        assert icons[platform].keys() == translated.keys(), platform
+        with_entity = translated.keys() - RECORD_STATISTICS.keys()
+        assert icons[platform].keys() == with_entity, platform
 
 
 @pytest.mark.parametrize("path", TRANSLATIONS, ids=lambda path: path.stem)

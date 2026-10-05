@@ -157,6 +157,27 @@
       },
       "clock_drift": {
         "name": "Écart avant synchronisation"
+      },
+      "clock_time": {
+        "name": "Heure de l’horloge"
+      },
+      "temperature_min_24h": {
+        "name": "Température minimale (24 h)"
+      },
+      "temperature_max_24h": {
+        "name": "Température maximale (24 h)"
+      },
+      "humidity_min_24h": {
+        "name": "Humidité minimale (24 h)"
+      },
+      "humidity_max_24h": {
+        "name": "Humidité maximale (24 h)"
+      },
+      "temperature_records": {
+        "name": "Relevés de température"
+      },
+      "humidity_records": {
+        "name": "Relevés d’humidité"
       }
     },
     "time": {

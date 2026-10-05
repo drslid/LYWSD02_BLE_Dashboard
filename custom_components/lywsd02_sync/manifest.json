@@ -1,6 +1,7 @@
 {
   "domain": "lywsd02_sync",
   "name": "LYWSD02 Clock Sync",
+  "after_dependencies": ["recorder"],
   "bluetooth": [
     {
       "local_name": "LYWSD02*",
@@ -15,5 +16,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/drslid/LYWSD02_BLE_Dashboard/issues",
   "requirements": [],
-  "version": "1.2.0"
+  "version": "1.3.0"
 }
