@@ -56,9 +56,11 @@ python3.14 -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, daylight saving changes, restarts and translations.
+This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, the search and reconnections of the sync button, daylight saving changes, restarts and translations.
 
 Home Assistant does not call integrations back for every advertisement: identical advertisements are skipped, and when a passive proxy owns a device, a connectable proxy can make it reachable silently. The integration therefore never waits for an advertisement alone. It retries on timers and looks the clock up at each attempt; advertisements only shorten the wait.
+
+A clock counts as reachable only while a connectable adapter or proxy still lists it. Home Assistant keeps a clock in its history for a few minutes after its adapters stopped hearing it, but cannot connect through that history. The **Sync clock** button therefore searches for up to a minute, asking adapters in automatic scanning mode for an active scan where Home Assistant provides `bluetooth.async_request_active_scan`, and reconnects after 2, 5 and 10 seconds when a connection fails or drops. Test proxies date advertisements with the real monotonic clock, so frozen time never makes them forget a clock; `Proxy.hear(ago=...)` sends an old advertisement instead.
 
 Home Assistant 2026.3 and later read the integration icon from `custom_components/lywsd02_sync/brand/`. Confirm Bluetooth behavior with a physical clock before publishing a release.
 

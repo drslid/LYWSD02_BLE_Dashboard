@@ -167,7 +167,7 @@
   },
   "exceptions": {
     "not_in_range": {
-      "message": "{name} est hors de portée Bluetooth. L’heure sera réglée dès qu’elle sera de nouveau détectée."
+      "message": "Aucun adaptateur ni proxy Bluetooth n’a entendu {name} pendant la recherche. L’heure sera réglée dès qu’elle sera de nouveau détectée."
     },
     "passive_only": {
       "message": "{name} n’est entendue que par des proxys Bluetooth qui ne peuvent pas s’y connecter. Activez les connexions sur un proxy proche de l’horloge, ou rapprochez un adaptateur Bluetooth."

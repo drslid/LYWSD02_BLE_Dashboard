@@ -15,5 +15,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/drslid/LYWSD02_BLE_Dashboard/issues",
   "requirements": [],
-  "version": "1.1.0"
+  "version": "1.2.0"
 }

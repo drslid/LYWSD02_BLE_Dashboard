@@ -25,5 +25,5 @@ class SyncClockButton(LYWSD02Entity, ButtonEntity):
     _attr_translation_key = "sync_clock"
 
     async def async_press(self) -> None:
-        """Sync now and report failures in the interface."""
-        await self._manager.async_sync()
+        """Sync now, searching for the clock and reconnecting if needed; report failures in the interface."""
+        await self._manager.async_sync(force=True)

@@ -37,6 +37,9 @@ from .const import (
     CONF_CORRECTION,
     CONF_UNIT,
     DOMAIN,
+    FORCE_POLL_INTERVAL,
+    FORCE_RECONNECT_DELAYS,
+    FORCE_TIMEOUT,
     ISSUE_NO_CONNECTABLE_ADAPTER,
     ISSUE_PASSIVE_ONLY,
     REPORT_MISSING_AFTER,
@@ -98,6 +101,18 @@ def device_settings(options: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+class _NotHeard(Exception):
+    """No Bluetooth adapter or proxy that can connect hears the clock."""
+
+
+class _ConnectionFailed(Exception):
+    """The connection failed or dropped before the clock was written."""
+
+    def __init__(self, error: Exception) -> None:
+        super().__init__(error)
+        self.error = error
+
+
 class ClockSyncManager:
     """Synchronize one clock and share the result with its entities."""
 
@@ -122,6 +137,7 @@ class ClockSyncManager:
         self._missing_since: datetime | None = None
         self._missing_reported = False
         self._format_warned = False
+        self._stopped = False
         self._issue_id = f"unreachable_{entry.entry_id}"
         self._task: asyncio.Task[None] | None = None
         self._unsub_schedule: CALLBACK_TYPE | None = None
@@ -186,34 +202,91 @@ class ClockSyncManager:
         self._async_cancel_retry()
         self._async_start_background_sync()
 
-    async def async_sync(self) -> None:
-        """Write the time and settings; raise HomeAssistantError when the clock cannot be reached."""
+    async def async_sync(self, force: bool = False) -> None:
+        """Write the time and settings; raise HomeAssistantError when the clock cannot be reached.
+
+        Forced, as by the sync button, it searches for a clock that is not heard and reconnects
+        after a failed connection, for up to FORCE_TIMEOUT, instead of giving up at once.
+        """
         self._pending = True
         self._syncing += 1
         self._async_cancel_retry()
+        deadline = self.hass.loop.time() + FORCE_TIMEOUT
+        reconnect_delays = iter(FORCE_RECONNECT_DELAYS if force else ())
         try:
-            async with self.hass.data.setdefault(SYNC_LOCK, asyncio.Lock()):
-                # Settings changed during a connection are written by one more connection.
-                while self._pending:
-                    await self._async_attempt()
+            while True:
+                try:
+                    async with self.hass.data.setdefault(SYNC_LOCK, asyncio.Lock()):
+                        # Settings changed during a connection are written by one more connection.
+                        while self._pending:
+                            await self._async_attempt()
+                    return
+                except _NotHeard:
+                    if not force or not await self._async_search(deadline):
+                        raise self._async_missing() from None
+                except _ConnectionFailed as failure:
+                    delay = next(reconnect_delays, None)
+                    if delay is None or self._stopped or self.hass.loop.time() + delay >= deadline:
+                        raise self._async_failed(failure.error) from failure.error
+                    _LOGGER.debug("Reconnecting to %s in %s s: %s", self.name, delay, failure.error)
+                    await asyncio.sleep(delay)
         finally:
             self._syncing -= 1
 
+    async def _async_search(self, deadline: float) -> bool:
+        """Look for the clock until an adapter that can connect hears it; return False at the deadline."""
+        loop = self.hass.loop
+        if loop.time() >= deadline or not bluetooth.async_scanner_count(self.hass, connectable=True):
+            return False
+        if self.status != STATUS_WAITING:
+            self.status = STATUS_WAITING
+            self._async_notify()
+        scan: asyncio.Task[None] | None = None
+        # Older Home Assistant lacks it; adapters in automatic mode scan passively and can miss the clock.
+        if request_active_scan := getattr(bluetooth, "async_request_active_scan", None):
+            scan = self.entry.async_create_background_task(
+                self.hass,
+                request_active_scan(self.hass, deadline - loop.time()),
+                f"{DOMAIN} scan {self.address}",
+            )
+        try:
+            while self._async_reachable_device() is None:
+                remaining = deadline - loop.time()
+                if remaining <= 0 or self._stopped:
+                    return False
+                await asyncio.sleep(min(remaining, FORCE_POLL_INTERVAL))
+        finally:
+            if scan:
+                scan.cancel()
+        return True
+
+    @callback
+    def _async_reachable_device(self) -> BLEDevice | None:
+        """Return the clock if an adapter or proxy that can connect hears it now."""
+        # Home Assistant remembers a clock for minutes after its adapters stopped hearing it.
+        devices = bluetooth.async_scanner_devices_by_address(self.hass, self.address, connectable=True)
+        if not devices:
+            return None
+        return (
+            bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
+            or devices[0].ble_device
+        )
+
     async def _async_attempt(self) -> None:
-        ble_device = bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
+        ble_device = self._async_reachable_device()
         if ble_device is None:
-            raise self._async_missing()
+            raise _NotHeard
         self._async_found()
         settings = device_settings(self.entry.options)
         try:
             async with asyncio.timeout(SYNC_TIMEOUT):
                 drift, unit = await self._async_write_clock(ble_device, settings)
         except (*BLEAK_RETRY_EXCEPTIONS, TimeoutError) as err:
-            raise self._async_failed(err) from err
+            raise _ConnectionFailed(err) from err
         except Exception as err:
             # Bluetooth backends can raise their own errors; the clock must still be retried.
             _LOGGER.exception("Unexpected error while synchronizing %s", self.name)
-            raise self._async_failed(err) from err
+            raise _ConnectionFailed(err) from err
         now = dt_util.now()
         self.last_sync = now
         self.drift = drift
@@ -311,7 +384,7 @@ class ClockSyncManager:
         """Return why a heard clock cannot be reached, or None when it is not heard at all."""
         if not bluetooth.async_scanner_count(self.hass, connectable=True):
             return ISSUE_NO_CONNECTABLE_ADAPTER
-        if bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=False):
+        if bluetooth.async_scanner_devices_by_address(self.hass, self.address, connectable=False):
             return ISSUE_PASSIVE_ONLY
         return None
 
@@ -360,7 +433,7 @@ class ClockSyncManager:
     @callback
     def _async_listen(self) -> None:
         """Watch for the clock while it is missing; active mode makes automatic scanners look for it."""
-        if self._unsub_advertisements is None:
+        if self._unsub_advertisements is None and not self._stopped:
             self._unsub_advertisements = bluetooth.async_register_callback(
                 self.hass,
                 self._async_advertisement,
@@ -385,7 +458,9 @@ class ClockSyncManager:
     @callback
     def _async_schedule_retry(self, delay: timedelta) -> None:
         self._async_cancel_retry()
-        self._unsub_retry = async_call_later(self.hass, delay, self._async_retry)
+        # A button sync can end after the entry was unloaded.
+        if not self._stopped:
+            self._unsub_retry = async_call_later(self.hass, delay, self._async_retry)
 
     @callback
     def _async_retry(self, _now: datetime) -> None:
@@ -418,6 +493,7 @@ class ClockSyncManager:
 
     @callback
     def _async_stop(self) -> None:
+        self._stopped = True
         self._async_cancel_schedule()
         self._async_cancel_retry()
         self._async_stop_listening()

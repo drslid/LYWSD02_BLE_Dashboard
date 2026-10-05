@@ -63,6 +63,12 @@ RETRY_DELAYS: Final = (
 # Proxies can take a few minutes to report the clock after Home Assistant starts.
 REPORT_MISSING_AFTER: Final = timedelta(minutes=5)
 SYNC_TIMEOUT: Final = 60
+# The sync button searches for the clock and reconnects for this long (seconds) before giving up.
+FORCE_TIMEOUT: Final = 60
+# Pauses (seconds) of the sync button before reconnecting after a failed or dropped connection.
+FORCE_RECONNECT_DELAYS: Final = (2, 5, 10)
+# How often (seconds) the sync button looks the clock up while searching for it.
+FORCE_POLL_INTERVAL: Final = 1
 
 STATUS_SYNCED: Final = "synced"
 STATUS_WAITING: Final = "waiting"

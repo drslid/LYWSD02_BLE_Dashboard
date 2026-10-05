@@ -167,7 +167,7 @@
   },
   "exceptions": {
     "not_in_range": {
-      "message": "{name} è fuori dalla portata Bluetooth. Verrà sincronizzato appena sarà di nuovo rilevato."
+      "message": "Nessun adattatore o proxy Bluetooth ha sentito {name} durante la ricerca. Verrà sincronizzato appena sarà di nuovo rilevato."
     },
     "passive_only": {
       "message": "{name} è sentito solo da proxy Bluetooth che non possono connettersi. Attiva le connessioni su un proxy vicino all’orologio o avvicina un adattatore Bluetooth."

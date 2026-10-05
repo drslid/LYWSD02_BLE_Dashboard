@@ -167,7 +167,7 @@
   },
   "exceptions": {
     "not_in_range": {
-      "message": "{name} ist außerhalb der Bluetooth-Reichweite. Die Uhr wird synchronisiert, sobald sie wieder erkannt wird."
+      "message": "Kein Bluetooth-Adapter oder -Proxy hat {name} während der Suche gehört. Die Uhr wird synchronisiert, sobald sie wieder erkannt wird."
     },
     "passive_only": {
       "message": "{name} wird nur von Bluetooth-Proxys gehört, die keine Verbindung herstellen können. Aktiviere Verbindungen auf einem Proxy in der Nähe der Uhr oder bring einen Bluetooth-Adapter näher heran."

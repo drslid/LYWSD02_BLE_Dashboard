@@ -54,6 +54,8 @@ class FakeClock:
         self.units: list[bytes] = []
         self.formats: list[bytes] = []
         self.disconnects = 0
+        # Number of coming connections the clock drops before anything is written.
+        self.drops = 0
         self.on_time_write: Callable[[], None] | None = None
 
     async def read_gatt_char(self, uuid: str) -> bytearray:
@@ -61,6 +63,9 @@ class FakeClock:
 
     async def write_gatt_char(self, uuid: str, data: bytes, response: bool) -> None:
         assert response is True
+        if self.drops:
+            self.drops -= 1
+            raise BleakError("Disconnected")
         if uuid == UNIT_CHARACTERISTIC:
             self.units.append(bytes(data))
             self.unit = bytes(data)
@@ -83,9 +88,11 @@ class FakeClock:
 class Proxy(BaseHaRemoteScanner):
     """Bluetooth proxy; only connectable ones (ESPHome active: true) can reach the clock."""
 
-    def hear(self, address: str = ADDRESS, name: str = "LYWSD02") -> None:
-        """Deliver one advertisement, always identical, as a real clock does."""
-        self._async_on_advertisement(address, -60, name, [], {}, {}, None, {}, monotonic_time_coarse())
+    def hear(self, address: str = ADDRESS, name: str = "LYWSD02", ago: float = 0) -> None:
+        """Deliver one advertisement, always identical, as a real clock does; ago dates it in the past."""
+        self._async_on_advertisement(
+            address, -60, name, [], {}, {}, None, {}, monotonic_time_coarse() - ago
+        )
 
 
 class BluetoothHarness:

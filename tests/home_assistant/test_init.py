@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from datetime import timedelta
 import logging
 import struct
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from bleak.exc import BleakError
 from freezegun.api import FrozenDateTimeFactory
@@ -22,7 +23,15 @@ from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
-from custom_components.lywsd02_sync.const import DEFAULT_OPTIONS, DOMAIN, SEARCH_INTERVAL
+from custom_components.lywsd02_sync.const import (
+    DEFAULT_OPTIONS,
+    DOMAIN,
+    FORCE_POLL_INTERVAL,
+    FORCE_RECONNECT_DELAYS,
+    FORCE_TIMEOUT,
+    RETRY_DELAYS,
+    SEARCH_INTERVAL,
+)
 
 from .conftest import ADDRESS, TITLE, BluetoothHarness, FakeClock
 
@@ -82,6 +91,26 @@ def now_timestamp() -> int:
 async def press(hass: HomeAssistant) -> None:
     """Press the sync button."""
     await hass.services.async_call("button", "press", {"entity_id": BUTTON}, blocking=True)
+
+
+async def run_pending() -> None:
+    """Let ready tasks run; settle() would also wait for a press still in progress."""
+    for _ in range(10):
+        await asyncio.sleep(0)
+
+
+async def start_press(hass: HomeAssistant) -> asyncio.Task[None]:
+    """Press the sync button and return while it searches for the clock or reconnects."""
+    pressing = asyncio.create_task(press(hass))
+    await run_pending()
+    return pressing
+
+
+async def elapse(hass: HomeAssistant, freezer: FrozenDateTimeFactory, seconds: float) -> None:
+    """Move time forward while a press is still in progress."""
+    freezer.tick(seconds)
+    async_fire_time_changed(hass)
+    await run_pending()
 
 
 async def change(hass: HomeAssistant, entity_id: str, value: Any) -> None:
@@ -155,10 +184,6 @@ async def test_clock_found_later_is_synced_at_once(
         # Active mode lets automatic scanners look for the missing clock.
         assert modes == [bluetooth.BluetoothScanningMode.ACTIVE]
 
-        with pytest.raises(HomeAssistantError) as error:
-            await press(hass)
-        assert error.value.translation_key == "not_in_range"
-
         proxy.hear()
         await settle(hass)
         assert len(clock.writes) == 1
@@ -212,22 +237,157 @@ async def test_failed_sync_retries_on_a_growing_delay(
     assert hass.states.get(STATUS).state == "synced"
 
 
-async def test_button_reports_a_failed_sync(hass: HomeAssistant, ble: BluetoothHarness, clock: FakeClock) -> None:
-    """A manual sync shows why it failed."""
+async def test_button_searches_for_a_clock_that_is_not_heard(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """The button looks for the clock instead of trusting what Home Assistant remembers, then syncs it."""
+    freezer.move_to("2026-09-29 10:00:00+00:00")
+    proxy = ble.proxy()
+    proxy.hear()
+    await setup_clock(hass)
+    # Last heard four minutes ago: the proxy forgets the clock, Home Assistant still remembers it.
+    proxy.hear(ago=240)
+    await later(hass, freezer, timedelta(seconds=30))
+    assert bluetooth.async_ble_device_from_address(hass, ADDRESS, connectable=True) is not None
+
+    with patch(
+        "homeassistant.components.bluetooth.async_request_active_scan", AsyncMock(), create=True
+    ) as request_active_scan:
+        pressing = await start_press(hass)
+        await elapse(hass, freezer, 30)
+        assert not pressing.done()
+        assert ble.connections == 1
+        assert hass.states.get(STATUS).state == "waiting"
+
+        proxy.hear()
+        await elapse(hass, freezer, FORCE_POLL_INTERVAL)
+        await pressing
+
+    # Adapters in automatic mode scan actively during the search.
+    request_active_scan.assert_awaited_once_with(hass, FORCE_TIMEOUT)
+    assert ble.connections == 2
+    assert len(clock.writes) == 2
+    assert hass.states.get(STATUS).state == "synced"
+
+
+@pytest.mark.parametrize(
+    ("heard", "reason"),
+    [
+        ("never", "not_in_range"),
+        # Long enough ago for the proxy to forget the clock, not Home Assistant.
+        ("long ago", "not_in_range"),
+        ("by a passive proxy", "passive_only"),
+    ],
+)
+async def test_button_gives_up_after_a_minute_and_keeps_searching(
+    hass: HomeAssistant,
+    freezer: FrozenDateTimeFactory,
+    ble: BluetoothHarness,
+    clock: FakeClock,
+    heard: str,
+    reason: str,
+) -> None:
+    """A clock that no adapter able to connect hears is searched for one minute, then in the background."""
+    proxy = ble.proxy()
+    if heard == "long ago":
+        proxy.hear(ago=240)
+        await later(hass, freezer, timedelta(seconds=30))
+    elif heard == "by a passive proxy":
+        ble.proxy(connectable=False).hear()
+    await setup_clock(hass)
+
+    pressing = await start_press(hass)
+    await elapse(hass, freezer, FORCE_TIMEOUT - 1)
+    assert not pressing.done()
+    await elapse(hass, freezer, 1)
+    with pytest.raises(HomeAssistantError) as error:
+        await pressing
+    assert error.value.translation_key == reason
+    assert ble.connections == 0
+    assert hass.states.get(STATUS).state == "waiting"
+
+    proxy.hear()
+    await later(hass, freezer, SEARCH_INTERVAL)
+    assert len(clock.writes) == 1
+    assert hass.states.get(STATUS).state == "synced"
+
+
+async def test_button_fails_at_once_without_an_adapter_that_can_connect(
+    hass: HomeAssistant, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """Searching cannot help when no adapter or proxy of Home Assistant can connect."""
+    ble.proxy(connectable=False).hear()
+    await setup_clock(hass)
+
+    with pytest.raises(HomeAssistantError) as error:
+        await press(hass)
+    assert error.value.translation_key == "no_connectable_adapter"
+
+
+async def test_button_reconnects_when_the_clock_drops_the_connection(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """The clock can drop a connection before the time is written: the button connects again."""
+    ble.proxy().hear()
+    await setup_clock(hass)
+    clock.drops = 2
+
+    pressing = await start_press(hass)
+    assert ble.connections == 2
+    await elapse(hass, freezer, FORCE_RECONNECT_DELAYS[0])
+    assert ble.connections == 3
+    await elapse(hass, freezer, FORCE_RECONNECT_DELAYS[1])
+    await pressing
+
+    assert ble.connections == 4
+    assert clock.disconnects == 4
+    assert len(clock.writes) == 2
+    assert hass.states.get(STATUS).state == "synced"
+
+
+async def test_button_reports_a_failed_sync(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """After its reconnections, a manual sync shows why it failed, as a single failure."""
     ble.proxy().hear()
     await setup_clock(hass)
     ble.connect_error = BleakError("No free connection slot")
 
+    pressing = await start_press(hass)
+    for delay in FORCE_RECONNECT_DELAYS:
+        await elapse(hass, freezer, delay)
     with pytest.raises(HomeAssistantError) as error:
-        await press(hass)
+        await pressing
     assert error.value.translation_key == "sync_failed"
     assert error.value.translation_placeholders == {"name": TITLE, "error": "No free connection slot"}
+    assert ble.connections == 2 + len(FORCE_RECONNECT_DELAYS)
     assert hass.states.get(STATUS).state == "failed"
 
+    # The automatic retries start over with their first delay.
     ble.connect_error = None
-    await press(hass)
+    await later(hass, freezer, RETRY_DELAYS[0] - timedelta(seconds=1))
+    assert ble.connections == 2 + len(FORCE_RECONNECT_DELAYS)
+    await later(hass, freezer, timedelta(seconds=1))
     assert len(clock.writes) == 2
     assert hass.states.get(STATUS).state == "synced"
+
+
+async def test_unloading_ends_the_search_of_the_button(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """A clock reloaded or removed while the button searches for it is left alone afterwards."""
+    proxy = ble.proxy()
+    entry = await setup_clock(hass)
+    pressing = await start_press(hass)
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    await elapse(hass, freezer, FORCE_POLL_INTERVAL)
+    with pytest.raises(HomeAssistantError):
+        await pressing
+
+    proxy.hear()
+    await later(hass, freezer, SEARCH_INTERVAL)
+    assert ble.connections == 0
 
 
 def warnings(caplog: pytest.LogCaptureFixture) -> list[str]:
@@ -260,9 +420,6 @@ async def test_unreachable_clock_explains_how_to_fix_it(
     active = ble.proxy() if connectable_proxy else None
     ble.proxy(connectable=False).hear()
     entry = await setup_clock(hass)
-    with pytest.raises(HomeAssistantError) as error:
-        await press(hass)
-    assert error.value.translation_key == reason
 
     # Proxies can take a few minutes to report the clock after a restart.
     await later(hass, freezer, timedelta(minutes=4))

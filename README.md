@@ -131,7 +131,7 @@ Whatever you choose:
 
 | Entity | What it shows |
 | --- | --- |
-| **Sync clock** button | Sets the clock now. Use it in dashboards and automations with `button.press`. |
+| **Sync clock** button | Sets the clock now. If no adapter hears the clock, it looks for it for up to a minute; if the connection drops, it reconnects. Use it in dashboards and automations with `button.press`. |
 | **Last sync** | When the clock was last set. |
 | **Next sync** | When the next scheduled sync runs. |
 | **Sync status** | *On time*, *Searching for the clock* or *Failed, retrying*. |
@@ -141,11 +141,11 @@ The settings are entities too, so automations can change them. The clock uses th
 
 ### If a clock is not synchronized
 
-- **Searching for the clock:** no Bluetooth adapter can reach it right now. After 5 minutes the log explains why, and **Settings → Repairs** shows what to do when the setup is the cause:
+- **Searching for the clock:** no Bluetooth adapter can reach it right now. Press **Sync clock** to look for it for up to a minute: it is synchronized as soon as an adapter hears it. After 5 minutes the log explains why, and **Settings → Repairs** shows what to do when the setup is the cause:
   - *Only heard by passive Bluetooth proxies*: enable connections on an ESPHome proxy near the clock with `active: true` under `bluetooth_proxy:`, or bring a Bluetooth adapter closer. Shelly devices only listen; they cannot set a clock.
   - *No Bluetooth adapter can connect*: add a Bluetooth adapter, or an ESPHome proxy with `active: true`.
   - Without a repair, the clock is out of range: move it closer to an adapter or proxy.
-- **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button shows the exact error.
+- **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button reconnects a few times, then shows the exact error.
 - **12 h has no effect:** only the LYWSD02MMC supports it. A plain LYWSD02 stays in 24 h and its time is still set.
 
 <a id="languages"></a>
