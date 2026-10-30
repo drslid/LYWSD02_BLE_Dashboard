@@ -107,6 +107,8 @@ Supported device families are **LYWSD02**, **LYWSD02MMC** and **MHO-C303**. The 
 
 MHO-C303 compatibility was contributed by [@drug123](https://github.com/drug123) in [PR #1](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1). Their [physical Home Assistant test](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251) confirmed clock sync, temperature/humidity notifications, battery and hourly records alongside a working LYWSD02. Browser discovery and reconnection now include this model; physical browser validation is still pending. MHO-C303 alarm functions and 12/24-hour switching have not been validated.
 
+This support is for original firmware. The [PVVX compatibility assessment](PVVX_COMPATIBILITY.md) describes the separate command adapter required by custom firmware, candidate models, history semantics and a naming/migration proposal. Device photographs and locally stored contributor avatars are documented in [image credits](ASSET_CREDITS.md).
+
 The dashboard uses the Xiaomi service `EBE0CCB0-7A0A-4B0C-8A1A-6FF2997DA3A6` and these characteristics:
 
 | Function | Characteristic |

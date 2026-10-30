@@ -83,6 +83,8 @@
 
   const MESSAGES = {
     en: {
+      "compatibility.stockFirmware": "Original firmware",
+      "compatibility.photoCredits": "Photo credits",
       'compatibility.models': "Compatible clocks: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "MHO-C303 hardware testing: Home Assistant confirmed; browser validation pending.",
       'ha.credit': "MHO-C303 support contributed and tested by",
@@ -278,6 +280,8 @@
       'error.historyIncomplete': 'incomplete history counter'
     },
     fr: {
+      "compatibility.stockFirmware": "Firmware d’origine",
+      "compatibility.photoCredits": "Crédits photo",
       'compatibility.models': "Horloges compatibles : LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "Essai matériel du MHO-C303 : confirmé dans Home Assistant ; validation navigateur à effectuer.",
       'ha.credit': "Compatibilité MHO-C303 ajoutée et testée par",
@@ -299,6 +303,8 @@
       'read.battery': 'Lecture batterie', 'read.unit': 'Lecture unité', 'read.time': 'Lecture heure', 'error.unknown': 'erreur inconnue', 'error.network': 'connexion Bluetooth interrompue', 'error.notFound': 'service LYWSD02 / MHO-C303 introuvable ou sélection annulée', 'error.notSupported': 'fonction Bluetooth non prise en charge', 'error.security': 'accès Bluetooth bloqué par le navigateur', 'error.notAllowed': 'autorisation Bluetooth refusée', 'error.timeIncomplete': 'valeur horaire incomplète', 'error.historyIncomplete': 'compteur d’historique incomplet'
     },
     es: {
+      "compatibility.stockFirmware": "Firmware original",
+      "compatibility.photoCredits": "Créditos de las fotos",
       'compatibility.models': "Relojes compatibles: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "Prueba física del MHO-C303: confirmada en Home Assistant; pendiente en el navegador.",
       'ha.credit': "Compatibilidad con MHO-C303 añadida y probada por",
@@ -319,6 +325,8 @@
       'read.battery': 'Lectura de batería', 'read.unit': 'Lectura de unidad', 'read.time': 'Lectura de hora', 'error.unknown': 'error desconocido', 'error.network': 'conexión Bluetooth interrumpida', 'error.notFound': 'servicio LYWSD02 / MHO-C303 no encontrado o selección cancelada', 'error.notSupported': 'función Bluetooth no compatible', 'error.security': 'acceso Bluetooth bloqueado', 'error.notAllowed': 'permiso Bluetooth denegado', 'error.timeIncomplete': 'valor horario incompleto', 'error.historyIncomplete': 'contador de historial incompleto'
     },
     it: {
+      "compatibility.stockFirmware": "Firmware originale",
+      "compatibility.photoCredits": "Crediti fotografici",
       'compatibility.models': "Orologi compatibili: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "Test fisico MHO-C303: confermato in Home Assistant; da verificare nel browser.",
       'ha.credit': "Compatibilità MHO-C303 aggiunta e testata da",
@@ -339,6 +347,8 @@
       'read.battery': 'Lettura batteria', 'read.unit': 'Lettura unità', 'read.time': 'Lettura ora', 'error.unknown': 'errore sconosciuto', 'error.network': 'connessione Bluetooth interrotta', 'error.notFound': 'servizio LYWSD02 / MHO-C303 non trovato o selezione annullata', 'error.notSupported': 'funzione Bluetooth non supportata', 'error.security': 'accesso Bluetooth bloccato', 'error.notAllowed': 'permesso Bluetooth negato', 'error.timeIncomplete': 'valore ora incompleto', 'error.historyIncomplete': 'contatore cronologia incompleto'
     },
     de: {
+      "compatibility.stockFirmware": "Original-Firmware",
+      "compatibility.photoCredits": "Bildnachweise",
       'compatibility.models': "Kompatible Uhren: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "MHO-C303-Gerätetest: in Home Assistant bestätigt; Browserprüfung steht noch aus.",
       'ha.credit': "MHO-C303-Unterstützung beigetragen und getestet von",
@@ -359,6 +369,8 @@
       'read.battery': 'Batteriestand', 'read.unit': 'Einheit', 'read.time': 'Uhrzeit', 'error.unknown': 'unbekannter Fehler', 'error.network': 'Bluetooth-Verbindung unterbrochen', 'error.notFound': 'LYWSD02 / MHO-C303-Dienst nicht gefunden oder Auswahl abgebrochen', 'error.notSupported': 'Bluetooth-Funktion nicht unterstützt', 'error.security': 'Bluetooth-Zugriff blockiert', 'error.notAllowed': 'Bluetooth-Berechtigung verweigert', 'error.timeIncomplete': 'unvollständiger Zeitwert', 'error.historyIncomplete': 'unvollständiger Verlaufszähler'
     },
     ar: {
+      "compatibility.stockFirmware": "البرنامج الثابت الأصلي",
+      "compatibility.photoCredits": "مصادر الصور",
       'compatibility.models': "الساعات المتوافقة: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "اختبار MHO-C303 الفعلي: مؤكد في Home Assistant؛ التحقق عبر المتصفح ما زال مطلوبًا.",
       'ha.credit': "أضاف دعم MHO-C303 واختبره",
@@ -379,6 +391,8 @@
       'read.battery': 'قراءة البطارية', 'read.unit': 'قراءة الوحدة', 'read.time': 'قراءة الوقت', 'error.unknown': 'خطأ غير معروف', 'error.network': 'انقطع اتصال البلوتوث', 'error.notFound': 'خدمة LYWSD02 / MHO-C303 غير موجودة أو أُلغي الاختيار', 'error.notSupported': 'ميزة البلوتوث غير مدعومة', 'error.security': 'منع المتصفح الوصول إلى البلوتوث', 'error.notAllowed': 'رُفض إذن البلوتوث', 'error.timeIncomplete': 'قيمة وقت غير مكتملة', 'error.historyIncomplete': 'عداد سجل غير مكتمل'
     },
     zh: {
+      "compatibility.stockFirmware": "原厂固件",
+      "compatibility.photoCredits": "图片来源",
       'compatibility.models': "兼容时钟：LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "MHO-C303 实机测试：已在 Home Assistant 中确认，浏览器验证尚待完成。",
       'ha.credit': "MHO-C303 支持的贡献与实机测试来自",
@@ -399,6 +413,8 @@
       'read.battery': '电量读取', 'read.unit': '单位读取', 'read.time': '时间读取', 'error.unknown': '未知错误', 'error.network': '蓝牙连接中断', 'error.notFound': '未找到 LYWSD02 / MHO-C303 服务或取消了选择', 'error.notSupported': '不支持此蓝牙功能', 'error.security': '浏览器阻止了蓝牙访问', 'error.notAllowed': '蓝牙权限被拒绝', 'error.timeIncomplete': '时间值不完整', 'error.historyIncomplete': '历史计数不完整'
     },
     pt: {
+      "compatibility.stockFirmware": "Firmware original",
+      "compatibility.photoCredits": "Créditos das fotografias",
       'compatibility.models': "Relógios compatíveis: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "Teste físico do MHO-C303: confirmado no Home Assistant; validação no navegador pendente.",
       'ha.credit': "Compatibilidade MHO-C303 adicionada e testada por",
@@ -419,6 +435,8 @@
       'read.battery': 'Leitura da bateria', 'read.unit': 'Leitura da unidade', 'read.time': 'Leitura da hora', 'error.unknown': 'erro desconhecido', 'error.network': 'ligação Bluetooth interrompida', 'error.notFound': 'serviço LYWSD02 / MHO-C303 não encontrado ou seleção cancelada', 'error.notSupported': 'função Bluetooth não suportada', 'error.security': 'acesso Bluetooth bloqueado', 'error.notAllowed': 'permissão Bluetooth recusada', 'error.timeIncomplete': 'valor de hora incompleto', 'error.historyIncomplete': 'contador de histórico incompleto'
     },
     hi: {
+      "compatibility.stockFirmware": "मूल फ़र्मवेयर",
+      "compatibility.photoCredits": "तस्वीरों का श्रेय",
       'compatibility.models': "संगत घड़ियाँ: LYWSD02 · LYWSD02MMC · MHO-C303",
       'compatibility.note': "MHO-C303 का वास्तविक परीक्षण: Home Assistant में पुष्टि हुई; ब्राउज़र में सत्यापन बाकी है।",
       'ha.credit': "MHO-C303 समर्थन जोड़ने और परीक्षण का श्रेय",

@@ -87,6 +87,18 @@ The connection is local. Measurements and saved sensor names stay in your browse
 
 ## 📡 Compatible devices
 
+<table>
+  <tr>
+    <td align="center"><img src="img/devices/lywsd02.jpg" alt="LYWSD02 thermometer clock" width="220"><br><strong>LYWSD02</strong></td>
+    <td align="center"><img src="img/lywsd02-product.webp" alt="LYWSD02MMC thermometer clock" width="220"><br><strong>LYWSD02MMC</strong></td>
+    <td align="center"><img src="img/devices/mho-c303.jpg" alt="MHO-C303 thermometer alarm clock" width="220"><br><strong>MHO-C303</strong></td>
+  </tr>
+</table>
+
+<sub>LYWSD02 and MHO-C303 photos: ESPHome documentation, CC BY-NC-SA 4.0. [Photo credits](docs/ASSET_CREDITS.md).</sub>
+
+The compatibility below applies to **original firmware**. Installing custom firmware such as PVVX changes the protocol, even on the same physical model.
+
 | Model | Browser dashboard | Home Assistant |
 | --- | --- | --- |
 | **LYWSD02** | Supported; 24-hour display | Supported; 24-hour display |
@@ -96,6 +108,12 @@ The connection is local. Measurements and saved sensor names stay in your browse
 Thank you to **[@drug123](https://github.com/drug123)** for contributing MHO-C303 support in [pull request #1](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1) and [testing it on a physical clock in Home Assistant](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251), alongside an existing LYWSD02.
 
 The MHO-C303 shares the time, measurement and history characteristics used by the integration. Its 12/24-hour setting and alarm functions have not been validated; alarm management is not provided by this project. Other Bluetooth thermometers are not automatically compatible: the device name and GATT protocol must match.
+
+### What about PVVX / ATC devices?
+
+Devices running [PVVX ATC_MiThermometer](https://github.com/pvvx/ATC_MiThermometer), including LYWSD03MMC, MHO-C401, CGG1, CGDK2 and MJWSD05MMC, are candidates for a separate protocol adapter. **They are not supported by this dashboard or its clock-sync integration yet.** Their time commands, configuration and stored measurements differ from the stock Xiaomi protocol. This also applies to an LYWSD02MMC flashed with PVVX.
+
+See the [PVVX compatibility assessment and naming proposal](docs/PVVX_COMPATIBILITY.md) for the verified protocol differences, implementation priorities and migration considerations. Home Assistant can already receive BTHome broadcasts from appropriately configured PVVX devices through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/).
 
 <a id="home-assistant"></a>
 
@@ -226,10 +244,13 @@ For local setup, tests and device protocol details, see the [contributor and tec
 
 Special thanks to [@drug123](https://github.com/drug123) for MHO-C303 compatibility and hardware testing ([#1](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1)).
 
-<a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=drslid/LYWSD02_BLE_Dashboard" alt="Contributors to LYWSD02 BLE Dashboard">
-</a>
+<p>
+  <a href="https://github.com/drslid"><img src="img/contributors/drslid.svg" alt="@drslid" width="64" height="64"></a>
+  <a href="https://github.com/drug123"><img src="img/contributors/drug123.svg" alt="@drug123" width="64" height="64"></a>
+</p>
 
-Released under the [MIT License](LICENSE).
+[All contributions on GitHub](https://github.com/drslid/LYWSD02_BLE_Dashboard/graphs/contributors).
+
+Code released under the [MIT License](LICENSE). Third-party photos retain the licenses listed in [photo credits](docs/ASSET_CREDITS.md).
 
 <p align="right"><a href="#top">⬆️ Back to top</a></p>
