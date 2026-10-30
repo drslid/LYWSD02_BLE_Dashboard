@@ -120,6 +120,7 @@
 
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="../i18n.js" defer></script>
+  <script src="../ble-devices.js" defer></script>
   <script src="../app.js" defer></script>
 </head>
 <body>
@@ -293,6 +294,27 @@
       </section>
 
       <section class="connection-panel container" aria-labelledby="connection-title">
+        <div class="protocol-options">
+          <label class="field" for="deviceProfile">
+            <span data-i18n="protocol.label">डिवाइस / फ़र्मवेयर</span>
+            <select id="deviceProfile" aria-describedby="protocolNote">
+              <option value="stock" data-i18n="protocol.stock">LYWSD02 / MHO-C303 — मूल फ़र्मवेयर</option>
+              <option value="pvvx" data-i18n="protocol.pvvx">PVVX BLE — प्रयोगात्मक</option>
+              <option value="cgd1" data-i18n="protocol.cgd1">CGD1 — मूल फ़र्मवेयर, प्रयोगात्मक</option>
+              <optgroup label="मूल फ़र्मवेयर · प्रयोगात्मक सेंसर" data-i18n-label="protocol.sensors">
+                <option value="lywsdcgq">LYWSDCGQ / MJ_HT_V1</option>
+                <option value="lywsd03">LYWSD03MMC</option>
+                <option value="cgg1">CGG1 (ClearGrass)</option>
+                <option value="cgdk2">CGDK2 (Qingping)</option>
+                <option value="flowercare">HHCCJCY01 / GCLS002 (Flower Care)</option>
+                <option value="ropot">HHCCPOT002 (RoPot)</option>
+              </optgroup>
+            </select>
+          </label>
+          <label class="field" id="pairingTokenField" for="pairingToken" hidden><span data-i18n="protocol.token">मौजूदा CGD1 पेयरिंग टोकन (32 हेक्साडेसिमल अक्षर)</span><input id="pairingToken" type="password" autocomplete="off" spellcheck="false" maxlength="32" pattern="[0-9a-fA-F]{32}"></label>
+          <p class="field-hint" id="protocolNote" data-i18n="protocol.note">नए प्रोफ़ाइल प्रकाशित कमांड और सिमुलेशन परीक्षणों पर आधारित हैं; वास्तविक सत्यापन बाकी है। PVVX पहले से स्थापित होना चाहिए। मौजूदा CGD1 टोकन केवल इस ब्राउज़र सत्र में रहता है।</p>
+          <a class="text-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard/blob/main/docs/DEVICE_SUPPORT.md" data-i18n="protocol.supportMatrix">प्रयोगात्मक प्रोफ़ाइल और उपकरण शोध</a>
+        </div>
         <div class="connection-panel__main">
           <div class="connection-heading">
             <div><p class="section-kicker" data-i18n="connection.kicker">कनेक्शन</p><h2 id="connection-title" data-i18n="connection.title">सक्रिय सेंसर</h2></div>
@@ -348,6 +370,11 @@
           <div><p data-i18n="metric.deviceTime">डिवाइस समय</p><strong id="deviceTime" aria-live="polite">--:--</strong></div>
           <footer><span id="deviceTimeZone" data-i18n="metric.timezoneUnread">समय क्षेत्र नहीं पढ़ा</span><span id="deviceTimeDrift" data-i18n="metric.driftUnknown">अंतर --</span></footer>
         </article>
+      </section>
+
+      <section class="extra-measurements container" id="extraMeasurements" hidden>
+        <h2 data-i18n="protocol.extraMeasurements">अतिरिक्त माप</h2>
+        <dl id="extraMeasurementsList"></dl>
       </section>
 
       <section class="workbench container" aria-label="Sensor tools">

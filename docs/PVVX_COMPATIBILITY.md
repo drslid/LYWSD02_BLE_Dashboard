@@ -1,10 +1,10 @@
 # PVVX compatibility assessment and project naming
 
-Reviewed on October 30, 2026 against [PVVX ATC_MiThermometer commit cafd86d](https://github.com/pvvx/ATC_MiThermometer/tree/cafd86d2f091d6ac80ac9e71a3fb1862b34133be), its configurator and the current dashboard source. This is a feasibility assessment, not a claim that these devices have been tested with this project.
+Reviewed on October 30, 2026 against [PVVX ATC_MiThermometer commit cafd86d](https://github.com/pvvx/ATC_MiThermometer/tree/cafd86d2f091d6ac80ac9e71a3fb1862b34133be), its configurator and the current dashboard source. The development version now implements an experimental PVVX adapter in the browser and Home Assistant. **Physical validation is still pending.** See the [current device matrix and usage](DEVICE_SUPPORT.md) for implementation status and limits.
 
 ## Current support depends on firmware
 
-The dashboard and `lywsd02_sync` integration implement the stock LYWSD02 GATT protocol. LYWSD02, LYWSD02MMC and MHO-C303 with original firmware are the current device families. The physical MHO-C303 validation was performed in Home Assistant by [@drug123](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251); its browser path still needs physical validation.
+The established dashboard and `lywsd02_sync` path implements the stock LYWSD02 GATT protocol for LYWSD02, LYWSD02MMC and MHO-C303 with original firmware. The physical MHO-C303 validation was performed in Home Assistant by [@drug123](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251); its browser path still needs physical validation. The new PVVX adapter uses its own command service and validates identity, firmware v4.7–v5.9 and service capabilities before clock/settings writes.
 
 PVVX firmware is another protocol even when installed on an LYWSD02MMC. Adding `ATC_` or more model names to discovery would not provide compatibility: the existing service lookup and characteristic reads/writes would still be wrong. MHO-C303 and MHO-C401 are different devices; support for the former does not validate the latter.
 
@@ -30,7 +30,7 @@ Upstream sources: [model catalogue](https://github.com/pvvx/ATC_MiThermometer/bl
 
 | Function | Current stock Xiaomi adapter | PVVX adapter requirement |
 | --- | --- | --- |
-| Transport | Service `ebe0ccb0-…` and separate characteristics | Service `0x1F10`, command/notification characteristic `0x1F1F` |
+| Transport | Service `ebe0ccb0-…` and separate characteristics | Service `0x1F10`, command/notification characteristic `0x1F1F`; Write Without Response plus notification replies |
 | Identification | Advertised name prefix, model saved in the config entry | Validate a `0x00` device-ID reply: protocol revision, hardware, firmware and service flags |
 | Time | Timestamp plus a signed timezone byte on `ebe0ccb7-…` | `0x23` command plus a 32-bit timestamp; separate timezone handling |
 | Temperature / humidity | Signed hundredths of °C plus humidity in whole percent | Standard Environmental Sensing characteristics or PVVX `0x33` notifications; humidity uses hundredths of percent |
@@ -50,19 +50,19 @@ PVVX records contain a time, temperature, humidity and battery voltage. The upst
 
 Sources: [upstream configurator, `setDevTime()`](https://github.com/pvvx/pvvx.github.io/blob/master/ATC_MiThermometer/TelinkMiFlasher.html), [record structure](https://github.com/pvvx/ATC_MiThermometer/blob/cafd86d2f091d6ac80ac9e71a3fb1862b34133be/src/logger.h), [recording semantics](https://github.com/pvvx/ATC_MiThermometer#reading-measurements-from-flash).
 
-## Suggested implementation sequence
+## Implementation and remaining validation
 
-1. Add separate stock-Xiaomi and PVVX adapters, sharing connection cancellation, saved devices and UI rendering. Start with PVVX identification and read-only measurements on one physical LYWSD03MMC. Validate service and firmware replies before enabling writes.
-2. Add clock sync and drift, then capability-aware settings. Test positive/negative and fractional timezones, daylight saving changes, unsupported commands, invalid packets and disconnections.
-3. Add a PVVX sample-history view and CSV export. Keep sample/average history distinct from the stock hourly extrema. Verify transfer termination, duplicates, reconnects and partial downloads.
-4. Extend Home Assistant through the same protocol separation. Retain stable entry/entity IDs, retries and scheduling. Import statistics with the correct sample semantics.
-5. Validate additional physical models and firmware versions before moving them into the supported-device table.
+1. Implemented: separate adapters, identity/capability checks, command queues, cancellation, clock read-back and settings that preserve unrelated flags. Simulated tests cover signed/fractional offsets, malformed/unknown identities, errors and disconnections.
+2. Implemented in the browser: measurements, battery, sample-history transfer and a dedicated CSV containing raw device timestamps. The record-count selector counts samples for PVVX, hours for stock clocks.
+3. Implemented in Home Assistant: discovery hints, protocol selection, scheduled time/settings updates and readings. Existing integration/entity/statistics identities remain unchanged. PVVX records are deliberately not imported as stock hourly extrema.
+4. Pending: physical verification of clock display, daylight saving transitions, transfer completion, exact board variants and firmware behavior. PIN-protected command services are outside this implementation.
+5. Pending: wider firmware/hardware coverage and a release after physical validation. Unknown identities and Zigbee builds are rejected rather than used through the stock protocol.
 
 Home Assistant already receives PVVX sensors configured for BTHome through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/). The useful addition here would be a simpler device-control interface, time synchronization and history retrieval. Reimplementing passive sensor reception alone would add little value. Keep firmware installation in the existing upstream flasher initially rather than expanding this dashboard into an OTA tool.
 
 ## Naming recommendation
 
-A broader public name such as **BLE Climate Dashboard** would fit a future product that supports multiple clock and sensor protocols. The current project can keep its established name while the PVVX adapter is only a proposal. A rename should follow working, physically validated multi-protocol support, or be chosen explicitly as a branding decision.
+A broader public name such as **BLE Climate Dashboard** fits multiple clock and sensor protocols. The current project can keep its established name while the new profiles remain experimental. A rename should follow working, physically validated multi-protocol support, or be chosen explicitly as a branding decision.
 
 | Name or identifier | Recommendation |
 | --- | --- |

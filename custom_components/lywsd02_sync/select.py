@@ -12,7 +12,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import LYWSD02ConfigEntry
 from .const import (
-    CLOCK_FORMATS,
     CONF_CLOCK_FORMAT,
     CONF_SCHEDULE,
     CONF_UNIT,
@@ -66,7 +65,7 @@ SELECTS: tuple[LYWSD02SelectDescription, ...] = (
     LYWSD02SelectDescription(
         key=CONF_CLOCK_FORMAT,
         translation_key="clock_format",
-        options_fn=lambda manager: list(CLOCK_FORMATS),
+        options_fn=lambda manager: manager.clock_formats,
         value_fn=lambda manager: manager.entry.options.get(CONF_CLOCK_FORMAT),
     ),
 )

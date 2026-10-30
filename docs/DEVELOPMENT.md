@@ -2,7 +2,7 @@
 
 For instructions on synchronizing your clock and changing its display settings, see the [user guide](../README.md).
 
-This page collects implementation details and the device research behind the dashboard. Run the local commands from the repository root. Browser tests use simulated sensors; confirm Bluetooth behavior and device writes with a physical LYWSD02.
+This page collects implementation details and the device research behind the dashboard. Run the local commands from the repository root. Browser tests use simulated sensors; confirm Bluetooth behavior and device writes with the physical model and firmware being claimed. New profiles have no physical validation yet; the maintainer currently owns only LYWSD02 clocks.
 
 ## Run locally
 
@@ -22,6 +22,7 @@ Run the connection regression checks with Node.js, without installing packages:
 
 ```bash
 node tests/connection-regressions.cjs
+node --test tests/ble-devices.test.cjs
 ```
 
 These checks simulate device switching, cancellation during connection setup, delayed Bluetooth responses and the retry limit. They do not replace validation with physical sensors.
@@ -56,7 +57,7 @@ python3.14 -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The same suite passes on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, the search and reconnections of the sync button, readings, hourly records and their statistics, daylight saving changes, restarts and translations.
+This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. The original stock-clock suite was also verified on Home Assistant 2025.2.0, the minimum declared in `hacs.json` (harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`). The extended suite has been run on 2026.9.4. Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, the search and reconnections of the sync button, readings, hourly records and their statistics, daylight saving changes, restarts and translations. `test_extended_protocols.py` adds PVVX and CGD1 wire replies through both isolated command adapters and real HA entry setup.
 
 Home Assistant does not call integrations back for every advertisement: identical advertisements are skipped, and when a passive proxy owns a device, a connectable proxy can make it reachable silently. The integration therefore never waits for an advertisement alone. It retries on timers and looks the clock up at each attempt; advertisements only shorten the wait.
 
@@ -89,6 +90,7 @@ index.html               Generated English page
 fr/, es/, it/, de/       Generated French, Spanish, Italian and German pages
 ar/, zh/, pt/, hi/       Generated Arabic, Chinese, Portuguese and Hindi pages
 app.js                   Bluetooth, reconnect, history and device persistence
+ble-devices.js           Experimental PVVX/CGD1 and factory sensor GATT adapters
 i18n.js                  Nine language catalogs and localized metadata
 styles.css               Responsive LTR/RTL interface
 site.webmanifest         Installable app metadata
@@ -107,7 +109,7 @@ Supported device families are **LYWSD02**, **LYWSD02MMC** and **MHO-C303**. The 
 
 MHO-C303 compatibility was contributed by [@drug123](https://github.com/drug123) in [PR #1](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1). Their [physical Home Assistant test](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251) confirmed clock sync, temperature/humidity notifications, battery and hourly records alongside a working LYWSD02. Browser discovery and reconnection now include this model; physical browser validation is still pending. MHO-C303 alarm functions and 12/24-hour switching have not been validated.
 
-This support is for original firmware. The [PVVX compatibility assessment](PVVX_COMPATIBILITY.md) describes the separate command adapter required by custom firmware, candidate models, history semantics and a naming/migration proposal. Device photographs and locally stored contributor avatars are documented in [image credits](ASSET_CREDITS.md).
+This established support is for original firmware. The [complete BLE device research](DEVICE_SUPPORT.md) records all 20 ESPHome models and the new experimental profiles. `ble-devices.js` implements browser protocols; `custom_components/lywsd02_sync/extended_protocols.py` implements PVVX and existing-token CGD1 clock sessions for HA. Factory measurement-only profiles are browser additions; native HA integrations already handle their broadcasts. The [PVVX compatibility assessment](PVVX_COMPATIBILITY.md) describes protocol differences, history semantics and a naming/migration proposal. Device photographs and locally stored contributor avatars are documented in [image credits](ASSET_CREDITS.md).
 
 The dashboard uses the Xiaomi service `EBE0CCB0-7A0A-4B0C-8A1A-6FF2997DA3A6` and these characteristics:
 

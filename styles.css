@@ -550,6 +550,30 @@ html.is-phone .noscript-message {
   margin-inline: auto;
 }
 
+.protocol-options {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.protocol-options .field-hint {
+  max-width: 80ch;
+  margin: 0;
+}
+
+.extra-measurements {
+  margin-block: 20px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.extra-measurements h2 { font-size: 1rem; }
+.extra-measurements dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.extra-measurements dd { margin: 0; font-family: var(--font-mono); }
+
 .device-card {
   display: grid;
   grid-template-columns: minmax(0, 130px) minmax(0, 1fr);
@@ -1279,6 +1303,7 @@ a.button {
 
 select,
 input[type="number"],
+input[type="password"],
 input[type="text"] {
   min-height: 42px;
   padding: 9px 11px;

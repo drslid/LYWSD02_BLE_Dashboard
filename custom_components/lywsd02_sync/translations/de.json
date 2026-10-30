@@ -6,16 +6,31 @@
         "description": "{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Zeitplan, Temperatureinheit, Zeitformat und Zeitkorrektur kannst du später auf der Geräteseite ändern."
       },
       "user": {
-        "description": "Wähle die LYWSD02 / LYWSD02MMC / MHO-C303-Uhr, die immer richtig gehen soll.",
+        "description": "Eine originale LYWSD02 / LYWSD02MMC / MHO-C303 oder ein experimentelles PVVX- / CGD1-Profil wählen (Gerätetests stehen aus).",
         "data": {
-          "address": "Uhr"
+          "address": "Uhr",
+          "device_protocol": "Gerät / Firmware"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "Experimentelle CGD1-Unterstützung; Gerätetests stehen aus. Das vorhandene Kopplungstoken mit 32 Hexadezimalzeichen eingeben. Home Assistant speichert es für geplante Verbindungen. Die Uhr wird weder neu gekoppelt noch zurückgesetzt.",
+        "data": {
+          "pairing_token": "Vorhandenes CGD1-Kopplungstoken (32 Hexadezimalzeichen)"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "Die PVVX- / CGD1-Unterstützung ist experimentell und nur mit simulierten Geräten getestet. Gerätetests stehen aus.\n\n{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Zeitplan, Temperatureinheit, Zeitformat und Zeitkorrektur kannst du später auf der Geräteseite ändern."
       }
     },
     "abort": {
       "already_configured": "Diese Uhr ist bereits eingerichtet.",
       "already_in_progress": "Diese Uhr wird bereits eingerichtet.",
-      "no_devices_found": "Keine LYWSD02 / LYWSD02MMC / MHO-C303-Uhr gefunden. Bring sie näher an deinen Bluetooth-Adapter oder -Proxy und versuche es erneut."
+      "no_devices_found": "Keine kompatible Uhr gefunden. Eine originale LYWSD02 / MHO-C303, PVVX (ATC_ / BTH_ / PVVX_) oder CGD1 näher an den Bluetooth-Adapter oder aktiven Proxy bringen."
+    },
+    "error": {
+      "invalid_token": "Für das vorhandene CGD1-Token genau 32 Hexadezimalzeichen eingeben."
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "Automatische Synchronisierung",
         "description": "Wann soll Home Assistant die Uhr stellen? Zeitumstellungen werden immer innerhalb einer Stunde korrigiert, und die Schaltfläche „Uhr synchronisieren“ funktioniert jederzeit. Temperatureinheit, Zeitformat und Zeitkorrektur findest du auf der Geräteseite.",
         "data": {
-          "schedule": "Häufigkeit"
+          "schedule": "Häufigkeit",
+          "pairing_token": "Neues CGD1-Token (leer behält das vorhandene)"
+        },
+        "data_description": {
+          "pairing_token": "Experimentelle CGD1-Unterstützung; Gerätetests stehen aus. Das vorhandene Kopplungstoken mit 32 Hexadezimalzeichen eingeben. Home Assistant speichert es für geplante Verbindungen. Die Uhr wird weder neu gekoppelt noch zurückgesetzt."
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "Dieser Cron-Ausdruck ist ungültig.",
-      "too_frequent": "Lass mindestens eine Stunde zwischen zwei Synchronisierungen, um die Batterie zu schonen."
+      "too_frequent": "Lass mindestens eine Stunde zwischen zwei Synchronisierungen, um die Batterie zu schonen.",
+      "invalid_token": "Für das vorhandene CGD1-Token genau 32 Hexadezimalzeichen eingeben."
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "Freitag",
         "sat": "Samstag",
         "sun": "Sonntag"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — Original-Firmware",
+        "pvvx": "PVVX BLE — experimentell",
+        "cgd1": "CGD1 — Original-Firmware, experimentell"
       }
     }
   },

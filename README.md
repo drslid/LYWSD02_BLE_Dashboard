@@ -109,11 +109,20 @@ Thank you to **[@drug123](https://github.com/drug123)** for contributing MHO-C30
 
 The MHO-C303 shares the time, measurement and history characteristics used by the integration. Its 12/24-hour setting and alarm functions have not been validated; alarm management is not provided by this project. Other Bluetooth thermometers are not automatically compatible: the device name and GATT protocol must match.
 
-### What about PVVX / ATC devices?
+### Experimental devices and firmware (development version)
 
-Devices running [PVVX ATC_MiThermometer](https://github.com/pvvx/ATC_MiThermometer), including LYWSD03MMC, MHO-C401, CGG1, CGDK2 and MJWSD05MMC, are candidates for a separate protocol adapter. **They are not supported by this dashboard or its clock-sync integration yet.** Their time commands, configuration and stored measurements differ from the stock Xiaomi protocol. This also applies to an LYWSD02MMC flashed with PVVX.
+The development source adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Select the matching **Device / firmware** profile before connecting in the browser. The existing stock profile remains the default.
 
-See the [PVVX compatibility assessment and naming proposal](docs/PVVX_COMPATIBILITY.md) for the verified protocol differences, implementation priorities and migration considerations. Home Assistant can already receive BTHome broadcasts from appropriately configured PVVX devices through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/).
+| Device / firmware | Browser dashboard | Home Assistant |
+| --- | --- | --- |
+| **PVVX BLE v4.7–v5.9**, recognized climate hardware: LYWSD03MMC, MHO-C401/C401N, CGG1/CGG1N, CGDK2, MJWSD05MMC variants, MHO-C122, LYWSD02MMC | Experimental time sync, unit, live readings and averaged sample history/CSV; 12/24 h only on matching hardware | Experimental clock sync/settings/readings; sample history is not imported as stock min/max statistics |
+| **CGD1**, original firmware | Experimental time/timezone/unit/12–24 h and readings, using its **existing pairing token** | Experimental clock sync/settings/readings with the same token; no measured clock drift/read-back |
+| **LYWSDCGQ / MJ_HT_V1**, **LYWSD03MMC**, **CGG1 ClearGrass variant**, **CGDK2**, original firmware | Experimental measurements; device clock/settings actions disabled | Use native Xiaomi BLE / Qingping, according to the device |
+| **HHCCJCY01 / GCLS002** Flower Care and **HHCCPOT002** RoPot | Experimental soil measurements and battery; Flower Care also temperature and illuminance | Use native Xiaomi BLE / ESPHome |
+
+PVVX must already be installed; this dashboard does not flash firmware. Identity/capability checks reject unknown PVVX hardware, unsupported versions and Zigbee builds. CGD1 session authentication preserves the existing pairing and unrelated settings; it does not configure alarms or ringtones. Factory CGG1 variants differ; the HomeKit variant is excluded. These development additions are not included in the last tagged HACS release.
+
+See the [complete research for all 20 ESPHome models, commands and limitations](docs/DEVICE_SUPPORT.md), and the [PVVX protocol and naming assessment](docs/PVVX_COMPATIBILITY.md). Home Assistant can receive appropriately configured PVVX BTHome broadcasts through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/). Other motion/contact/air-quality devices remain deferred until their active commands and authentication are verified; their supported broadcasts can already be used through native HA or ESPHome.
 
 <a id="home-assistant"></a>
 

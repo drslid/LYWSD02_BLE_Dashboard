@@ -18,7 +18,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 
 from . import LYWSD02ConfigEntry
-from .const import STATUSES
+from .const import CONF_PROTOCOL, STATUSES
 from .entity import LYWSD02Entity
 from .manager import ClockSyncManager
 from .protocol import HourlyRecord
@@ -135,7 +135,13 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Add the sync sensors."""
-    async_add_entities(LYWSD02Sensor(entry.runtime_data, description) for description in SENSORS)
+    protocol = entry.data.get(CONF_PROTOCOL, "stock")
+    async_add_entities(
+        LYWSD02Sensor(entry.runtime_data, description)
+        for description in SENSORS
+        if not (protocol != "stock" and description.key.endswith("_24h"))
+        and not (protocol == "cgd1" and description.key in ("clock_drift", "clock_time", "battery"))
+    )
 
 
 class LYWSD02Sensor(LYWSD02Entity, SensorEntity):

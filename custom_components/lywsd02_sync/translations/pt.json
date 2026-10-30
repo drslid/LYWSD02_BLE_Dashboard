@@ -6,16 +6,31 @@
         "description": "Manter {name} à hora certa? O Home Assistant acerta o relógio de imediato, depois todas as noites às 04:00 e após cada mudança de hora. O agendamento, a unidade de temperatura, o formato da hora e a correção da hora alteram-se depois na página do dispositivo."
       },
       "user": {
-        "description": "Escolha o relógio LYWSD02 / LYWSD02MMC / MHO-C303 a manter à hora certa.",
+        "description": "Escolha um relógio LYWSD02 / LYWSD02MMC / MHO-C303 original ou um perfil PVVX / CGD1 experimental (sem validação física).",
         "data": {
-          "address": "Relógio"
+          "address": "Relógio",
+          "device_protocol": "Dispositivo / firmware"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "Suporte CGD1 experimental, sem validação física. Insira o token de emparelhamento existente com 32 caracteres hexadecimais. O Home Assistant guarda-o para ligações agendadas. Não emparelha nem repõe o relógio.",
+        "data": {
+          "pairing_token": "Token de emparelhamento CGD1 existente (32 caracteres hexadecimais)"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "O suporte PVVX / CGD1 é experimental e foi testado apenas com dispositivos simulados. Falta validação física.\n\nManter {name} à hora certa? O Home Assistant acerta o relógio de imediato, depois todas as noites às 04:00 e após cada mudança de hora. O agendamento, a unidade de temperatura, o formato da hora e a correção da hora alteram-se depois na página do dispositivo."
       }
     },
     "abort": {
       "already_configured": "Este relógio já está configurado.",
       "already_in_progress": "Este relógio já está a ser configurado.",
-      "no_devices_found": "Nenhum relógio LYWSD02 / LYWSD02MMC / MHO-C303 encontrado. Aproxime-o do adaptador ou proxy Bluetooth e tente novamente."
+      "no_devices_found": "Nenhum relógio compatível encontrado. Aproxime um LYWSD02 / MHO-C303 original, PVVX (ATC_ / BTH_ / PVVX_) ou CGD1 do adaptador Bluetooth ou proxy ativo."
+    },
+    "error": {
+      "invalid_token": "Insira exatamente 32 caracteres hexadecimais para o token CGD1 existente."
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "Sincronização automática",
         "description": "Quando deve o Home Assistant acertar o relógio? As mudanças de hora são sempre corrigidas em menos de uma hora e o botão Sincronizar relógio funciona a qualquer momento. A unidade de temperatura, o formato da hora e a correção da hora estão na página do dispositivo.",
         "data": {
-          "schedule": "Frequência"
+          "schedule": "Frequência",
+          "pairing_token": "Token CGD1 de substituição (vazio mantém o existente)"
+        },
+        "data_description": {
+          "pairing_token": "Suporte CGD1 experimental, sem validação física. Insira o token de emparelhamento existente com 32 caracteres hexadecimais. O Home Assistant guarda-o para ligações agendadas. Não emparelha nem repõe o relógio."
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "Esta expressão cron não é válida.",
-      "too_frequent": "Deixe pelo menos uma hora entre duas sincronizações para poupar a bateria."
+      "too_frequent": "Deixe pelo menos uma hora entre duas sincronizações para poupar a bateria.",
+      "invalid_token": "Insira exatamente 32 caracteres hexadecimais para o token CGD1 existente."
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "Sexta-feira",
         "sat": "Sábado",
         "sun": "Domingo"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — firmware original",
+        "pvvx": "PVVX BLE — experimental",
+        "cgd1": "CGD1 — firmware original, experimental"
       }
     }
   },

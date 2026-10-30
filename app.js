@@ -14,6 +14,7 @@
 
   const BASE_URL = 'https://drslid.github.io/LYWSD02_BLE_Dashboard/';
   const DEVICE_NAME_PREFIXES = ['LYWSD02', 'MHO-C303'];
+  const EXTRA_PROFILES = ['pvvx', 'cgd1', 'lywsdcgq', 'lywsd03', 'flowercare', 'ropot', 'cgg1', 'cgdk2'];
   const ALIASES_KEY = 'lywsd02-device-aliases-v1';
   const DEVICE_HISTORY_KEY = 'lywsd02-device-history-v1';
   const AUTO_RETRY_KEY = 'lywsd02-auto-retry-v1';
@@ -49,6 +50,8 @@
     deviceAlias: byId('deviceAlias'),
     deviceId: byId('deviceId'),
     deviceLabel: byId('deviceLabel'),
+    deviceProfile: byId('deviceProfile'),
+    pairingToken: byId('pairingToken'),
     deviceTime: byId('deviceTime'),
     deviceTimeDrift: byId('deviceTimeDrift'),
     deviceTimeZone: byId('deviceTimeZone'),
@@ -87,6 +90,9 @@
   const legacyAliases = readStoredObject(ALIASES_KEY);
   const state = {
     aliases: legacyAliases,
+    adapter: null,
+    protocolKind: 'stock',
+    extraMeasurements: {},
     bluetoothUsable: false,
     cancelHistoryCollection: null,
     clockDrift: null,
@@ -161,6 +167,7 @@
       normalized[id] = {
         id,
         name: String(record.name || 'LYWSD02'),
+        profile: EXTRA_PROFILES.includes(record.profile) ? record.profile : 'stock',
         alias: String(record.alias || aliases[id] || ''),
         lastConnected: Number(record.lastConnected || 0),
         connections: Number(record.connections || 0),
@@ -254,6 +261,25 @@
     elements.loadHistoryBtn.disabled = !state.isConnected || state.historyLoading;
     elements.historyLimit.disabled = !state.isConnected || state.historyLoading;
     elements.exportHistoryBtn.disabled = state.historyRecords.length === 0;
+    if (elements.deviceProfile) elements.deviceProfile.disabled = state.isConnected || state.isConnecting;
+    const tokenField = byId('pairingTokenField');
+    if (tokenField) tokenField.hidden = elements.deviceProfile?.value !== 'cgd1';
+    if (state.adapter) {
+      const capabilities = state.adapter.capabilities;
+      elements.syncBtn.disabled = !state.isConnected;
+      elements.unitBtn.disabled = !state.isConnected || !capabilities.unit;
+      elements.loadHistoryBtn.disabled = !state.isConnected || state.historyLoading || !capabilities.history;
+      elements.refreshTimeBtn.disabled = !state.isConnected || !capabilities.time || state.protocolKind === 'cgd1';
+      elements.historyLimit.disabled = !state.isConnected || state.historyLoading || !capabilities.history;
+      document.querySelectorAll('input[name="clockMode"]').forEach((control) => { control.disabled = !state.isConnected || !capabilities.format; });
+      elements.autoSyncClock.disabled = !capabilities.time;
+      elements.timezone.disabled = !state.isConnected || !capabilities.time;
+      elements.offsetMinutes.disabled = !state.isConnected || !capabilities.time;
+      elements.offsetMinutesRange.disabled = !state.isConnected || !capabilities.time;
+    }
+    if (!state.adapter) elements.autoSyncClock.disabled = false;
+    const syncLabel = elements.syncBtn.querySelector('span');
+    if (syncLabel) syncLabel.textContent = t(state.adapter && !state.adapter.capabilities.time ? 'protocol.refreshMeasurements' : 'settings.sync');
     renderDeviceHistory();
   }
 
@@ -303,6 +329,7 @@
       ...previous,
       id: device.id,
       name: device.name || previous.name || 'LYWSD02',
+      profile: state.protocolKind,
       alias: previous.alias || state.aliases[device.id] || '',
       lastConnected: Date.now(),
       connections: Number(previous.connections || 0) + 1
@@ -323,7 +350,27 @@
     renderDeviceHistory();
   }
 
+  function renderExtraMeasurements() {
+    const panel = byId('extraMeasurements');
+    const list = byId('extraMeasurementsList');
+    if (!panel || !list) return;
+    const units = { soilMoisture: '%', conductivity: 'µS/cm', illuminance: 'lx', batteryMv: 'mV' };
+    const labels = { soilMoisture: 'protocol.soilMoisture', conductivity: 'protocol.conductivity', illuminance: 'protocol.illuminance', batteryMv: 'protocol.batteryVoltage' };
+    const entries = Object.entries(state.extraMeasurements);
+    panel.hidden = entries.length === 0;
+    list.replaceChildren();
+    entries.forEach(([key, value]) => {
+      const term = document.createElement('dt');
+      term.textContent = t(labels[key]);
+      const reading = document.createElement('dd');
+      reading.textContent = `${formatNumber(value, 0)} ${units[key]}`;
+      list.append(term, reading);
+    });
+  }
+
   function resetMeasurements() {
+    state.extraMeasurements = {};
+    renderExtraMeasurements();
     state.clockDrift = null;
     state.deviceTimezoneMinutes = null;
     state.lastBattery = null;
@@ -348,12 +395,13 @@
 
   function resetHistory() {
     state.historyRecords = [];
+    updateHistoryLabels();
     elements.historyTableBody.replaceChildren();
     elements.historyTableWrap.hidden = true;
     elements.historyEmpty.hidden = false;
     elements.historyEmpty.querySelector('p').textContent = state.device ? t('history.emptyLoaded') : t('history.emptyConnect');
     elements.historyCount.textContent = t('history.count', { count: 0 });
-    elements.historyStatus.textContent = t('history.statusDefault');
+    elements.historyStatus.textContent = t(state.protocolKind === 'pvvx' ? 'protocol.sampleHistory' : 'history.statusDefault');
     elements.exportHistoryBtn.disabled = true;
   }
 
@@ -455,6 +503,8 @@
   }
 
   function clearConnectionResources() {
+    state.adapter?.close();
+    state.adapter = null;
     state.dataCharacteristic?.removeEventListener('characteristicvaluechanged', handleMeasurement);
     state.dataCharacteristic = null;
     state.cancelHistoryCollection?.();
@@ -476,9 +526,12 @@
 
     let selectedDevice = null;
     try {
+      const profile = expectedId ? state.deviceHistory[expectedId]?.profile : elements.deviceProfile?.value;
+      const extended = EXTRA_PROFILES.includes(profile);
+      if (elements.deviceProfile) elements.deviceProfile.value = extended ? profile : 'stock';
       selectedDevice = await connectionStep(navigator.bluetooth.requestDevice({
-        filters: DEVICE_NAME_PREFIXES.map((namePrefix) => ({ namePrefix })),
-        optionalServices: [UUIDS.service]
+        ...(extended ? { acceptAllDevices: true } : { filters: DEVICE_NAME_PREFIXES.map((namePrefix) => ({ namePrefix })) }),
+        optionalServices: [UUIDS.service, '00001f10-0000-1000-8000-00805f9b34fb', '0000180f-0000-1000-8000-00805f9b34fb', '22210000-554a-4546-5542-46534450464d', '226c0000-6476-4566-7562-66734470666d', '00001204-0000-1000-8000-00805f9b34fb']
       }), task);
       if (expectedId && selectedDevice.id !== expectedId) {
         log(t('retry.mismatch', { name: expectedName || displayNameForId(expectedId) }), 'warning');
@@ -506,9 +559,14 @@
     if (state.isConnected) persistDeviceSnapshot(true);
     const previousDevice = state.device;
     const changedDevice = previousDevice?.id !== device.id;
+    const previousProtocol = state.protocolKind;
     state.connectionRun += 1;
     const run = state.connectionRun;
     const task = startConnectionTask(device);
+    const requestedProfile = ['history', 'reconnect'].includes(reason) ? state.deviceHistory[device.id]?.profile : elements.deviceProfile?.value;
+    task.profile = EXTRA_PROFILES.includes(requestedProfile) ? requestedProfile : 'stock';
+    state.protocolKind = task.profile;
+    if (elements.deviceProfile) elements.deviceProfile.value = task.profile;
     state.isConnecting = true;
     state.isConnected = false;
     clearConnectionResources();
@@ -516,11 +574,11 @@
       previousDevice.removeEventListener('gattserverdisconnected', handleGattDisconnected);
       if (previousDevice.gatt?.connected) previousDevice.gatt.disconnect();
     }
-    if (changedDevice) {
+    if (changedDevice || previousProtocol !== state.protocolKind) {
       resetMeasurements();
     }
     bindDevice(device);
-    if (changedDevice) resetHistory();
+    if (changedDevice || previousProtocol !== state.protocolKind) resetHistory();
     state.manualDisconnect = false;
     state.service = null;
     state.server = null;
@@ -595,6 +653,45 @@
     }, () => {});
     const server = await connectionStep(connecting, task);
     if (run !== state.connectionRun) return;
+    if (task.profile !== 'stock') {
+      const protocols = window.BLE_DEVICES;
+      if (!protocols) throw Object.assign(new Error('Device protocols unavailable'), { name: 'NotSupportedError' });
+      const emit = (measurement) => {
+        if (run !== state.connectionRun || task.cancelled) return;
+        if (measurement.temperature !== undefined) {
+          state.lastTemperatureC = measurement.temperature;
+          renderTemperature();
+          elements.tempTimestamp.textContent = nowLabel();
+        }
+        if (measurement.humidity !== undefined) {
+          state.lastHumidity = measurement.humidity;
+          renderHumidity(measurement.humidity);
+          elements.humTimestamp.textContent = nowLabel();
+        }
+        if (measurement.battery !== undefined) {
+          state.lastBattery = measurement.battery;
+          elements.battery.textContent = `${measurement.battery} %`;
+          elements.batteryBar.style.width = `${measurement.battery}%`;
+          elements.batTimestamp.textContent = nowLabel();
+        }
+        state.measurements += 1;
+        for (const key of ['soilMoisture', 'conductivity', 'illuminance', 'batteryMv']) {
+          if (measurement[key] !== undefined) state.extraMeasurements[key] = measurement[key];
+        }
+        renderExtraMeasurements();
+        elements.updateCount.textContent = t('metric.updates', { count: state.measurements });
+        persistDeviceSnapshot();
+      };
+      const adapter = task.profile === 'pvvx' ? new protocols.Pvvx(server, emit)
+        : task.profile === 'cgd1' ? new protocols.Cgd1(server, emit, elements.pairingToken?.value.trim())
+        : new protocols.Sensor(server, emit, task.profile);
+      state.adapter = adapter;
+      await connectionStep(adapter.open(), task);
+      if (run !== state.connectionRun) return;
+      state.server = server;
+      state.service = adapter.service;
+      return;
+    }
     const service = await connectionStep(server.getPrimaryService(UUIDS.service), task);
     if (run !== state.connectionRun) return;
     const dataCharacteristic = await connectionStep(service.getCharacteristic(UUIDS.measurements), task);
@@ -613,6 +710,20 @@
 
   async function readInitialValues(context) {
     let drift = null;
+    if (state.adapter) {
+      const adapter = state.adapter;
+      for (const operation of [() => adapter.startMeasurements(), ...(adapter.capabilities.unit ? [() => adapter.unit().then((unit) => {
+        if (!isCurrentConnection(context)) return;
+        const radio = document.querySelector(`input[name="unit"][value="${unit}"]`);
+        if (radio) radio.checked = true;
+      })] : []), async () => { drift = await readDeviceTime(false, context); }]) {
+        if (!isCurrentConnection(context)) return;
+        try { await operation(); }
+        catch (error) { if (isCurrentConnection(context)) log(describeError(error), 'warning'); }
+      }
+      if (isCurrentConnection(context) && elements.autoSyncClock.checked && drift !== null && Math.abs(drift) > 10) await syncTime(true, context);
+      return;
+    }
     const tasks = [
       [t('read.battery'), () => readBattery(context)],
       [t('read.unit'), () => readDeviceUnit(context)],
@@ -750,6 +861,17 @@
 
   async function readDeviceTime(announce = true, context = connectionContext()) {
     if (!isCurrentConnection(context)) return null;
+    if (state.adapter) {
+      const reading = await state.adapter.readTime(desiredTimezoneMinutes());
+      if (!isCurrentConnection(context) || !reading) return null;
+      state.clockDrift = reading.drift;
+      state.deviceTimezoneMinutes = reading.offset;
+      elements.deviceTime.textContent = new Intl.DateTimeFormat(localeTag(), { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'UTC' }).format(new Date(reading.localEpoch * 1000));
+      elements.deviceTimeZone.textContent = formatTimezone(reading.offset);
+      elements.deviceTimeDrift.textContent = t('metric.drift', { value: driftText(reading.drift) });
+      if (announce) log(t('log.timeRefreshed'), 'success');
+      return reading.drift;
+    }
     const characteristic = await context.service.getCharacteristic(UUIDS.time);
     if (!isCurrentConnection(context)) return null;
     const value = await characteristic.readValue();
@@ -781,6 +903,19 @@
     elements.syncBtn.disabled = true;
     elements.syncBtn.classList.add('is-loading');
     try {
+      if (state.adapter) {
+        const adapter = state.adapter;
+        if (!adapter.capabilities.time) {
+          await adapter.refresh();
+          return;
+        }
+        const mode = document.querySelector('input[name="clockMode"]:checked')?.value || '24';
+        await adapter.sync(desiredTimezoneMinutes(), automatic ? 0 : Number(elements.offsetMinutes.value || 0), adapter.capabilities.format ? mode : null);
+        if (!isCurrentConnection(context)) return;
+        log(t(adapter.kind === 'cgd1' ? 'protocol.clockAcknowledged' : 'log.autoTimeSynced'), 'success');
+        await readDeviceTime(false, context);
+        return;
+      }
       const characteristic = await context.service.getCharacteristic(UUIDS.time);
       if (!isCurrentConnection(context)) return;
       const desiredOffset = desiredTimezoneMinutes();
@@ -826,6 +961,13 @@
     elements.unitBtn.disabled = true;
     try {
       const unit = selectedUnit();
+      if (state.adapter) {
+        await state.adapter.configure({ unit });
+        if (!isCurrentConnection(context)) return;
+        renderTemperature();
+        log(t('log.unitSet', { unit }), 'success');
+        return;
+      }
       const characteristic = await context.service.getCharacteristic(UUIDS.unit);
       if (!isCurrentConnection(context)) return;
       await writeCharacteristic(characteristic, new Uint8Array([unit === 'F' ? 0x01 : 0xff]));
@@ -835,7 +977,7 @@
     } catch (error) {
       if (isCurrentConnection(context)) log(t('log.unitFailed', { error: describeError(error) }), 'error');
     } finally {
-      if (context.run === state.connectionRun) elements.unitBtn.disabled = !state.isConnected;
+      if (context.run === state.connectionRun) elements.unitBtn.disabled = !state.isConnected || (state.adapter && !state.adapter.capabilities.unit);
     }
   }
 
@@ -894,17 +1036,25 @@
   function setHistoryLoading(loading) {
     state.historyLoading = loading;
     elements.loadHistoryBtn.classList.toggle('is-loading', loading);
-    elements.loadHistoryBtn.disabled = loading || !state.isConnected;
-    elements.historyLimit.disabled = loading || !state.isConnected;
+    elements.loadHistoryBtn.disabled = loading || !state.isConnected || (state.adapter && !state.adapter.capabilities.history);
+    elements.historyLimit.disabled = elements.loadHistoryBtn.disabled;
   }
 
   async function loadHistory() {
     const context = connectionContext();
-    if (!isCurrentConnection(context) || state.historyLoading) return;
+    if (!isCurrentConnection(context) || state.historyLoading || (state.adapter && !state.adapter.capabilities.history)) return;
     setHistoryLoading(true);
     elements.historyStatus.textContent = t('history.reading');
     log(t('log.historyReading'));
     try {
+      if (state.adapter) {
+        const records = await state.adapter.history(Number(elements.historyLimit.value));
+        if (!isCurrentConnection(context)) return;
+        state.historyRecords = records;
+        renderHistory();
+        elements.historyStatus.textContent = t('protocol.sampleHistory');
+        return;
+      }
       const countCharacteristic = await context.service.getCharacteristic(UUIDS.recordCount);
       if (!isCurrentConnection(context)) return;
       const countValue = await countCharacteristic.readValue();
@@ -946,7 +1096,21 @@
     }
   }
 
+  function updateHistoryLabels() {
+    const samples = state.protocolKind === 'pvvx';
+    const title = document.querySelector('[data-i18n="history.title"]');
+    if (title) title.textContent = t(samples ? 'protocol.sampleHistoryTitle' : 'history.title');
+    const headings = document.querySelectorAll('#historyTableWrap th');
+    const keys = samples ? ['protocol.deviceTimestamp', 'metric.temperature', 'metric.humidity', 'protocol.batteryVoltage'] : ['history.date', 'history.tempMin', 'history.tempMax', 'history.humidity'];
+    headings.forEach((heading, index) => { heading.textContent = t(keys[index]); });
+    document.querySelectorAll('#historyLimit option').forEach((option) => {
+      option.textContent = samples ? t('history.count', { count: Number(option.value) }) : t(option.dataset.i18n);
+    });
+  }
+
   function renderHistory() {
+    const samples = state.protocolKind === 'pvvx';
+    updateHistoryLabels();
     elements.historyTableBody.replaceChildren();
     const count = state.historyRecords.length;
     elements.historyCount.textContent = t('history.count', { count });
@@ -961,11 +1125,14 @@
     const fragment = document.createDocumentFragment();
     state.historyRecords.forEach((record) => {
       const row = document.createElement('tr');
-      [
+      (samples ? [
+        new Intl.DateTimeFormat(localeTag(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(record.rawTimestamp * 1000)),
+        `${formatNumber(record.temperature)} °C`, `${formatNumber(record.humidity)} %`, `${record.batteryMv} mV`
+      ] : [
         dateFormatter.format(new Date(record.timestamp * 1000)),
         `${formatNumber(record.minTemperature)} °C`, `${formatNumber(record.maxTemperature)} °C`,
         `${record.minHumidity}–${record.maxHumidity} %`
-      ].forEach((value) => {
+      ]).forEach((value) => {
         const cell = document.createElement('td');
         cell.textContent = value;
         row.append(cell);
@@ -977,7 +1144,10 @@
 
   function exportHistory() {
     if (!state.historyRecords.length) return;
-    const rows = [
+    const rows = state.protocolKind === 'pvvx' ? [
+      ['device_timestamp_raw', 'temperature_average_c', 'humidity_average_pct', 'battery_mv'],
+      ...state.historyRecords.map((record) => [record.rawTimestamp, record.temperature, record.humidity, record.batteryMv])
+    ] : [
       ['date_iso', 'temperature_min_c', 'temperature_max_c', 'humidity_min_pct', 'humidity_max_pct'],
       ...state.historyRecords.map((record) => [new Date(record.timestamp * 1000).toISOString(), record.minTemperature.toFixed(2), record.maxTemperature.toFixed(2), record.minHumidity, record.maxHumidity])
     ];
@@ -997,7 +1167,7 @@
     if (state.bluetoothUsable && typeof navigator.bluetooth.getDevices === 'function') {
       try {
         const devices = await navigator.bluetooth.getDevices();
-        devices.filter((device) => !device.name || DEVICE_NAME_PREFIXES.some((prefix) => device.name.startsWith(prefix)))
+        devices.filter((device) => !device.name || state.deviceHistory[device.id]?.profile || DEVICE_NAME_PREFIXES.some((prefix) => device.name.startsWith(prefix)))
           .forEach((device) => state.grantedDevices.set(device.id, device));
       } catch {
         state.grantedDevices.clear();
@@ -1198,6 +1368,7 @@
   }
 
   function attachEvents() {
+    elements.deviceProfile?.addEventListener('change', setConnectionControls);
     document.querySelectorAll('[data-language-select]').forEach((select) => {
       select.value = window.LYWSD02_I18N?.locale() || 'en';
       select.addEventListener('change', (event) => window.LYWSD02_I18N?.setLocale(event.target.value));

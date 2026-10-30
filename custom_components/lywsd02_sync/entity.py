@@ -6,7 +6,7 @@ from homeassistant.const import CONF_MODEL
 from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
 from homeassistant.helpers.entity import Entity
 
-from .const import model_from_name
+from .const import CONF_PROTOCOL, model_from_name
 from .manager import ClockSyncManager
 
 
@@ -23,7 +23,7 @@ class LYWSD02Entity(Entity):
         self._attr_device_info = DeviceInfo(
             connections={(CONNECTION_BLUETOOTH, manager.address)},
             name=manager.name,
-            manufacturer="Xiaomi",
+            manufacturer="Qingping" if manager.entry.data.get(CONF_PROTOCOL) == "cgd1" else "Xiaomi",
             model=manager.entry.data.get(CONF_MODEL, model_from_name(manager.name)),
         )
 

@@ -36,8 +36,12 @@ from homeassistant.util.hass_dict import HassKey
 
 from .const import (
     BATTERY_CHARACTERISTIC,
+    CLOCK_FORMATS,
+    FORMAT_24H,
     CONF_CLOCK_FORMAT,
     CONF_CORRECTION,
+    CONF_PROTOCOL,
+    CONF_PAIRING_TOKEN,
     CONF_UNIT,
     DOMAIN,
     FORCE_POLL_INTERVAL,
@@ -80,6 +84,7 @@ from .protocol import (
     utc_offset_minutes,
 )
 from .records import async_import_records
+from .extended_protocols import Pvvx, Cgd1
 from .schedule import cron_expression, next_run, previous_run
 
 _LOGGER = logging.getLogger(__name__)
@@ -145,7 +150,7 @@ class _Session:
     clock_time: datetime | None = None
     battery: int | None = None
     temperature: float | None = None
-    humidity: int | None = None
+    humidity: float | None = None
     records: dict[int, HourlyRecord] = field(default_factory=dict)
 
 
@@ -167,7 +172,8 @@ class ClockSyncManager:
         self.clock_time: datetime | None = None
         self.battery: int | None = None
         self.temperature: float | None = None
-        self.humidity: int | None = None
+        self.humidity: float | None = None
+        self._pvvx_hardware: int | None = None
         # Hourly records of the 24 hours before the last sync, by the UTC hour they cover.
         self.recent: dict[datetime, HourlyRecord] = {}
         self._next_record = 0
@@ -189,6 +195,13 @@ class ClockSyncManager:
         self._unsub_advertisements: CALLBACK_TYPE | None = None
         self._listeners: list[CALLBACK_TYPE] = []
         self._store = _store(hass, entry.entry_id)
+
+    @property
+    def clock_formats(self) -> list[str]:
+        """Offer the PVVX 12-hour flag only on models where it means AM/PM."""
+        if self.entry.data.get(CONF_PROTOCOL) == "pvvx" and self._pvvx_hardware not in (9, 12, 49):
+            return [FORMAT_24H]
+        return list(CLOCK_FORMATS)
 
     async def async_start(self) -> None:
         """Restore the last sync, then follow the schedule, the settings and the UTC offset."""
@@ -399,6 +412,25 @@ class ClockSyncManager:
                 BleakClientWithServiceCache, ble_device, self.name, max_attempts=3
             )
         try:
+            protocol = self.entry.data.get(CONF_PROTOCOL, "stock")
+            if protocol != "stock":
+                if protocol not in ("pvvx", "cgd1"):
+                    raise ValueError("Unsupported device protocol")
+                adapter = Pvvx(client) if protocol == "pvvx" else Cgd1(client, self.entry.data.get(CONF_PAIRING_TOKEN, ""))
+                try:
+                    async with asyncio.timeout_at(deadline):
+                        await adapter.open()
+                        if isinstance(adapter, Pvvx):
+                            self._pvvx_hardware = adapter.hardware
+                        reading = await adapter.synchronize(dt_util.now(), settings)
+                    try:
+                        async with asyncio.timeout(READINGS_TIMEOUT):
+                            await adapter.readings(reading)
+                    except Exception:
+                        _LOGGER.debug("Optional readings unavailable for %s", self.name)
+                    return _Session(**vars(reading))
+                finally:
+                    await adapter.close()
             async with asyncio.timeout_at(deadline):
                 session = await self._async_set_clock(client, settings)
             await self._async_read_clock(client, session)

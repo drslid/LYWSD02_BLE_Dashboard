@@ -120,6 +120,7 @@
 
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
   <script src="../i18n.js" defer></script>
+  <script src="../ble-devices.js" defer></script>
   <script src="../app.js" defer></script>
 </head>
 <body>
@@ -293,6 +294,27 @@
       </section>
 
       <section class="connection-panel container" aria-labelledby="connection-title">
+        <div class="protocol-options">
+          <label class="field" for="deviceProfile">
+            <span data-i18n="protocol.label">Dispositivo / firmware</span>
+            <select id="deviceProfile" aria-describedby="protocolNote">
+              <option value="stock" data-i18n="protocol.stock">LYWSD02 / MHO-C303 — firmware original</option>
+              <option value="pvvx" data-i18n="protocol.pvvx">PVVX BLE — experimental</option>
+              <option value="cgd1" data-i18n="protocol.cgd1">CGD1 — firmware original, experimental</option>
+              <optgroup label="Firmware original · sensores (experimental)" data-i18n-label="protocol.sensors">
+                <option value="lywsdcgq">LYWSDCGQ / MJ_HT_V1</option>
+                <option value="lywsd03">LYWSD03MMC</option>
+                <option value="cgg1">CGG1 (ClearGrass)</option>
+                <option value="cgdk2">CGDK2 (Qingping)</option>
+                <option value="flowercare">HHCCJCY01 / GCLS002 (Flower Care)</option>
+                <option value="ropot">HHCCPOT002 (RoPot)</option>
+              </optgroup>
+            </select>
+          </label>
+          <label class="field" id="pairingTokenField" for="pairingToken" hidden><span data-i18n="protocol.token">Token de emparejamiento CGD1 existente (32 caracteres hexadecimales)</span><input id="pairingToken" type="password" autocomplete="off" spellcheck="false" maxlength="32" pattern="[0-9a-fA-F]{32}"></label>
+          <p class="field-hint" id="protocolNote" data-i18n="protocol.note">Los nuevos perfiles usan comandos documentados y pruebas simuladas; falta validación física. PVVX debe estar instalado. El token CGD1 existente se conserva solo en esta sesión del navegador.</p>
+          <a class="text-link" href="https://github.com/drslid/LYWSD02_BLE_Dashboard/blob/main/docs/DEVICE_SUPPORT.md" data-i18n="protocol.supportMatrix">Perfiles experimentales e investigación de dispositivos</a>
+        </div>
         <div class="connection-panel__main">
           <div class="connection-heading">
             <div><p class="section-kicker" data-i18n="connection.kicker">Conexión</p><h2 id="connection-title" data-i18n="connection.title">Sensor activo</h2></div>
@@ -348,6 +370,11 @@
           <div><p data-i18n="metric.deviceTime">Hora del dispositivo</p><strong id="deviceTime" aria-live="polite">--:--</strong></div>
           <footer><span id="deviceTimeZone" data-i18n="metric.timezoneUnread">Zona no leída</span><span id="deviceTimeDrift" data-i18n="metric.driftUnknown">Desviación --</span></footer>
         </article>
+      </section>
+
+      <section class="extra-measurements container" id="extraMeasurements" hidden>
+        <h2 data-i18n="protocol.extraMeasurements">Mediciones adicionales</h2>
+        <dl id="extraMeasurementsList"></dl>
       </section>
 
       <section class="workbench container" aria-label="Sensor tools">

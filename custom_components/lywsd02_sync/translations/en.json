@@ -6,16 +6,31 @@
         "description": "Keep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. The schedule, temperature unit, time format and time correction can be changed later on the device page."
       },
       "user": {
-        "description": "Choose the LYWSD02 / LYWSD02MMC / MHO-C303 clock to keep on time.",
+        "description": "Choose a stock LYWSD02 / LYWSD02MMC / MHO-C303 clock, or an experimental PVVX / CGD1 profile (physical validation pending).",
         "data": {
-          "address": "Clock"
+          "address": "Clock",
+          "device_protocol": "Device / firmware"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "Experimental CGD1 support: physical validation is pending. Enter its existing 32-character hexadecimal pairing token. Home Assistant stores it for scheduled connections. This does not pair or reset the clock.",
+        "data": {
+          "pairing_token": "Existing CGD1 pairing token (32 hexadecimal characters)"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "PVVX / CGD1 support is experimental and has only been tested with simulated devices. Physical validation is pending.\n\nKeep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. The schedule, temperature unit, time format and time correction can be changed later on the device page."
       }
     },
     "abort": {
       "already_configured": "This clock is already set up.",
       "already_in_progress": "This clock is already being set up.",
-      "no_devices_found": "No LYWSD02 / LYWSD02MMC / MHO-C303 clock found. Bring it closer to your Bluetooth adapter or proxy, then try again."
+      "no_devices_found": "No compatible clock found. Bring a stock LYWSD02 / MHO-C303, PVVX (ATC_ / BTH_ / PVVX_) or CGD1 clock closer to a Bluetooth adapter or active proxy."
+    },
+    "error": {
+      "invalid_token": "Enter exactly 32 hexadecimal characters for the existing CGD1 token."
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "Automatic sync",
         "description": "When should Home Assistant set the clock? Daylight saving changes are always corrected within the hour, and the Sync clock button works at any time. The temperature unit, time format and time correction are on the device page.",
         "data": {
-          "schedule": "Frequency"
+          "schedule": "Frequency",
+          "pairing_token": "Replacement CGD1 token (blank keeps the existing token)"
+        },
+        "data_description": {
+          "pairing_token": "Experimental CGD1 support: physical validation is pending. Enter its existing 32-character hexadecimal pairing token. Home Assistant stores it for scheduled connections. This does not pair or reset the clock."
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "This cron expression is not valid.",
-      "too_frequent": "Leave at least one hour between two syncs to save the battery."
+      "too_frequent": "Leave at least one hour between two syncs to save the battery.",
+      "invalid_token": "Enter exactly 32 hexadecimal characters for the existing CGD1 token."
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "Friday",
         "sat": "Saturday",
         "sun": "Sunday"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — original firmware",
+        "pvvx": "PVVX BLE — experimental",
+        "cgd1": "CGD1 — original firmware, experimental"
       }
     }
   },

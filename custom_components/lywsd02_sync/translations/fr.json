@@ -6,16 +6,31 @@
         "description": "Garder {name} à l’heure ? Home Assistant règle son horloge tout de suite, puis chaque nuit à 04:00 et après chaque changement d’heure. La planification, l’unité de température, le format de l’heure et la correction de l’heure se règlent ensuite sur la page de l’appareil."
       },
       "user": {
-        "description": "Choisissez l’horloge LYWSD02 / LYWSD02MMC / MHO-C303 à garder à l’heure.",
+        "description": "Choisissez une horloge LYWSD02 / LYWSD02MMC / MHO-C303 d’origine, ou un profil PVVX / CGD1 expérimental (validation matérielle à faire).",
         "data": {
-          "address": "Horloge"
+          "address": "Horloge",
+          "device_protocol": "Appareil / firmware"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "Prise en charge CGD1 expérimentale : validation matérielle à faire. Saisissez son jeton d’appairage existant de 32 caractères hexadécimaux. Home Assistant le conserve pour les connexions planifiées. Cela n’appaire ni ne réinitialise l’horloge.",
+        "data": {
+          "pairing_token": "Jeton d’appairage CGD1 existant (32 caractères hexadécimaux)"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "La prise en charge PVVX / CGD1 est expérimentale et testée uniquement avec des appareils simulés. La validation matérielle reste à faire.\n\nGarder {name} à l’heure ? Home Assistant règle son horloge tout de suite, puis chaque nuit à 04:00 et après chaque changement d’heure. La planification, l’unité de température, le format de l’heure et la correction de l’heure se règlent ensuite sur la page de l’appareil."
       }
     },
     "abort": {
       "already_configured": "Cette horloge est déjà configurée.",
       "already_in_progress": "La configuration de cette horloge est déjà en cours.",
-      "no_devices_found": "Aucune horloge LYWSD02 / LYWSD02MMC / MHO-C303 trouvée. Rapprochez-la de votre adaptateur ou proxy Bluetooth, puis réessayez."
+      "no_devices_found": "Aucune horloge compatible trouvée. Rapprochez une LYWSD02 / MHO-C303 d’origine, une PVVX (ATC_ / BTH_ / PVVX_) ou une CGD1 d’un adaptateur Bluetooth ou proxy actif."
+    },
+    "error": {
+      "invalid_token": "Saisissez exactement 32 caractères hexadécimaux pour le jeton CGD1 existant."
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "Synchronisation automatique",
         "description": "Quand Home Assistant doit-il régler l’horloge ? Les changements d’heure sont toujours corrigés dans l’heure, et le bouton Synchroniser l’heure fonctionne à tout moment. L’unité de température, le format de l’heure et la correction de l’heure se trouvent sur la page de l’appareil.",
         "data": {
-          "schedule": "Fréquence"
+          "schedule": "Fréquence",
+          "pairing_token": "Nouveau jeton CGD1 (laisser vide pour conserver l’existant)"
+        },
+        "data_description": {
+          "pairing_token": "Prise en charge CGD1 expérimentale : validation matérielle à faire. Saisissez son jeton d’appairage existant de 32 caractères hexadécimaux. Home Assistant le conserve pour les connexions planifiées. Cela n’appaire ni ne réinitialise l’horloge."
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "Cette expression cron n’est pas valide.",
-      "too_frequent": "Laissez au moins une heure entre deux synchronisations pour préserver la pile."
+      "too_frequent": "Laissez au moins une heure entre deux synchronisations pour préserver la pile.",
+      "invalid_token": "Saisissez exactement 32 caractères hexadécimaux pour le jeton CGD1 existant."
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "Vendredi",
         "sat": "Samedi",
         "sun": "Dimanche"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — firmware d’origine",
+        "pvvx": "PVVX BLE — expérimental",
+        "cgd1": "CGD1 — firmware d’origine, expérimental"
       }
     }
   },

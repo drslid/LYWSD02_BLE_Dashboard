@@ -84,7 +84,7 @@ function renderPage(template, code) {
   assert.equal(replacements, translatedElements, 'Every data-i18n element must contain only text, never child markup.');
 
   html = html.replace(/<([a-z][\w:-]*)\b([^<>]*)>/gi, (_, tag, attributes) => {
-    for (const [dataName, name] of [['title', 'title'], ['aria', 'aria-label'], ['placeholder', 'placeholder'], ['alt', 'alt']]) {
+    for (const [dataName, name] of [['title', 'title'], ['aria', 'aria-label'], ['placeholder', 'placeholder'], ['alt', 'alt'], ['label', 'label']]) {
       const key = attributes.match(new RegExp(`\\sdata-i18n-${dataName}="([^"]+)"`))?.[1];
       if (key) attributes = setAttribute(attributes, name, translation(code, key));
     }
@@ -156,7 +156,7 @@ function renderPage(template, code) {
   assert.ok(hasStructuredData, 'Missing structured data in the template.');
 
   if (code !== 'en') {
-    html = html.replace(/\b(src|href)="((?:img\/[^"<>]+)|(?:styles\.css|i18n\.js|app\.js|site\.webmanifest)(?:[?#][^"<>]*)?)"/g,
+    html = html.replace(/\b(src|href)="((?:img\/[^"<>]+)|(?:styles\.css|i18n\.js|ble-devices\.js|app\.js|site\.webmanifest)(?:[?#][^"<>]*)?)"/g,
       (_, attribute, value) => `${attribute}="../${value}"`);
   }
   return html.replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';

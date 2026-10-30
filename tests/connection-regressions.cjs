@@ -27,7 +27,7 @@ function createNode() {
   };
 }
 
-function setup(t, { fakeTimers = false, clockMode = '24' } = {}) {
+function setup(t, { fakeTimers = false, clockMode = '24', protocols } = {}) {
   const nodes = new Map();
   const storage = new Map();
   const timers = new Set();
@@ -51,7 +51,7 @@ function setup(t, { fakeTimers = false, clockMode = '24' } = {}) {
       getItem(key) { return storage.get(key) ?? null; },
       setItem(key, value) { storage.set(key, value); }
     },
-    window: {},
+    window: { BLE_DEVICES: protocols },
     setTimeout(callback, delay) {
       if (fakeTimers) {
         const timer = ++nextTimer;
@@ -753,3 +753,58 @@ for (const outcome of ['resolve', 'reject']) {
     assert.equal(app.state.isConnected, true);
   });
 }
+
+test('an explicit experimental profile connects through its adapter and persists the profile without a token', async (t) => {
+  let closes = 0;
+  class Adapter {
+    constructor() { this.service = {}; this.capabilities = { time: true, unit: true, format: false, history: true }; }
+    async open() {}
+    close() { closes++; }
+  }
+  const app = setup(t, { protocols: { Pvvx: Adapter } });
+  const sensor = device('pvvx'); sensor.dev.name = 'ATC_TEST';
+  app.elements.deviceProfile.value = 'pvvx';
+  app.elements.pairingToken.value = 'do-not-store-this';
+  await app.connectToDevice(sensor.dev);
+  assert.equal(app.state.isConnected, true);
+  assert.equal(app.state.protocolKind, 'pvvx');
+  assert.equal(app.state.deviceHistory.pvvx.profile, 'pvvx');
+  assert.doesNotMatch(JSON.stringify(Array.from(app.storage.values())), /do-not-store-this/);
+  app.disconnectManually();
+  assert.equal(closes, 1);
+});
+
+test('cancellation while a new protocol identifies a device releases controls and ignores a late identification', async (t) => {
+  const pending = deferred(); let closes = 0;
+  class Adapter {
+    constructor() { this.service = {}; this.capabilities = { time: true, unit: true, format: false, history: true }; }
+    async open() { await pending.promise; }
+    close() { closes++; }
+  }
+  const app = setup(t, { protocols: { Pvvx: Adapter } });
+  app.elements.deviceProfile.value = 'pvvx';
+  const sensor = device('pvvx');
+  const connecting = app.connectToDevice(sensor.dev);
+  await ticks(); app.cancelConnection();
+  assert.equal(await connecting, false);
+  assert.equal(closes, 1);
+  assert.equal(app.state.isConnecting, false);
+  pending.resolve(); await ticks();
+  assert.equal(app.state.isConnected, false);
+  assert.equal(app.state.service, null);
+});
+
+test('a sensor-only profile refreshes measurements and cannot write the clock, unit or history', async (t) => {
+  const app = setup(t); const sensor = device('sensor'); install(app, sensor);
+  let refreshes = 0;
+  app.state.adapter = { capabilities: { time: false, unit: false, format: false, history: false }, async refresh() { refreshes++; } };
+  app.state.protocolKind = 'flowercare';
+  app.setConnectionControls();
+  assert.equal(app.elements.unitBtn.disabled, true);
+  assert.equal(app.elements.loadHistoryBtn.disabled, true);
+  assert.equal(app.elements.refreshTimeBtn.disabled, true);
+  assert.equal(app.elements.timezone.disabled, true);
+  assert.equal(app.elements.syncBtn.disabled, false);
+  await app.syncTime(false);
+  assert.equal(refreshes, 1);
+});

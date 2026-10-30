@@ -6,16 +6,31 @@
         "description": "Mantenere {name} all’ora esatta? Home Assistant regola subito l’orologio, poi ogni notte alle 04:00 e dopo ogni cambio dell’ora legale. Pianificazione, unità di temperatura, formato dell’ora e correzione dell’ora si cambiano poi nella pagina del dispositivo."
       },
       "user": {
-        "description": "Scegli l’orologio LYWSD02 / LYWSD02MMC / MHO-C303 da mantenere all’ora esatta.",
+        "description": "Scegli un orologio LYWSD02 / LYWSD02MMC / MHO-C303 originale oppure un profilo PVVX / CGD1 sperimentale (verifica fisica da fare).",
         "data": {
-          "address": "Orologio"
+          "address": "Orologio",
+          "device_protocol": "Dispositivo / firmware"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "Supporto CGD1 sperimentale, senza verifica fisica. Inserisci il token di associazione esistente di 32 caratteri esadecimali. Home Assistant lo conserva per le connessioni pianificate. Non associa né ripristina l’orologio.",
+        "data": {
+          "pairing_token": "Token di associazione CGD1 esistente (32 caratteri esadecimali)"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "Il supporto PVVX / CGD1 è sperimentale e testato solo con dispositivi simulati. Manca la verifica fisica.\n\nMantenere {name} all’ora esatta? Home Assistant regola subito l’orologio, poi ogni notte alle 04:00 e dopo ogni cambio dell’ora legale. Pianificazione, unità di temperatura, formato dell’ora e correzione dell’ora si cambiano poi nella pagina del dispositivo."
       }
     },
     "abort": {
       "already_configured": "Questo orologio è già configurato.",
       "already_in_progress": "La configurazione di questo orologio è già in corso.",
-      "no_devices_found": "Nessun orologio LYWSD02 / LYWSD02MMC / MHO-C303 trovato. Avvicinalo all’adattatore o al proxy Bluetooth e riprova."
+      "no_devices_found": "Nessun orologio compatibile trovato. Avvicina un LYWSD02 / MHO-C303 originale, PVVX (ATC_ / BTH_ / PVVX_) o CGD1 all’adattatore Bluetooth o proxy attivo."
+    },
+    "error": {
+      "invalid_token": "Inserisci esattamente 32 caratteri esadecimali per il token CGD1 esistente."
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "Sincronizzazione automatica",
         "description": "Quando deve Home Assistant regolare l’orologio? I cambi dell’ora legale vengono sempre corretti entro un’ora e il pulsante Sincronizza orologio funziona in qualsiasi momento. Unità di temperatura, formato dell’ora e correzione dell’ora si trovano nella pagina del dispositivo.",
         "data": {
-          "schedule": "Frequenza"
+          "schedule": "Frequenza",
+          "pairing_token": "Token CGD1 sostitutivo (vuoto mantiene quello esistente)"
+        },
+        "data_description": {
+          "pairing_token": "Supporto CGD1 sperimentale, senza verifica fisica. Inserisci il token di associazione esistente di 32 caratteri esadecimali. Home Assistant lo conserva per le connessioni pianificate. Non associa né ripristina l’orologio."
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "Questa espressione cron non è valida.",
-      "too_frequent": "Lascia almeno un’ora tra due sincronizzazioni per risparmiare la batteria."
+      "too_frequent": "Lascia almeno un’ora tra due sincronizzazioni per risparmiare la batteria.",
+      "invalid_token": "Inserisci esattamente 32 caratteri esadecimali per il token CGD1 esistente."
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "Venerdì",
         "sat": "Sabato",
         "sun": "Domenica"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — firmware originale",
+        "pvvx": "PVVX BLE — sperimentale",
+        "cgd1": "CGD1 — firmware originale, sperimentale"
       }
     }
   },

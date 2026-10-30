@@ -57,6 +57,12 @@ def test_hacs_can_install_the_integration() -> None:
     assert manifest["bluetooth"] == [
         {"local_name": "LYWSD02*", "connectable": True},
         {"local_name": "MHO-C303*", "connectable": True},
+        {"local_name": "ATC_*", "connectable": True},
+        {"local_name": "BTH_*", "connectable": True},
+        {"local_name": "PVVX_*", "connectable": True},
+        {"local_name": "CGD1*", "connectable": True},
+        {"local_name": "Qingping Alarm Clock*", "connectable": True},
+        {"local_name": "Cleargrass Alarm Clock*", "connectable": True},
     ]
     assert [folder.name for folder in (ROOT / "custom_components").iterdir() if folder.is_dir()] == [DOMAIN]
     for name, size in (("icon.png", 256), ("icon@2x.png", 512)):

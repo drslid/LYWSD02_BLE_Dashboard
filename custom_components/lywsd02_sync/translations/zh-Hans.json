@@ -6,16 +6,31 @@
         "description": "要让 {name} 保持准确时间吗？Home Assistant 会立即校准时钟，之后每晚 04:00 以及每次夏令时切换后自动校准。计划、温度单位、时间格式和时间校正稍后可在设备页面中修改。"
       },
       "user": {
-        "description": "选择要保持准确时间的 LYWSD02 / LYWSD02MMC / MHO-C303 时钟。",
+        "description": "选择原厂 LYWSD02 / LYWSD02MMC / MHO-C303 时钟，或尚待实机验证的实验性 PVVX / CGD1 配置。",
         "data": {
-          "address": "时钟"
+          "address": "时钟",
+          "device_protocol": "设备 / 固件"
         }
+      },
+      "credentials": {
+        "title": "CGD1",
+        "description": "CGD1 支持为实验性功能，尚待实机验证。请输入现有的 32 位十六进制配对令牌。Home Assistant 将保存令牌供定时连接使用。不会重新配对或重置时钟。",
+        "data": {
+          "pairing_token": "现有 CGD1 配对令牌（32 位十六进制字符）"
+        }
+      },
+      "experimental_confirm": {
+        "title": "PVVX / CGD1",
+        "description": "PVVX / CGD1 支持为实验性功能，仅通过模拟设备测试，尚待实机验证。\n\n要让 {name} 保持准确时间吗？Home Assistant 会立即校准时钟，之后每晚 04:00 以及每次夏令时切换后自动校准。计划、温度单位、时间格式和时间校正稍后可在设备页面中修改。"
       }
     },
     "abort": {
       "already_configured": "此时钟已配置。",
       "already_in_progress": "此时钟正在配置中。",
-      "no_devices_found": "未找到 LYWSD02 / LYWSD02MMC / MHO-C303 时钟。请将其靠近蓝牙适配器或蓝牙代理后重试。"
+      "no_devices_found": "未发现兼容时钟。请将原厂 LYWSD02 / MHO-C303、PVVX（ATC_ / BTH_ / PVVX_）或 CGD1 靠近蓝牙适配器或支持主动连接的代理。"
+    },
+    "error": {
+      "invalid_token": "现有 CGD1 令牌必须为 32 位十六进制字符。"
     }
   },
   "options": {
@@ -24,7 +39,11 @@
         "title": "自动同步",
         "description": "Home Assistant 应在何时校准时钟？夏令时切换总会在一小时内自动校正，“同步时钟”按钮也可随时使用。温度单位、时间格式和时间校正位于设备页面。",
         "data": {
-          "schedule": "频率"
+          "schedule": "频率",
+          "pairing_token": "替换 CGD1 令牌（留空保留现有令牌）"
+        },
+        "data_description": {
+          "pairing_token": "CGD1 支持为实验性功能，尚待实机验证。请输入现有的 32 位十六进制配对令牌。Home Assistant 将保存令牌供定时连接使用。不会重新配对或重置时钟。"
         }
       },
       "daily": {
@@ -63,7 +82,8 @@
     },
     "error": {
       "invalid_cron": "此 Cron 表达式无效。",
-      "too_frequent": "两次同步之间至少间隔一小时，以节省电池电量。"
+      "too_frequent": "两次同步之间至少间隔一小时，以节省电池电量。",
+      "invalid_token": "现有 CGD1 令牌必须为 32 位十六进制字符。"
     }
   },
   "selector": {
@@ -85,6 +105,14 @@
         "fri": "星期五",
         "sat": "星期六",
         "sun": "星期日"
+      }
+    },
+    "device_protocol": {
+      "options": {
+        "auto": "Auto",
+        "stock": "LYWSD02 / MHO-C303 — 原厂固件",
+        "pvvx": "PVVX BLE — 实验性",
+        "cgd1": "CGD1 — 原厂固件，实验性"
       }
     }
   },

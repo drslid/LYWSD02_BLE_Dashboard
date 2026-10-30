@@ -22,12 +22,18 @@ from homeassistant.helpers.selector import (
     SelectSelectorConfig,
     SelectSelectorMode,
     TextSelector,
+    TextSelectorConfig,
+    TextSelectorType,
     TimeSelector,
 )
 from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_CRON,
+    CONF_PROTOCOL,
+    CONF_PAIRING_TOKEN,
+    PVVX_NAME_PREFIXES,
+    CGD1_NAME_PREFIXES,
     CONF_DAY,
     CONF_SCHEDULE,
     CONF_TIME,
@@ -46,12 +52,20 @@ from .const import (
     SCHEDULES,
     WEEKDAYS,
     model_from_name,
+    protocol_from_name,
 )
 from .schedule import cron_error
 
 
 def _title(info: BluetoothServiceInfoBleak) -> str:
     return human_readable_name(None, info.name, info.address)
+
+
+def _valid_token(token: str) -> bool:
+    try:
+        return len(token) == 32 and len(bytes.fromhex(token)) == 16
+    except ValueError:
+        return False
 
 
 class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -63,6 +77,7 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
         """Start without a selected clock."""
         self._discovery: BluetoothServiceInfoBleak | None = None
         self._discovered: dict[str, BluetoothServiceInfoBleak] = {}
+        self._protocol = "stock"
 
     @staticmethod
     @callback
@@ -86,12 +101,19 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
         """Confirm the discovered clock."""
         assert self._discovery is not None
         if user_input is not None:
+            self._protocol = protocol_from_name(self._discovery.name)
+            if self._protocol == "cgd1":
+                return await self.async_step_credentials()
             return self._async_create(self._discovery)
         self._set_confirm_only()
         return self.async_show_form(
-            step_id="bluetooth_confirm",
+            step_id=("bluetooth_confirm" if protocol_from_name(self._discovery.name) == "stock" else "experimental_confirm"),
             description_placeholders={"name": _title(self._discovery)},
         )
+
+    async def async_step_experimental_confirm(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Use the same confirmation while identifying the experimental profile."""
+        return await self.async_step_bluetooth_confirm(user_input)
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
@@ -101,11 +123,16 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
             info = self._discovered[user_input[CONF_ADDRESS]]
             await self.async_set_unique_id(info.address, raise_on_progress=False)
             self._abort_if_unique_id_configured()
+            self._discovery = info
+            choice = user_input.get(CONF_PROTOCOL, "auto")
+            self._protocol = protocol_from_name(info.name) if choice == "auto" else choice
+            if self._protocol == "cgd1":
+                return await self.async_step_credentials()
             return self._async_create(info)
 
         configured = self._async_current_ids(include_ignore=False)
         for info in async_discovered_service_info(self.hass, connectable=True):
-            if info.address not in configured and info.name.startswith(LOCAL_NAME_PREFIXES):
+            if info.address not in configured and info.name.startswith((*LOCAL_NAME_PREFIXES, *PVVX_NAME_PREFIXES, *CGD1_NAME_PREFIXES)):
                 self._discovered[info.address] = info
         if not self._discovered:
             return self.async_abort(reason="no_devices_found")
@@ -115,17 +142,40 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required(CONF_ADDRESS): vol.In(
                         {address: _title(info) for address, info in self._discovered.items()}
-                    )
+                    ),
+                    vol.Optional(CONF_PROTOCOL, default="auto"): SelectSelector(
+                        SelectSelectorConfig(options=["auto", "stock", "pvvx", "cgd1"], translation_key="device_protocol")
+                    ),
                 }
             ),
         )
 
     @callback
-    def _async_create(self, info: BluetoothServiceInfoBleak) -> ConfigFlowResult:
+    def _async_create(self, info: BluetoothServiceInfoBleak, token: str | None = None) -> ConfigFlowResult:
+        data = {CONF_ADDRESS: info.address, CONF_MODEL: model_from_name(info.name)}
+        if self._protocol != "stock":
+            data[CONF_PROTOCOL] = self._protocol
+        if token is not None:
+            data[CONF_PAIRING_TOKEN] = token
         return self.async_create_entry(
             title=_title(info),
-            data={CONF_ADDRESS: info.address, CONF_MODEL: model_from_name(info.name)},
+            data=data,
             options=dict(DEFAULT_OPTIONS),
+        )
+
+    async def async_step_credentials(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        """Use the clock's existing token without provisioning a new pairing."""
+        errors = {}
+        if user_input is not None:
+            token = str(user_input[CONF_PAIRING_TOKEN]).strip()
+            if not _valid_token(token):
+                errors["base"] = "invalid_token"
+            else:
+                assert self._discovery is not None
+                return self._async_create(self._discovery, token)
+        return self.async_show_form(
+            step_id="credentials", errors=errors,
+            data_schema=vol.Schema({vol.Required(CONF_PAIRING_TOKEN): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD))}),
         )
 
 
@@ -135,9 +185,19 @@ class LYWSD02OptionsFlow(OptionsFlow):
     def __init__(self) -> None:
         """Start without a chosen frequency."""
         self._schedule = SCHEDULE_DAILY
+        self._pairing_token: str | None = None
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
         """Choose how often the clock is synchronized."""
+        errors = {}
+        if user_input is not None:
+            if self.config_entry.data.get(CONF_PROTOCOL) == "cgd1":
+                token = str(user_input.get(CONF_PAIRING_TOKEN, "")).strip()
+                if token and not _valid_token(token):
+                    errors["base"] = "invalid_token"
+                    user_input = None
+                elif token:
+                    self._pairing_token = token
         if user_input is not None:
             self._schedule = user_input[CONF_SCHEDULE]
             if self._schedule == SCHEDULE_DAILY:
@@ -151,19 +211,23 @@ class LYWSD02OptionsFlow(OptionsFlow):
             return self._save({})
 
         current = self.config_entry.options.get(CONF_SCHEDULE, SCHEDULE_DAILY)
+        fields = {
+            vol.Required(CONF_SCHEDULE, default=current): SelectSelector(
+                SelectSelectorConfig(
+                    options=SCHEDULES,
+                    translation_key=CONF_SCHEDULE,
+                    mode=SelectSelectorMode.LIST,
+                )
+            )
+        }
+        if self.config_entry.data.get(CONF_PROTOCOL) == "cgd1":
+            fields[vol.Optional(CONF_PAIRING_TOKEN)] = TextSelector(
+                TextSelectorConfig(type=TextSelectorType.PASSWORD)
+            )
         return self.async_show_form(
             step_id="init",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_SCHEDULE, default=current): SelectSelector(
-                        SelectSelectorConfig(
-                            options=SCHEDULES,
-                            translation_key=CONF_SCHEDULE,
-                            mode=SelectSelectorMode.LIST,
-                        )
-                    )
-                }
-            ),
+            data_schema=vol.Schema(fields),
+            errors=errors,
         )
 
     async def async_step_daily(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
@@ -238,6 +302,11 @@ class LYWSD02OptionsFlow(OptionsFlow):
 
     def _save(self, changes: dict[str, Any]) -> ConfigFlowResult:
         # Merge into the current options: device page settings may have changed meanwhile.
+        if self._pairing_token is not None:
+            self.hass.config_entries.async_update_entry(
+                self.config_entry,
+                data={**self.config_entry.data, CONF_PAIRING_TOKEN: self._pairing_token},
+            )
         return self.async_create_entry(
             data={**self.config_entry.options, CONF_SCHEDULE: self._schedule, **changes}
         )

@@ -5,6 +5,7 @@ from __future__ import annotations
 from unittest.mock import patch
 
 import pytest
+import voluptuous as vol
 
 from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
 from homeassistant.const import CONF_ADDRESS, CONF_MODEL
@@ -179,3 +180,53 @@ async def test_cron_step_rejects_bad_expressions(
     assert result["type"] is FlowResultType.FORM
     assert result["errors"] == {"cron": error}
     assert entry.options == DEFAULT_OPTIONS
+
+
+@pytest.mark.parametrize(("name", "protocol"), [("ATC_TEST", "pvvx"), ("BTH_TEST", "pvvx"), ("Qingping Alarm Clock", "cgd1")])
+async def test_extended_discovery_identifies_the_protocol_and_requires_cgd1_credentials(hass: HomeAssistant, name: str, protocol: str) -> None:
+    """Confirmed discovery persists the protocol, and a token never defaults silently."""
+    from custom_components.lywsd02_sync.const import CONF_PROTOCOL, CONF_PAIRING_TOKEN
+    result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_BLUETOOTH}, data=service_info(name=name))
+    assert result["step_id"] == "experimental_confirm"
+    with patch(SETUP, return_value=True):
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+        if protocol == "cgd1":
+            assert result["step_id"] == "credentials"
+            result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_PAIRING_TOKEN: "not-a-token"})
+            assert result["errors"] == {"base": "invalid_token"}
+            result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_PAIRING_TOKEN: "12" * 16})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_PROTOCOL] == protocol
+    if protocol == "cgd1":
+        assert result["data"][CONF_PAIRING_TOKEN] == "12" * 16
+    else:
+        assert CONF_PAIRING_TOKEN not in result["data"]
+
+
+async def test_cgd1_token_can_be_corrected_without_exposing_the_saved_secret(hass: HomeAssistant) -> None:
+    from custom_components.lywsd02_sync.const import CONF_PROTOCOL, CONF_PAIRING_TOKEN
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id=ADDRESS,
+        data={CONF_ADDRESS: ADDRESS, CONF_PROTOCOL: "cgd1", CONF_PAIRING_TOKEN: "12" * 16},
+        options=DEFAULT_OPTIONS,
+    )
+    entry.add_to_hass(hass)
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    token_field = next(field for field in result["data_schema"].schema if field == CONF_PAIRING_TOKEN)
+    assert token_field.default is vol.UNDEFINED
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"schedule": "manual", CONF_PAIRING_TOKEN: "bad"}
+    )
+    assert result["errors"] == {"base": "invalid_token"}
+    assert entry.data[CONF_PAIRING_TOKEN] == "12" * 16
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {"schedule": "daily", CONF_PAIRING_TOKEN: "34" * 16}
+    )
+    assert entry.data[CONF_PAIRING_TOKEN] == "12" * 16, "Do not change a token before the form is saved"
+    result = await hass.config_entries.options.async_configure(result["flow_id"], {"time": "05:00:00"})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert entry.data[CONF_PAIRING_TOKEN] == "34" * 16
+    assert CONF_PAIRING_TOKEN not in entry.options
+    result = await hass.config_entries.options.async_init(entry.entry_id)
+    await hass.config_entries.options.async_configure(result["flow_id"], {"schedule": "manual", CONF_PAIRING_TOKEN: ""})
+    assert entry.data[CONF_PAIRING_TOKEN] == "34" * 16

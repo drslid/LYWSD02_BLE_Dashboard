@@ -9,6 +9,10 @@ DOMAIN: Final = "lywsd02_sync"
 
 # The MHO-C303 alarm clock uses the same time and settings characteristics as the LYWSD02.
 LOCAL_NAME_PREFIXES: Final = ("LYWSD02", "MHO-C303")
+PVVX_NAME_PREFIXES: Final = ("ATC_", "BTH_", "PVVX_")
+CGD1_NAME_PREFIXES: Final = ("CGD1", "Qingping Alarm Clock", "Cleargrass Alarm Clock")
+CONF_PROTOCOL: Final = "device_protocol"
+CONF_PAIRING_TOKEN: Final = "pairing_token"
 TIME_CHARACTERISTIC: Final = "ebe0ccb7-7a0a-4b0c-8a1a-6ff2997da3a6"
 UNIT_CHARACTERISTIC: Final = "ebe0ccbe-7a0a-4b0c-8a1a-6ff2997da3a6"
 MEASUREMENT_CHARACTERISTIC: Final = "ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6"
@@ -96,7 +100,20 @@ ISSUE_PASSIVE_ONLY: Final = "passive_only"
 
 def model_from_name(name: str) -> str:
     """Identify the clock model, checking the longer LYWSD02MMC name first."""
+    if name.startswith(CGD1_NAME_PREFIXES):
+        return "CGD1"
+    if name.startswith(PVVX_NAME_PREFIXES):
+        return "PVVX"
     return next(
         (model for model in ("LYWSD02MMC", *LOCAL_NAME_PREFIXES) if name.startswith(model)),
         "LYWSD02",
     )
+
+
+def protocol_from_name(name: str) -> str:
+    """Choose a discovery default; the connected device is still validated."""
+    if name.startswith(PVVX_NAME_PREFIXES):
+        return "pvvx"
+    if name.startswith(CGD1_NAME_PREFIXES):
+        return "cgd1"
+    return "stock"
