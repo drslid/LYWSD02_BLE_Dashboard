@@ -6,6 +6,10 @@
     {
       "local_name": "LYWSD02*",
       "connectable": true
+    },
+    {
+      "local_name": "MHO-C303*",
+      "connectable": true
     }
   ],
   "codeowners": ["@drslid"],

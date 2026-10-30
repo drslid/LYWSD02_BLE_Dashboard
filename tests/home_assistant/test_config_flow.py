@@ -65,6 +65,16 @@ async def test_user_picks_among_clocks_in_range(hass: HomeAssistant) -> None:
     assert result["title"] == TITLE
 
 
+async def test_mho_c303_is_offered_too(hass: HomeAssistant) -> None:
+    """The MHO-C303 alarm clock shares the LYWSD02 protocol and is offered alongside it."""
+    mho = "E7:50:00:00:00:02"
+    nearby = [service_info(), service_info(mho, "MHO-C303")]
+    with patch(DISCOVERED, return_value=nearby):
+        result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
+    assert result["type"] is FlowResultType.FORM
+    assert list(result["data_schema"].schema[CONF_ADDRESS].container) == [ADDRESS, mho]
+
+
 async def test_user_flow_without_clock_explains_how_to_fix(hass: HomeAssistant) -> None:
     """No clock in range aborts with a helpful reason."""
     with patch(DISCOVERED, return_value=[]):
