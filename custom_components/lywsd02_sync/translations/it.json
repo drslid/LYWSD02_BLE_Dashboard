@@ -6,7 +6,7 @@
         "description": "Mantenere {name} all’ora esatta? Home Assistant regola subito l’orologio, poi ogni notte alle 04:00 e dopo ogni cambio dell’ora legale. Pianificazione, unità di temperatura, formato dell’ora e correzione dell’ora si cambiano poi nella pagina del dispositivo."
       },
       "user": {
-        "description": "Scegli l’orologio LYWSD02 da mantenere all’ora esatta.",
+        "description": "Scegli l’orologio LYWSD02 / LYWSD02MMC / MHO-C303 da mantenere all’ora esatta.",
         "data": {
           "address": "Orologio"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "Questo orologio è già configurato.",
       "already_in_progress": "La configurazione di questo orologio è già in corso.",
-      "no_devices_found": "Nessun orologio LYWSD02 trovato. Avvicinalo all’adattatore o al proxy Bluetooth e riprova."
+      "no_devices_found": "Nessun orologio LYWSD02 / LYWSD02MMC / MHO-C303 trovato. Avvicinalo all’adattatore o al proxy Bluetooth e riprova."
     }
   },
   "options": {

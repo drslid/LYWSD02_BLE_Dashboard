@@ -167,3 +167,20 @@ test('the Home Assistant section comes right after the introduction', () => {
     assert.deepEqual(sections.slice(0, 3), ['intro', 'ha-panel', 'compatibility-notice'], code);
   }
 });
+
+test('every locale names the compatible models and credits the MHO-C303 contribution', () => {
+  for (const code of codes) {
+    const html = read(pagePath(code));
+    assert.match(SEO[code].title, /MHO-C303/);
+    assert.match(SEO[code].description, /MHO-C303/);
+    for (const model of ['LYWSD02', 'LYWSD02MMC', 'MHO-C303']) {
+      assert.ok(MESSAGES[code]['compatibility.models'].includes(model), `${code}: ${model}`);
+      assert.ok(MESSAGES[code]['ha.lead'].includes(model), `${code}: HA ${model}`);
+    }
+    assert.ok(html.includes(MESSAGES[code]['compatibility.note']));
+    assert.equal(tags(html, 'a').filter((tag) => tag.href === 'https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1').length, 2);
+    const translation = JSON.parse(read(`custom_components/lywsd02_sync/translations/${code === 'zh' ? 'zh-Hans' : code}.json`));
+    assert.match(translation.config.step.user.description, /MHO-C303/);
+    assert.match(translation.config.abort.no_devices_found, /MHO-C303/);
+  }
+});

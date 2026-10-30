@@ -78,10 +78,12 @@ function setup(t, { fakeTimers = false, clockMode = '24' } = {}) {
     const auditLogs = [];
     log = (message, type = 'info') => auditLogs.push({ message, type });
     readInitialValues = async () => {};
+    const auditRefreshGrantedDevices = refreshGrantedDevices;
     refreshGrantedDevices = async () => {};
     globalThis.audit = {
       state, elements, connectToDevice, chooseDevice, cancelConnection, setConnectionControls, handleMeasurement,
-      loadHistory, disconnectManually, readDeviceTime, readBattery, syncTime, collectHistory, logs: auditLogs
+      loadHistory, disconnectManually, readDeviceTime, readBattery, syncTime, collectHistory,
+      refreshGrantedDevices: auditRefreshGrantedDevices, logs: auditLogs
     };
   })();`), context);
   assert.ok(context.audit, 'The app harness must be initialized');
@@ -151,6 +153,43 @@ function deferred() {
 async function ticks(count = 8) {
   while (count-- > 0) await Promise.resolve();
 }
+
+test('the Bluetooth chooser offers both clock families and connects an MHO-C303', async (t) => {
+  const app = setup(t);
+  const sensor = device('mho');
+  sensor.dev.name = 'MHO-C303';
+  app.state.bluetoothUsable = true;
+  app.bluetooth.requestDevice = async (options) => {
+    assert.deepEqual(Array.from(options.filters, ({ namePrefix }) => namePrefix), ['LYWSD02', 'MHO-C303']);
+    assert.ok(options.optionalServices.includes('ebe0ccb0-7a0a-4b0c-8a1a-6ff2997da3a6'));
+    return sensor.dev;
+  };
+
+  await app.chooseDevice();
+
+  assert.equal(app.state.device, sensor.dev);
+  assert.equal(app.state.isConnected, true);
+  assert.equal(app.state.deviceHistory.mho.name, 'MHO-C303');
+});
+
+test('granted MHO-C303 and LYWSD02MMC clocks remain available for direct reconnection', async (t) => {
+  const app = setup(t);
+  app.state.bluetoothUsable = true;
+  const sensors = ['LYWSD02', 'LYWSD02MMC', 'MHO-C303', 'MHO-C303 extra', 'Other'].map((name, index) => {
+    const sensor = device(String(index));
+    sensor.dev.name = name;
+    return sensor.dev;
+  });
+  app.bluetooth.getDevices = async () => sensors;
+
+  await app.refreshGrantedDevices();
+
+  assert.deepEqual(Array.from(app.state.grantedDevices.values(), ({ name }) => name),
+    ['LYWSD02', 'LYWSD02MMC', 'MHO-C303', 'MHO-C303 extra']);
+  await app.connectToDevice(app.state.grantedDevices.get('2'), 'history');
+  assert.equal(app.state.device.name, 'MHO-C303');
+  assert.equal(app.state.isConnected, true);
+});
 
 test('switching sensors disconnects the previous GATT device', async (t) => {
   const app = setup(t);

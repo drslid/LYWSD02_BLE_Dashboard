@@ -6,7 +6,7 @@
         "description": "{name} auf der richtigen Zeit halten? Home Assistant stellt die Uhr sofort, dann jede Nacht um 04:00 und nach jeder Zeitumstellung. Zeitplan, Temperatureinheit, Zeitformat und Zeitkorrektur kannst du später auf der Geräteseite ändern."
       },
       "user": {
-        "description": "Wähle die LYWSD02-Uhr, die immer richtig gehen soll.",
+        "description": "Wähle die LYWSD02 / LYWSD02MMC / MHO-C303-Uhr, die immer richtig gehen soll.",
         "data": {
           "address": "Uhr"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "Diese Uhr ist bereits eingerichtet.",
       "already_in_progress": "Diese Uhr wird bereits eingerichtet.",
-      "no_devices_found": "Keine LYWSD02-Uhr gefunden. Bring sie näher an deinen Bluetooth-Adapter oder -Proxy und versuche es erneut."
+      "no_devices_found": "Keine LYWSD02 / LYWSD02MMC / MHO-C303-Uhr gefunden. Bring sie näher an deinen Bluetooth-Adapter oder -Proxy und versuche es erneut."
     }
   },
   "options": {

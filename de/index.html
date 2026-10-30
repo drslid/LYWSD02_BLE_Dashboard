@@ -13,8 +13,8 @@
     })();
   </script>
 
-  <title>Xiaomi LYWSD02 Uhrzeit einstellen: Bluetooth-Dashboard</title>
-  <meta name="description" content="Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud.">
+  <title>LYWSD02 / MHO-C303 Uhrzeit einstellen: Bluetooth-Dashboard</title>
+  <meta name="description" content="LYWSD02 und MHO-C303 per Bluetooth oder Home Assistant synchronisieren. Temperatur, Luftfeuchte, Batterie und Stundenverlauf lokal lesen, ohne Cloud.">
   <meta name="author" content="drslid">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#0f3d44">
@@ -43,8 +43,8 @@
   <meta property="og:locale:alternate" content="hi_IN">
 
   <meta property="og:site_name" content="LYWSD02 BLE Dashboard">
-  <meta property="og:title" content="Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen">
-  <meta property="og:description" content="Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.">
+  <meta property="og:title" content="LYWSD02 / MHO-C303 synchronisieren und optimal nutzen">
+  <meta property="og:description" content="LYWSD02 / MHO-C303: Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.">
   <meta property="og:url" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/de/">
   <meta property="og:image" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
   <meta property="og:image:secure_url" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
@@ -54,8 +54,8 @@
   <meta property="og:image:alt" content="Vorschau des Bluetooth-Dashboards für Xiaomi Mijia LYWSD02">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen">
-  <meta name="twitter:description" content="Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.">
+  <meta name="twitter:title" content="LYWSD02 / MHO-C303 synchronisieren und optimal nutzen">
+  <meta name="twitter:description" content="LYWSD02 / MHO-C303: Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.">
   <meta name="twitter:image" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
   <meta name="twitter:image:alt" content="Vorschau des Bluetooth-Dashboards für Xiaomi Mijia LYWSD02">
 
@@ -77,17 +77,17 @@
     {
       "@type": "WebSite",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#website",
-      "name": "Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen",
+      "name": "LYWSD02 / MHO-C303 synchronisieren und optimal nutzen",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/de/",
       "inLanguage": "de",
-      "description": "Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud."
+      "description": "LYWSD02 und MHO-C303 per Bluetooth oder Home Assistant synchronisieren. Temperatur, Luftfeuchte, Batterie und Stundenverlauf lokal lesen, ohne Cloud."
     },
     {
       "@type": "WebApplication",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#app",
-      "name": "Xiaomi Mijia LYWSD02 synchronisieren und optimal nutzen",
+      "name": "LYWSD02 / MHO-C303 synchronisieren und optimal nutzen",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/de/",
-      "description": "Stelle die Uhr deines Xiaomi Mijia LYWSD02 per Bluetooth, lies Temperatur, Luftfeuchte und Verlauf und halte sie mit Home Assistant pünktlich. Ohne Cloud.",
+      "description": "LYWSD02 und MHO-C303 per Bluetooth oder Home Assistant synchronisieren. Temperatur, Luftfeuchte, Batterie und Stundenverlauf lokal lesen, ohne Cloud.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Windows, macOS, Linux",
       "browserRequirements": "A Chromium browser with Web Bluetooth and HTTPS",
@@ -144,7 +144,7 @@
       <ol class="phone-steps">
         <li><span>1</span><p data-i18n="mobile.step1">Chrome, Edge oder einen Chromium-Browser öffnen.</p></li>
         <li><span>2</span><p data-i18n="mobile.step2">Dieselbe Adresse aufrufen.</p></li>
-        <li><span>3</span><p data-i18n="mobile.step3">Bluetooth einschalten und LYWSD02 verbinden.</p></li>
+        <li><span>3</span><p data-i18n="mobile.step3">Bluetooth einschalten und LYWSD02 / MHO-C303 verbinden.</p></li>
       </ol>
 
       <div class="address-copy">
@@ -158,19 +158,23 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">Automatisierung</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">Jede Uhr pünktlich mit Home Assistant</h2>
-        <p data-i18n="ha.lead">Die kostenlose Integration LYWSD02 Clock Sync stellt deine Uhren automatisch, folgt der Zeitumstellung und lässt dich °C/°F, 12/24 h und eine Zeitkorrektur wählen. Ohne YAML, ohne Cloud.</p>
+        <p data-i18n="compatibility.models">Kompatible Uhren: LYWSD02 · LYWSD02MMC · MHO-C303</p>
+        <p data-i18n="ha.lead">Synchronisiere LYWSD02, LYWSD02MMC und MHO-C303 automatisch, auch bei Zeitumstellungen. Lies Temperatur, Luftfeuchte, Batterie und Stundenverlauf. Ohne YAML und Cloud.</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">In HACS öffnen</span></a>
+        <p><span data-i18n="ha.credit">MHO-C303-Unterstützung beigetragen und getestet von</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1" target="_blank" rel="noopener noreferrer">@drug123</a>.</p>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
         <img src="../img/lywsd02-product.webp" width="1000" height="1000" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 Bluetooth-Thermometer, Hygrometer und Uhr">
-        <h2 id="mobile-product-title" data-i18n="hero.title">Xiaomi Mijia LYWSD02 synchronisieren, einstellen und optimal nutzen.</h2>
+        <h2 id="mobile-product-title" data-i18n="hero.title">Synchronisiere deine LYWSD02- und MHO-C303-Uhren.</h2>
         <p data-i18n="hero.lead">Live-Messwerte lesen, die Uhrabweichung korrigieren und gespeicherte Sensordaten abrufen.</p>
+        <p data-i18n="compatibility.models">Kompatible Uhren: LYWSD02 · LYWSD02MMC · MHO-C303</p>
+        <p data-i18n="compatibility.note">MHO-C303-Gerätetest: in Home Assistant bestätigt; Browserprüfung steht noch aus.</p>
         <ul class="phone-product__features">
           <li><strong data-i18n="metric.temperature">Temperatur</strong> · <span data-i18n="metric.humidity">Luftfeuchte</span> · <span data-i18n="metric.battery">Batterie</span></li>
           <li><strong data-i18n="settings.sync">Uhr synchronisieren</strong><p data-i18n="settings.autoClock">Uhrabweichung über 10 Sekunden automatisch korrigieren</p></li>
           <li><strong data-i18n="settings.timeFormat">Zeitformat</strong> · 12/24 h<br><span data-i18n="settings.unit">Temperatureinheit</span> · °C/°F</li>
           <li><strong data-i18n="history.title">Stundenverlauf</strong><p data-i18n="history.export">Verlauf als CSV exportieren</p></li>
-          <li><strong data-i18n="connection.multiTitle">Mehrere LYWSD02?</strong><p data-i18n="connection.multiText">Jeden Sensor einmal verbinden und lokal benennen. Browser-ID und letzte Verbindung bleiben auf diesem Computer gespeichert.</p></li>
+          <li><strong data-i18n="connection.multiTitle">Mehrere LYWSD02 / MHO-C303?</strong><p data-i18n="connection.multiText">Jeden Sensor einmal verbinden und lokal benennen. Browser-ID und letzte Verbindung bleiben auf diesem Computer gespeichert.</p></li>
         </ul>
       </section>
       <nav class="language-links" aria-label="Sprache">
@@ -216,8 +220,10 @@
       <section class="intro container" aria-labelledby="page-title">
         <div class="intro__copy">
           <p class="eyebrow" data-i18n="hero.eyebrow">Xiaomi Mijia Thermometer-Hygrometer mit Uhr</p>
-          <h1 id="page-title" data-i18n="hero.title">Xiaomi Mijia LYWSD02 synchronisieren, einstellen und optimal nutzen.</h1>
+          <h1 id="page-title" data-i18n="hero.title">Synchronisiere deine LYWSD02- und MHO-C303-Uhren.</h1>
           <p data-i18n="hero.lead">Live-Messwerte lesen, die Uhrabweichung korrigieren und gespeicherte Sensordaten abrufen.</p>
+          <p class="compatible-models" data-i18n="compatibility.models">Kompatible Uhren: LYWSD02 · LYWSD02MMC · MHO-C303</p>
+          <p class="compatibility-detail" data-i18n="compatibility.note">MHO-C303-Gerätetest: in Home Assistant bestätigt; Browserprüfung steht noch aus.</p>
           <div class="privacy-points">
             <span><i data-lucide="radio" aria-hidden="true"></i><span data-i18n="hero.local">Lokales Bluetooth</span></span>
             <span><i data-lucide="user-round-x" aria-hidden="true"></i><span data-i18n="hero.noAccount">Kein Konto</span></span>
@@ -235,7 +241,7 @@
           <div>
             <p class="section-kicker" data-i18n="ha.kicker">Automatisierung</p>
             <h2 id="ha-title" data-i18n="ha.title">Jede Uhr pünktlich mit Home Assistant</h2>
-            <p data-i18n="ha.lead">Die kostenlose Integration LYWSD02 Clock Sync stellt deine Uhren automatisch, folgt der Zeitumstellung und lässt dich °C/°F, 12/24 h und eine Zeitkorrektur wählen. Ohne YAML, ohne Cloud.</p>
+            <p data-i18n="ha.lead">Synchronisiere LYWSD02, LYWSD02MMC und MHO-C303 automatisch, auch bei Zeitumstellungen. Lies Temperatur, Luftfeuchte, Batterie und Stundenverlauf. Ohne YAML und Cloud.</p>
           </div>
         </div>
         <ol class="ha-steps">
@@ -250,6 +256,7 @@
           <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">Funktioniert mit ESPHome-Bluetooth-Proxys</span></li>
         </ul>
         <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">Erfordert HACS und Bluetooth in Home Assistant: einen lokalen Adapter oder einen Proxy mit aktiven Verbindungen.</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">Anleitung lesen</a></span></p>
+        <p class="ha-note"><i data-lucide="heart" aria-hidden="true"></i><span><span data-i18n="ha.credit">MHO-C303-Unterstützung beigetragen und getestet von</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1" target="_blank" rel="noopener noreferrer">@drug123</a>.</span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -283,7 +290,7 @@
 
         <aside class="identification-tip">
           <i data-lucide="info" aria-hidden="true"></i>
-          <p><strong data-i18n="connection.multiTitle">Mehrere LYWSD02?</strong> <span data-i18n="connection.multiText">Jeden Sensor einmal verbinden und lokal benennen. Browser-ID und letzte Verbindung bleiben auf diesem Computer gespeichert.</span></p>
+          <p><strong data-i18n="connection.multiTitle">Mehrere LYWSD02 / MHO-C303?</strong> <span data-i18n="connection.multiText">Jeden Sensor einmal verbinden und lokal benennen. Browser-ID und letzte Verbindung bleiben auf diesem Computer gespeichert.</span></p>
         </aside>
 
         <div id="knownDevices" class="known-devices">
@@ -368,6 +375,6 @@
     </form>
   </dialog>
 
-  <noscript><div class="noscript-message" data-i18n="noscript">JavaScript muss für die Bluetooth-Kommunikation mit LYWSD02 aktiviert sein.</div></noscript>
+  <noscript><div class="noscript-message" data-i18n="noscript">JavaScript muss für die Bluetooth-Kommunikation mit LYWSD02 / MHO-C303 aktiviert sein.</div></noscript>
 </body>
 </html>

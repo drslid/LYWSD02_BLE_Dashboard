@@ -2,7 +2,7 @@
 	"id": "./",
 	"name": "LYWSD02 BLE Dashboard",
 	"short_name": "LYWSD02",
-	"description": "Set the clock of your Xiaomi Mijia LYWSD02 over local Bluetooth, read its sensors and history, and keep it on time with Home Assistant.",
+	"description": "Local Bluetooth dashboard and Home Assistant integration for LYWSD02, LYWSD02MMC and MHO-C303 clocks: time sync, temperature, humidity, battery and history.",
 	"lang": "en",
 	"dir": "ltr",
 	"start_url": "./",

@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from homeassistant.config_entries import SOURCE_BLUETOOTH, SOURCE_USER
-from homeassistant.const import CONF_ADDRESS
+from homeassistant.const import CONF_ADDRESS, CONF_MODEL
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from pytest_homeassistant_custom_component.common import MockConfigEntry
@@ -20,20 +20,22 @@ SETUP = "custom_components.lywsd02_sync.async_setup_entry"
 DISCOVERED = "custom_components.lywsd02_sync.config_flow.async_discovered_service_info"
 
 
-async def test_bluetooth_discovery_needs_one_confirmation(hass: HomeAssistant) -> None:
+@pytest.mark.parametrize("model", ["LYWSD02", "LYWSD02MMC", "MHO-C303"])
+async def test_bluetooth_discovery_needs_one_confirmation(hass: HomeAssistant, model: str) -> None:
     """A discovered clock is added with the recommended daily schedule."""
     result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_BLUETOOTH}, data=service_info()
+        DOMAIN, context={"source": SOURCE_BLUETOOTH}, data=service_info(name=model)
     )
     assert result["type"] is FlowResultType.FORM
     assert result["step_id"] == "bluetooth_confirm"
-    assert result["description_placeholders"] == {"name": TITLE}
+    title = f"{model} (CDEF)"
+    assert result["description_placeholders"] == {"name": title}
 
     with patch(SETUP, return_value=True):
         result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["type"] is FlowResultType.CREATE_ENTRY
-    assert result["title"] == TITLE
-    assert result["data"] == {CONF_ADDRESS: ADDRESS}
+    assert result["title"] == title
+    assert result["data"] == {CONF_ADDRESS: ADDRESS, CONF_MODEL: model}
     assert result["options"] == DEFAULT_OPTIONS
     assert result["result"].unique_id == ADDRESS
 
@@ -73,6 +75,13 @@ async def test_mho_c303_is_offered_too(hass: HomeAssistant) -> None:
         result = await hass.config_entries.flow.async_init(DOMAIN, context={"source": SOURCE_USER})
     assert result["type"] is FlowResultType.FORM
     assert list(result["data_schema"].schema[CONF_ADDRESS].container) == [ADDRESS, mho]
+
+    with patch(SETUP, return_value=True):
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {CONF_ADDRESS: mho})
+    assert result["type"] is FlowResultType.CREATE_ENTRY
+    assert result["title"] == "MHO-C303 (0002)"
+    assert result["data"] == {CONF_ADDRESS: mho, CONF_MODEL: "MHO-C303"}
+    assert result["result"].unique_id == mho
 
 
 async def test_user_flow_without_clock_explains_how_to_fix(hass: HomeAssistant) -> None:

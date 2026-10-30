@@ -13,6 +13,7 @@
   };
 
   const BASE_URL = 'https://drslid.github.io/LYWSD02_BLE_Dashboard/';
+  const DEVICE_NAME_PREFIXES = ['LYWSD02', 'MHO-C303'];
   const ALIASES_KEY = 'lywsd02-device-aliases-v1';
   const DEVICE_HISTORY_KEY = 'lywsd02-device-history-v1';
   const AUTO_RETRY_KEY = 'lywsd02-auto-retry-v1';
@@ -476,7 +477,7 @@
     let selectedDevice = null;
     try {
       selectedDevice = await connectionStep(navigator.bluetooth.requestDevice({
-        filters: [{ namePrefix: 'LYWSD02' }],
+        filters: DEVICE_NAME_PREFIXES.map((namePrefix) => ({ namePrefix })),
         optionalServices: [UUIDS.service]
       }), task);
       if (expectedId && selectedDevice.id !== expectedId) {
@@ -996,7 +997,8 @@
     if (state.bluetoothUsable && typeof navigator.bluetooth.getDevices === 'function') {
       try {
         const devices = await navigator.bluetooth.getDevices();
-        devices.filter((device) => !device.name || device.name.startsWith('LYWSD02')).forEach((device) => state.grantedDevices.set(device.id, device));
+        devices.filter((device) => !device.name || DEVICE_NAME_PREFIXES.some((prefix) => device.name.startsWith(prefix)))
+          .forEach((device) => state.grantedDevices.set(device.id, device));
       } catch {
         state.grantedDevices.clear();
       }

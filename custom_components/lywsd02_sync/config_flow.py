@@ -12,7 +12,7 @@ from homeassistant.components.bluetooth import (
     async_discovered_service_info,
 )
 from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlow
-from homeassistant.const import CONF_ADDRESS
+from homeassistant.const import CONF_ADDRESS, CONF_MODEL
 from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     NumberSelector,
@@ -45,6 +45,7 @@ from .const import (
     SCHEDULE_WEEKLY,
     SCHEDULES,
     WEEKDAYS,
+    model_from_name,
 )
 from .schedule import cron_error
 
@@ -123,7 +124,7 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
     def _async_create(self, info: BluetoothServiceInfoBleak) -> ConfigFlowResult:
         return self.async_create_entry(
             title=_title(info),
-            data={CONF_ADDRESS: info.address},
+            data={CONF_ADDRESS: info.address, CONF_MODEL: model_from_name(info.name)},
             options=dict(DEFAULT_OPTIONS),
         )
 

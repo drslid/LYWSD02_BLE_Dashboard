@@ -103,6 +103,10 @@ docs/                    Contributor and technical documentation
 
 ## Protocol notes
 
+Supported device families are **LYWSD02**, **LYWSD02MMC** and **MHO-C303**. The browser chooser and granted-device history accept the `LYWSD02` and `MHO-C303` name prefixes; the first also matches `LYWSD02MMC`. Home Assistant uses the same prefixes for automatic and manual discovery.
+
+MHO-C303 compatibility was contributed by [@drug123](https://github.com/drug123) in [PR #1](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1). Their [physical Home Assistant test](https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1#issuecomment-6524401251) confirmed clock sync, temperature/humidity notifications, battery and hourly records alongside a working LYWSD02. Browser discovery and reconnection now include this model; physical browser validation is still pending. MHO-C303 alarm functions and 12/24-hour switching have not been validated.
+
 The dashboard uses the Xiaomi service `EBE0CCB0-7A0A-4B0C-8A1A-6FF2997DA3A6` and these characteristics:
 
 | Function | Characteristic |
@@ -137,7 +141,8 @@ Native-only features not copied into the web dashboard:
 - MAC-address and RSSI scan results: Web Bluetooth deliberately hides these details
 - Windows system-tray icon and start-at-login behavior
 - Background polling after the browser tab is closed
-- MHO-C303 selection: this project remains focused on the LYWSD02 protocol and history characteristics
+
+MHO-C303 selection was initially excluded from the widget audit. It is now supported through the shared protocol following PR #1 and its physical Home Assistant test.
 
 The widget also calculates a configurable comfort status. That is a useful future visualization, but it is not written to the stock LYWSD02 firmware and was kept out of the current device-control surface.
 

@@ -6,7 +6,7 @@
         "description": "Manter {name} à hora certa? O Home Assistant acerta o relógio de imediato, depois todas as noites às 04:00 e após cada mudança de hora. O agendamento, a unidade de temperatura, o formato da hora e a correção da hora alteram-se depois na página do dispositivo."
       },
       "user": {
-        "description": "Escolha o relógio LYWSD02 a manter à hora certa.",
+        "description": "Escolha o relógio LYWSD02 / LYWSD02MMC / MHO-C303 a manter à hora certa.",
         "data": {
           "address": "Relógio"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "Este relógio já está configurado.",
       "already_in_progress": "Este relógio já está a ser configurado.",
-      "no_devices_found": "Nenhum relógio LYWSD02 encontrado. Aproxime-o do adaptador ou proxy Bluetooth e tente novamente."
+      "no_devices_found": "Nenhum relógio LYWSD02 / LYWSD02MMC / MHO-C303 encontrado. Aproxime-o do adaptador ou proxy Bluetooth e tente novamente."
     }
   },
   "options": {

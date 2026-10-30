@@ -6,7 +6,7 @@
         "description": "要让 {name} 保持准确时间吗？Home Assistant 会立即校准时钟，之后每晚 04:00 以及每次夏令时切换后自动校准。计划、温度单位、时间格式和时间校正稍后可在设备页面中修改。"
       },
       "user": {
-        "description": "选择要保持准确时间的 LYWSD02 时钟。",
+        "description": "选择要保持准确时间的 LYWSD02 / LYWSD02MMC / MHO-C303 时钟。",
         "data": {
           "address": "时钟"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "此时钟已配置。",
       "already_in_progress": "此时钟正在配置中。",
-      "no_devices_found": "未找到 LYWSD02 时钟。请将其靠近蓝牙适配器或蓝牙代理后重试。"
+      "no_devices_found": "未找到 LYWSD02 / LYWSD02MMC / MHO-C303 时钟。请将其靠近蓝牙适配器或蓝牙代理后重试。"
     }
   },
   "options": {

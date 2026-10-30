@@ -92,3 +92,11 @@ STATUSES: Final = [STATUS_SYNCED, STATUS_WAITING, STATUS_FAILED]
 # Why no Bluetooth adapter can reach a clock that is heard.
 ISSUE_NO_CONNECTABLE_ADAPTER: Final = "no_connectable_adapter"
 ISSUE_PASSIVE_ONLY: Final = "passive_only"
+
+
+def model_from_name(name: str) -> str:
+    """Identify the clock model, checking the longer LYWSD02MMC name first."""
+    return next(
+        (model for model in ("LYWSD02MMC", *LOCAL_NAME_PREFIXES) if name.startswith(model)),
+        "LYWSD02",
+    )

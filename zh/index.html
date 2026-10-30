@@ -13,8 +13,8 @@
     })();
   </script>
 
-  <title>Xiaomi LYWSD02 时间同步与蓝牙控制面板</title>
-  <meta name="description" content="通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。">
+  <title>LYWSD02 / MHO-C303 时间同步与蓝牙控制面板</title>
+  <meta name="description" content="通过蓝牙或 Home Assistant 同步 LYWSD02 和 MHO-C303 时钟。本地读取温度、湿度、电量及每小时历史记录，无需云服务。">
   <meta name="author" content="drslid">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="theme-color" content="#0f3d44">
@@ -43,8 +43,8 @@
   <meta property="og:locale:alternate" content="hi_IN">
 
   <meta property="og:site_name" content="LYWSD02 BLE Dashboard">
-  <meta property="og:title" content="同步并充分使用你的 Xiaomi Mijia LYWSD02">
-  <meta property="og:description" content="通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。">
+  <meta property="og:title" content="同步并充分使用你的 LYWSD02 / MHO-C303">
+  <meta property="og:description" content="LYWSD02 / MHO-C303: 通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。">
   <meta property="og:url" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/">
   <meta property="og:image" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
   <meta property="og:image:secure_url" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
@@ -54,8 +54,8 @@
   <meta property="og:image:alt" content="Xiaomi Mijia LYWSD02 蓝牙控制面板预览">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="同步并充分使用你的 Xiaomi Mijia LYWSD02">
-  <meta name="twitter:description" content="通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。">
+  <meta name="twitter:title" content="同步并充分使用你的 LYWSD02 / MHO-C303">
+  <meta name="twitter:description" content="LYWSD02 / MHO-C303: 通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。">
   <meta name="twitter:image" content="https://drslid.github.io/LYWSD02_BLE_Dashboard/img/og-dashboard.jpg">
   <meta name="twitter:image:alt" content="Xiaomi Mijia LYWSD02 蓝牙控制面板预览">
 
@@ -77,17 +77,17 @@
     {
       "@type": "WebSite",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#website",
-      "name": "同步并充分使用你的 Xiaomi Mijia LYWSD02",
+      "name": "同步并充分使用你的 LYWSD02 / MHO-C303",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/",
       "inLanguage": "zh-CN",
-      "description": "通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。"
+      "description": "通过蓝牙或 Home Assistant 同步 LYWSD02 和 MHO-C303 时钟。本地读取温度、湿度、电量及每小时历史记录，无需云服务。"
     },
     {
       "@type": "WebApplication",
       "@id": "https://drslid.github.io/LYWSD02_BLE_Dashboard/#app",
-      "name": "同步并充分使用你的 Xiaomi Mijia LYWSD02",
+      "name": "同步并充分使用你的 LYWSD02 / MHO-C303",
       "url": "https://drslid.github.io/LYWSD02_BLE_Dashboard/zh/",
-      "description": "通过蓝牙校准 Xiaomi Mijia LYWSD02 的时钟，查看温度、湿度和历史记录，并借助 Home Assistant 自动保持准确时间。无需云服务。",
+      "description": "通过蓝牙或 Home Assistant 同步 LYWSD02 和 MHO-C303 时钟。本地读取温度、湿度、电量及每小时历史记录，无需云服务。",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Windows, macOS, Linux",
       "browserRequirements": "A Chromium browser with Web Bluetooth and HTTPS",
@@ -144,7 +144,7 @@
       <ol class="phone-steps">
         <li><span>1</span><p data-i18n="mobile.step1">打开 Chrome、Edge 或其他 Chromium 浏览器。</p></li>
         <li><span>2</span><p data-i18n="mobile.step2">访问同一网址。</p></li>
-        <li><span>3</span><p data-i18n="mobile.step3">开启蓝牙，然后连接 LYWSD02。</p></li>
+        <li><span>3</span><p data-i18n="mobile.step3">开启蓝牙，然后连接 LYWSD02 / MHO-C303。</p></li>
       </ol>
 
       <div class="address-copy">
@@ -158,19 +158,23 @@
       <section class="phone-ha" aria-labelledby="mobile-ha-title">
         <p class="eyebrow" data-i18n="ha.kicker">自动化</p>
         <h2 id="mobile-ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
-        <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成自动校准时钟，跟随夏令时切换，并可选择 °C/°F、12/24 小时制和时间校正。无需 YAML，无需云服务。</p>
+        <p data-i18n="compatibility.models">兼容时钟：LYWSD02 · LYWSD02MMC · MHO-C303</p>
+        <p data-i18n="ha.lead">自动同步 LYWSD02、LYWSD02MMC 和 MHO-C303 时钟，支持夏令时切换。读取温度、湿度、电量及每小时历史记录。无需 YAML 或云服务。</p>
         <a class="button phone-ha__button" href="https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&amp;repository=LYWSD02_BLE_Dashboard&amp;category=integration" target="_blank" rel="noopener noreferrer"><i data-lucide="package-plus" aria-hidden="true"></i><span data-i18n="ha.hacsButton">在 HACS 中打开</span></a>
+        <p><span data-i18n="ha.credit">MHO-C303 支持的贡献与实机测试来自</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1" target="_blank" rel="noopener noreferrer">@drug123</a>.</p>
       </section>
       <section class="phone-product" aria-labelledby="mobile-product-title">
         <img src="../img/lywsd02-product.webp" width="1000" height="1000" data-i18n-alt="hero.imageAlt" alt="Xiaomi Mijia LYWSD02 蓝牙温湿度计与时钟">
-        <h2 id="mobile-product-title" data-i18n="hero.title">同步、调校并充分使用你的 Xiaomi Mijia LYWSD02。</h2>
+        <h2 id="mobile-product-title" data-i18n="hero.title">同步你的 LYWSD02 和 MHO-C303 时钟。</h2>
         <p data-i18n="hero.lead">查看实时测量，修正时钟偏差，并读取传感器内部保存的记录。</p>
+        <p data-i18n="compatibility.models">兼容时钟：LYWSD02 · LYWSD02MMC · MHO-C303</p>
+        <p data-i18n="compatibility.note">MHO-C303 实机测试：已在 Home Assistant 中确认，浏览器验证尚待完成。</p>
         <ul class="phone-product__features">
           <li><strong data-i18n="metric.temperature">温度</strong> · <span data-i18n="metric.humidity">湿度</span> · <span data-i18n="metric.battery">电量</span></li>
           <li><strong data-i18n="settings.sync">同步时钟</strong><p data-i18n="settings.autoClock">时钟偏差超过 10 秒时自动校正</p></li>
           <li><strong data-i18n="settings.timeFormat">时间格式</strong> · 12/24 h<br><span data-i18n="settings.unit">温度单位</span> · °C/°F</li>
           <li><strong data-i18n="history.title">每小时历史</strong><p data-i18n="history.export">导出 CSV 历史</p></li>
-          <li><strong data-i18n="connection.multiTitle">有多个 LYWSD02？</strong><p data-i18n="connection.multiText">每个传感器连接一次并设置本地名称。浏览器 ID 和最近连接时间会保存在这台电脑上。</p></li>
+          <li><strong data-i18n="connection.multiTitle">有多个 LYWSD02 / MHO-C303？</strong><p data-i18n="connection.multiText">每个传感器连接一次并设置本地名称。浏览器 ID 和最近连接时间会保存在这台电脑上。</p></li>
         </ul>
       </section>
       <nav class="language-links" aria-label="语言">
@@ -216,8 +220,10 @@
       <section class="intro container" aria-labelledby="page-title">
         <div class="intro__copy">
           <p class="eyebrow" data-i18n="hero.eyebrow">Xiaomi Mijia 温湿度监测时钟</p>
-          <h1 id="page-title" data-i18n="hero.title">同步、调校并充分使用你的 Xiaomi Mijia LYWSD02。</h1>
+          <h1 id="page-title" data-i18n="hero.title">同步你的 LYWSD02 和 MHO-C303 时钟。</h1>
           <p data-i18n="hero.lead">查看实时测量，修正时钟偏差，并读取传感器内部保存的记录。</p>
+          <p class="compatible-models" data-i18n="compatibility.models">兼容时钟：LYWSD02 · LYWSD02MMC · MHO-C303</p>
+          <p class="compatibility-detail" data-i18n="compatibility.note">MHO-C303 实机测试：已在 Home Assistant 中确认，浏览器验证尚待完成。</p>
           <div class="privacy-points">
             <span><i data-lucide="radio" aria-hidden="true"></i><span data-i18n="hero.local">本地蓝牙</span></span>
             <span><i data-lucide="user-round-x" aria-hidden="true"></i><span data-i18n="hero.noAccount">无需账户</span></span>
@@ -235,7 +241,7 @@
           <div>
             <p class="section-kicker" data-i18n="ha.kicker">自动化</p>
             <h2 id="ha-title" data-i18n="ha.title">用 Home Assistant 让每个时钟保持准确</h2>
-            <p data-i18n="ha.lead">免费的 LYWSD02 Clock Sync 集成自动校准时钟，跟随夏令时切换，并可选择 °C/°F、12/24 小时制和时间校正。无需 YAML，无需云服务。</p>
+            <p data-i18n="ha.lead">自动同步 LYWSD02、LYWSD02MMC 和 MHO-C303 时钟，支持夏令时切换。读取温度、湿度、电量及每小时历史记录。无需 YAML 或云服务。</p>
           </div>
         </div>
         <ol class="ha-steps">
@@ -250,6 +256,7 @@
           <li><i data-lucide="radio-tower" aria-hidden="true"></i><span data-i18n="ha.point4">支持 ESPHome 蓝牙代理</span></li>
         </ul>
         <p class="ha-note"><i data-lucide="info" aria-hidden="true"></i><span><span data-i18n="ha.note">需要 HACS 以及 Home Assistant 中可用的蓝牙：本地适配器或支持主动连接的代理。</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard#home-assistant" target="_blank" rel="noopener noreferrer" data-i18n="ha.guide">阅读指南</a></span></p>
+        <p class="ha-note"><i data-lucide="heart" aria-hidden="true"></i><span><span data-i18n="ha.credit">MHO-C303 支持的贡献与实机测试来自</span> <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1" target="_blank" rel="noopener noreferrer">@drug123</a>.</span></p>
       </section>
 
       <section id="compatibilityNotice" class="compatibility-notice container" aria-live="polite" hidden>
@@ -283,7 +290,7 @@
 
         <aside class="identification-tip">
           <i data-lucide="info" aria-hidden="true"></i>
-          <p><strong data-i18n="connection.multiTitle">有多个 LYWSD02？</strong> <span data-i18n="connection.multiText">每个传感器连接一次并设置本地名称。浏览器 ID 和最近连接时间会保存在这台电脑上。</span></p>
+          <p><strong data-i18n="connection.multiTitle">有多个 LYWSD02 / MHO-C303？</strong> <span data-i18n="connection.multiText">每个传感器连接一次并设置本地名称。浏览器 ID 和最近连接时间会保存在这台电脑上。</span></p>
         </aside>
 
         <div id="knownDevices" class="known-devices">
@@ -368,6 +375,6 @@
     </form>
   </dialog>
 
-  <noscript><div class="noscript-message" data-i18n="noscript">必须启用 JavaScript 才能通过蓝牙与 LYWSD02 通信。</div></noscript>
+  <noscript><div class="noscript-message" data-i18n="noscript">必须启用 JavaScript 才能通过蓝牙与 LYWSD02 / MHO-C303 通信。</div></noscript>
 </body>
 </html>

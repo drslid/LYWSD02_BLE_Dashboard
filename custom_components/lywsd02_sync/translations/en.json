@@ -6,7 +6,7 @@
         "description": "Keep {name} on time? Home Assistant sets its clock right away, then every night at 04:00 and after each daylight saving change. The schedule, temperature unit, time format and time correction can be changed later on the device page."
       },
       "user": {
-        "description": "Choose the LYWSD02 clock to keep on time.",
+        "description": "Choose the LYWSD02 / LYWSD02MMC / MHO-C303 clock to keep on time.",
         "data": {
           "address": "Clock"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "This clock is already set up.",
       "already_in_progress": "This clock is already being set up.",
-      "no_devices_found": "No LYWSD02 clock found. Bring it closer to your Bluetooth adapter or proxy, then try again."
+      "no_devices_found": "No LYWSD02 / LYWSD02MMC / MHO-C303 clock found. Bring it closer to your Bluetooth adapter or proxy, then try again."
     }
   },
   "options": {

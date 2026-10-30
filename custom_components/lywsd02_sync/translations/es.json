@@ -6,7 +6,7 @@
         "description": "¿Mantener {name} en hora? Home Assistant ajusta su reloj ahora mismo, luego cada noche a las 04:00 y tras cada cambio de horario. La programación, la unidad de temperatura, el formato de hora y la corrección de hora se cambian después en la página del dispositivo."
       },
       "user": {
-        "description": "Elige el reloj LYWSD02 que quieres mantener en hora.",
+        "description": "Elige el reloj LYWSD02 / LYWSD02MMC / MHO-C303 que quieres mantener en hora.",
         "data": {
           "address": "Reloj"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "Este reloj ya está configurado.",
       "already_in_progress": "Este reloj ya se está configurando.",
-      "no_devices_found": "No se ha encontrado ningún reloj LYWSD02. Acércalo a tu adaptador o proxy Bluetooth e inténtalo de nuevo."
+      "no_devices_found": "No se ha encontrado ningún reloj LYWSD02 / LYWSD02MMC / MHO-C303. Acércalo a tu adaptador o proxy Bluetooth e inténtalo de nuevo."
     }
   },
   "options": {

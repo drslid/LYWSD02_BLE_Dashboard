@@ -526,6 +526,16 @@ html.is-phone .noscript-message {
   font-size: 1.05rem;
 }
 
+.intro__copy > p.compatible-models {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.intro__copy > p.compatibility-detail {
+  font-size: 0.8rem;
+}
+
 .intro__visual {
   display: grid;
   margin: 0;

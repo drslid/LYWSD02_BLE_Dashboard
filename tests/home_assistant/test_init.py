@@ -16,10 +16,11 @@ import pytest
 
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_ADDRESS, STATE_UNKNOWN
+from homeassistant.const import CONF_ADDRESS, CONF_MODEL, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers import device_registry as dr
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
 
@@ -74,6 +75,36 @@ async def setup_clock(hass: HomeAssistant, options: dict[str, Any] | None = None
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done(wait_background_tasks=True)
     return entry
+
+
+@pytest.mark.parametrize(
+    ("model", "title", "stored"),
+    [
+        ("MHO-C303", "Living room", True),
+        ("MHO-C303", "MHO-C303 (CDEF)", False),
+        ("LYWSD02MMC", "LYWSD02MMC (CDEF)", False),
+        ("LYWSD02", TITLE, False),
+    ],
+)
+async def test_device_registry_preserves_the_clock_model(
+    hass: HomeAssistant, ble: BluetoothHarness, model: str, title: str, stored: bool
+) -> None:
+    """Persisted models survive renaming; entries created before this change still work."""
+    ble.proxy().hear(name=model)
+    data = {CONF_ADDRESS: ADDRESS}
+    if stored:
+        data[CONF_MODEL] = model
+    entry = MockConfigEntry(
+        domain=DOMAIN, unique_id=ADDRESS, title=title, data=data, options=DEFAULT_OPTIONS
+    )
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done(wait_background_tasks=True)
+    devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+    assert len(devices) == 1
+    device = devices[0]
+    assert device.model == model
+    assert device.name == title
 
 
 async def settle(hass: HomeAssistant) -> None:

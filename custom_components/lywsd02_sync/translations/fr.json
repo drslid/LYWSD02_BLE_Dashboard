@@ -6,7 +6,7 @@
         "description": "Garder {name} à l’heure ? Home Assistant règle son horloge tout de suite, puis chaque nuit à 04:00 et après chaque changement d’heure. La planification, l’unité de température, le format de l’heure et la correction de l’heure se règlent ensuite sur la page de l’appareil."
       },
       "user": {
-        "description": "Choisissez l’horloge LYWSD02 à garder à l’heure.",
+        "description": "Choisissez l’horloge LYWSD02 / LYWSD02MMC / MHO-C303 à garder à l’heure.",
         "data": {
           "address": "Horloge"
         }
@@ -15,7 +15,7 @@
     "abort": {
       "already_configured": "Cette horloge est déjà configurée.",
       "already_in_progress": "La configuration de cette horloge est déjà en cours.",
-      "no_devices_found": "Aucune horloge LYWSD02 trouvée. Rapprochez-la de votre adaptateur ou proxy Bluetooth, puis réessayez."
+      "no_devices_found": "Aucune horloge LYWSD02 / LYWSD02MMC / MHO-C303 trouvée. Rapprochez-la de votre adaptateur ou proxy Bluetooth, puis réessayez."
     }
   },
   "options": {

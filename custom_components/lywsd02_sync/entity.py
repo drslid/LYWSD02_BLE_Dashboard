@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from homeassistant.const import CONF_MODEL
 from homeassistant.helpers.device_registry import CONNECTION_BLUETOOTH, DeviceInfo
 from homeassistant.helpers.entity import Entity
 
+from .const import model_from_name
 from .manager import ClockSyncManager
 
 
@@ -22,7 +24,7 @@ class LYWSD02Entity(Entity):
             connections={(CONNECTION_BLUETOOTH, manager.address)},
             name=manager.name,
             manufacturer="Xiaomi",
-            model="LYWSD02",
+            model=manager.entry.data.get(CONF_MODEL, model_from_name(manager.name)),
         )
 
     async def async_added_to_hass(self) -> None:
