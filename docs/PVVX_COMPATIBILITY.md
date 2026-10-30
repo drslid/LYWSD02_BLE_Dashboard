@@ -56,7 +56,7 @@ Sources: [upstream configurator, `setDevTime()`](https://github.com/pvvx/pvvx.gi
 2. Implemented in the browser: measurements, battery, sample-history transfer and a dedicated CSV containing raw device timestamps. The record-count selector counts samples for PVVX, hours for stock clocks.
 3. Implemented in Home Assistant: discovery hints, protocol selection, scheduled time/settings updates and readings. Existing integration/entity/statistics identities remain unchanged. PVVX records are deliberately not imported as stock hourly extrema.
 4. Pending: physical verification of clock display, daylight saving transitions, transfer completion, exact board variants and firmware behavior. PIN-protected command services are outside this implementation.
-5. Pending: wider firmware/hardware coverage and a release after physical validation. Unknown identities and Zigbee builds are rejected rather than used through the stock protocol.
+5. Included in v1.4.0 as experimental support. Physical validation is required before promoting these profiles to established support. Wider firmware/hardware coverage is pending; unknown identities and Zigbee builds are rejected rather than used through the stock protocol.
 
 Home Assistant already receives PVVX sensors configured for BTHome through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/). The useful addition here would be a simpler device-control interface, time synchronization and history retrieval. Reimplementing passive sensor reception alone would add little value. Keep firmware installation in the existing upstream flasher initially rather than expanding this dashboard into an OTA tool.
 

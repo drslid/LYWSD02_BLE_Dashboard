@@ -109,9 +109,9 @@ Thank you to **[@drug123](https://github.com/drug123)** for contributing MHO-C30
 
 The MHO-C303 shares the time, measurement and history characteristics used by the integration. Its 12/24-hour setting and alarm functions have not been validated; alarm management is not provided by this project. Other Bluetooth thermometers are not automatically compatible: the device name and GATT protocol must match.
 
-### Experimental devices and firmware (development version)
+### Experimental devices and firmware
 
-The development source adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Select the matching **Device / firmware** profile before connecting in the browser. The existing stock profile remains the default.
+Version **1.4.0** adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Select the matching **Device / firmware** profile before connecting in the browser. The existing stock profile remains the default.
 
 | Device / firmware | Browser dashboard | Home Assistant |
 | --- | --- | --- |
@@ -120,7 +120,7 @@ The development source adds separate BLE profiles based on published protocols. 
 | **LYWSDCGQ / MJ_HT_V1**, **LYWSD03MMC**, **CGG1 ClearGrass variant**, **CGDK2**, original firmware | Experimental measurements; device clock/settings actions disabled | Use native Xiaomi BLE / Qingping, according to the device |
 | **HHCCJCY01 / GCLS002** Flower Care and **HHCCPOT002** RoPot | Experimental soil measurements and battery; Flower Care also temperature and illuminance | Use native Xiaomi BLE / ESPHome |
 
-PVVX must already be installed; this dashboard does not flash firmware. Identity/capability checks reject unknown PVVX hardware, unsupported versions and Zigbee builds. CGD1 session authentication preserves the existing pairing and unrelated settings; it does not configure alarms or ringtones. Factory CGG1 variants differ; the HomeKit variant is excluded. These development additions are not included in the last tagged HACS release.
+PVVX must already be installed; this dashboard does not flash firmware. Identity/capability checks reject unknown PVVX hardware, unsupported versions and Zigbee builds. CGD1 session authentication preserves the existing pairing and unrelated settings; it does not configure alarms or ringtones. Factory CGG1 variants differ; the HomeKit variant is excluded. Update the HA integration to v1.4.0 to get the experimental PVVX/CGD1 clock profiles; factory sensor profiles are browser additions.
 
 See the [complete research for all 20 ESPHome models, commands and limitations](docs/DEVICE_SUPPORT.md), and the [PVVX protocol and naming assessment](docs/PVVX_COMPATIBILITY.md). Home Assistant can receive appropriately configured PVVX BTHome broadcasts through its built-in [BTHome integration](https://www.home-assistant.io/integrations/bthome/). Other motion/contact/air-quality devices remain deferred until their active commands and authentication are verified; their supported broadcasts can already be used through native HA or ESPHome.
 
@@ -142,6 +142,10 @@ You need **Home Assistant 2025.2 or later**, **[HACS](https://www.hacs.xyz/)** a
    [![Open your Home Assistant instance and start setting up LYWSD02 Clock Sync.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync)
 
 That’s it: each clock is synchronized immediately.
+
+### Updating an existing Home Assistant installation
+
+[Version 1.4.0](https://github.com/drslid/LYWSD02_BLE_Dashboard/releases/tag/v1.4.0) adds recovery for missed scheduled syncs, bounded Bluetooth cleanup and experimental PVVX/CGD1 profiles. In **HACS → LYWSD02 Clock Sync**, refresh the repository information if needed, download **v1.4.0**, then **restart Home Assistant**. Existing devices, schedules, entity IDs and statistics are preserved.
 
 > Without HACS, copy `custom_components/lywsd02_sync` into the `custom_components` folder of your Home Assistant configuration, then restart.
 
@@ -167,6 +171,8 @@ Whatever you choose:
 
 - **Daylight saving changes** are corrected within the hour.
 - **A clock out of range** is looked for every minute and synchronized as soon as an adapter can reach it.
+- **A missed scheduled run** is checked again every minute; retry delays are preserved after a failed connection. Manual, weekly and monthly schedules keep their chosen frequency.
+- **Clocks scheduled at the same time** use a shared Bluetooth queue, one connection at a time. Notification cleanup and disconnects have a five-second deadline, so a stuck cleanup cannot hold all the other clocks indefinitely. Disk writes and statistics imports run outside this queue.
 - **A failed connection** is retried after 5, 15, 30 and then 60 minutes.
 
 ### What you get
@@ -196,6 +202,8 @@ The settings are entities too, so automations can change them. The clock uses th
   - *No Bluetooth adapter can connect*: add a Bluetooth adapter, or an ESPHome proxy with `active: true`.
   - Without a repair, the clock is out of range: move it closer to an adapter or proxy.
 - **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button reconnects a few times, then shows the exact error.
+- **Last sync still says last week:** this timestamp is the last successful operation, not the last attempt. On the **Sync status** sensor, inspect `last_attempt`, `last_error`, `next_retry`, `pending` and `in_progress`. These describe the current HA session. The schedule is rechecked every minute. Missing clocks also trigger a ten-second active scan at most every five minutes on HA versions with that API; proxies configured only to listen still need `active: true` to connect.
+- **The browser works but HA does not:** the dashboard connects through your computer's Bluetooth; HA needs an adapter or active proxy within range of the clock. Disconnect the dashboard before testing HA so an open browser session does not compete for the device's BLE connection.
 - **12 h has no effect:** only the LYWSD02MMC supports it. A plain LYWSD02 stays in 24 h and its time is still set.
 
 <a id="languages"></a>

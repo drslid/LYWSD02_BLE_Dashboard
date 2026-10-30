@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import AsyncGenerator, Callable
+from inspect import signature
 import struct
 from typing import Any
 from unittest.mock import AsyncMock, patch
@@ -46,7 +47,7 @@ def service_info(address: str = ADDRESS, name: str = "LYWSD02") -> BluetoothServ
         service_data={},
         service_uuids=[],
         source="local",
-        device=BLEDevice(address, name, None),
+        device=BLEDevice(address, name, None, **({"rssi": -60} if "rssi" in signature(BLEDevice).parameters else {})),
         advertisement=AdvertisementData(name, {}, {}, [], None, -60, ()),
         connectable=True,
         time=0,
@@ -153,6 +154,7 @@ class BluetoothHarness:
     def __init__(self, hass: HomeAssistant, clock: FakeClock) -> None:
         self.hass = hass
         self.clock = clock
+        self.clocks: dict[str, FakeClock] = {}
         self.connect_error: Exception | None = None
         self.connections = 0
         self._cleanups: list[Callable[[], None]] = []
@@ -169,11 +171,11 @@ class BluetoothHarness:
         return scanner
 
     async def connect(self, client_class: Any, device: BLEDevice, name: str, **kwargs: Any) -> FakeClock:
-        assert device.address == ADDRESS
+        assert device.address == ADDRESS or device.address in self.clocks
         self.connections += 1
         if self.connect_error:
             raise self.connect_error
-        return self.clock
+        return self.clocks.get(device.address, self.clock)
 
     def close(self) -> None:
         for cleanup in reversed(self._cleanups):

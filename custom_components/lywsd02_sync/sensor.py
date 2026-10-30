@@ -158,3 +158,8 @@ class LYWSD02Sensor(LYWSD02Entity, SensorEntity):
     def native_value(self) -> StateType | datetime:
         """Return the current value."""
         return self.entity_description.value_fn(self._manager)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, object] | None:
+        """Expose retry progress on the synchronization status sensor."""
+        return self._manager.sync_diagnostics if self.entity_description.key == "sync_status" else None

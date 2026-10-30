@@ -64,6 +64,8 @@ DEFAULT_OPTIONS: Final = {
 MIN_CRON_INTERVAL: Final = timedelta(hours=1)
 # Looking the clock up costs no radio time; connecting does, so failures back off.
 SEARCH_INTERVAL: Final = timedelta(minutes=1)
+BACKGROUND_SCAN_INTERVAL: Final = timedelta(minutes=5)
+BACKGROUND_SCAN_DURATION: Final = 10
 RETRY_DELAYS: Final = (
     timedelta(minutes=5),
     timedelta(minutes=15),
@@ -73,6 +75,9 @@ RETRY_DELAYS: Final = (
 # Proxies can take a few minutes to report the clock after Home Assistant starts.
 REPORT_MISSING_AFTER: Final = timedelta(minutes=5)
 SYNC_TIMEOUT: Final = 60
+# Backend cleanup must not hold the shared connection queue indefinitely.
+CLEANUP_TIMEOUT: Final = 5
+POST_SYNC_TIMEOUT: Final = 15
 # The sync button searches for the clock and reconnects for this long (seconds) before giving up.
 FORCE_TIMEOUT: Final = 60
 # Pauses (seconds) of the sync button before reconnecting after a failed or dropped connection.
