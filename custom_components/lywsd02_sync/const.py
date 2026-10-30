@@ -7,7 +7,8 @@ from typing import Final
 
 DOMAIN: Final = "lywsd02_sync"
 
-LOCAL_NAME_PREFIX: Final = "LYWSD02"
+# The MHO-C303 alarm clock uses the same time and settings characteristics as the LYWSD02.
+LOCAL_NAME_PREFIXES: Final = ("LYWSD02", "MHO-C303")
 TIME_CHARACTERISTIC: Final = "ebe0ccb7-7a0a-4b0c-8a1a-6ff2997da3a6"
 UNIT_CHARACTERISTIC: Final = "ebe0ccbe-7a0a-4b0c-8a1a-6ff2997da3a6"
 MEASUREMENT_CHARACTERISTIC: Final = "ebe0ccc1-7a0a-4b0c-8a1a-6ff2997da3a6"

@@ -54,7 +54,10 @@ def test_hacs_can_install_the_integration() -> None:
     for key in ("domain", "documentation", "issue_tracker", "codeowners", "name", "version"):
         assert manifest[key], key
     assert manifest["domain"] == DOMAIN
-    assert manifest["bluetooth"] == [{"local_name": "LYWSD02*", "connectable": True}]
+    assert manifest["bluetooth"] == [
+        {"local_name": "LYWSD02*", "connectable": True},
+        {"local_name": "MHO-C303*", "connectable": True},
+    ]
     assert [folder.name for folder in (ROOT / "custom_components").iterdir() if folder.is_dir()] == [DOMAIN]
     for name, size in (("icon.png", 256), ("icon@2x.png", 512)):
         with Image.open(INTEGRATION / "brand" / name) as image:

@@ -37,7 +37,7 @@ from .const import (
     DEFAULT_TIME,
     DEFAULT_WEEKDAY,
     DOMAIN,
-    LOCAL_NAME_PREFIX,
+    LOCAL_NAME_PREFIXES,
     MAX_DAY,
     SCHEDULE_CRON,
     SCHEDULE_DAILY,
@@ -104,7 +104,7 @@ class LYWSD02ConfigFlow(ConfigFlow, domain=DOMAIN):
 
         configured = self._async_current_ids(include_ignore=False)
         for info in async_discovered_service_info(self.hass, connectable=True):
-            if info.address not in configured and info.name.startswith(LOCAL_NAME_PREFIX):
+            if info.address not in configured and info.name.startswith(LOCAL_NAME_PREFIXES):
                 self._discovered[info.address] = info
         if not self._discovered:
             return self.async_abort(reason="no_devices_found")

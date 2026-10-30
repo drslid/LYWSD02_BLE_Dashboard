@@ -95,7 +95,7 @@ You need **Home Assistant 2025.2 or later**, **[HACS](https://www.hacs.xyz/)** a
    [![Open your Home Assistant instance and open this repository in HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&repository=LYWSD02_BLE_Dashboard&category=integration)
 
 2. **Restart Home Assistant.**
-3. **Add your clocks.** Home Assistant discovers nearby LYWSD02 clocks: select **Add** on the notification. You can also add one yourself:
+3. **Add your clocks.** Home Assistant discovers nearby LYWSD02 clocks, and MHO-C303 alarm clocks, which share their protocol: select **Add** on the notification. You can also add one yourself:
 
    [![Open your Home Assistant instance and start setting up LYWSD02 Clock Sync.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=lywsd02_sync)
 
