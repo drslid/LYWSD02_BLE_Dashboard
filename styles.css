@@ -142,10 +142,6 @@ select { max-width: 100%; }
 .history-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: .75rem; }
 .history-toolbar select { width: auto; }
 .history-empty { padding: 30px 0; color: var(--muted); font-size: .8rem; text-align: center; }
-.history-table-wrap { overflow-x: auto; margin-top: 18px; }
-table { border-collapse: collapse; width: 100%; font-size: .75rem; text-align: start; }
-th, td { padding: 13px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; text-align: start; }
-th { color: var(--muted); font-size: .7rem; font-weight: 600; }
 #knownDevicesList { padding: 0; margin: 8px 0 0; list-style: none; }
 .known-device { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
 .known-device:last-child { padding-bottom: 0; border-bottom: 0; }
@@ -411,4 +407,36 @@ html[lang="hi"] { font-family: 'Noto Sans Devanagari', Manrope, sans-serif; }
 @media (min-width: 761px) {
   .connection-card.is-connected .connection-copy { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
   .connection-card.is-connected .main-actions { margin-top: 0; flex-shrink: 0; }
+}
+.history-chart { margin-top: 24px; }
+.history-chart-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.history-chart-mode { color: var(--muted); font-size: .67rem; display: inline-flex; align-items: center; gap: 7px; }
+.history-chart-mode::before { content: ''; width: 17px; height: 9px; border-radius: 3px; background: #ddecf1; border-block: 1px solid #78a4b5; }
+.history-chart-date { color: var(--ink); font-size: .7rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.history-plot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.history-plot { --chart-color: #b97147; --chart-fill: #d99b74; min-width: 0; padding: 18px 16px 10px; border: 1px solid #f0e1d6; border-radius: 13px; background: linear-gradient(180deg, #fff7f1, #fffdfb); }
+.history-plot--humidity { --chart-color: #377c9c; --chart-fill: #74adc4; background: linear-gradient(180deg, #f1f8fc, #fcfefe); border-color: #dcebf1; }
+.history-plot-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 0 4px 10px; }
+.history-plot-heading h3 { font-size: .75rem; font-weight: 700; letter-spacing: 0; color: var(--muted); }
+.history-plot-unit { display: block; font-size: .65rem; margin-top: 5px; color: var(--chart-color); }
+.history-plot-value { font-size: 1.05rem; font-weight: 800; color: var(--chart-color); font-variant-numeric: tabular-nums; white-space: nowrap; letter-spacing: -.035em; }
+.history-plot-canvas { border-radius: 6px; touch-action: pan-y; }
+.history-plot-canvas svg { display: block; width: 100%; height: 208px; overflow: visible; cursor: crosshair; }
+.chart-grid-line { stroke: #cad8d4; stroke-width: 1; stroke-opacity: .5; stroke-dasharray: 3 5; }
+.chart-axis-label { fill: var(--muted); font-size: 10px; font-family: inherit; }
+.chart-range-band { fill: var(--chart-fill); fill-opacity: .22; stroke: none; }
+.chart-series { fill: none; stroke: var(--chart-color); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.chart-series--minimum { stroke-width: 1.5; stroke-opacity: .6; stroke-dasharray: 4 4; }
+.chart-point { fill: var(--chart-color); stroke: white; stroke-width: 1.5; }
+.chart-cursor-line { stroke: var(--chart-color); stroke-width: 1; stroke-opacity: .5; stroke-dasharray: 3 3; }
+.chart-cursor-point { fill: white; stroke: var(--chart-color); stroke-width: 2.2; }
+.history-chart-hint { color: var(--muted); font-size: .65rem; text-align: center; margin-top: 14px; line-height: 1.6; }
+@media (max-width: 760px) {
+  .history-plot-grid { grid-template-columns: 1fr; gap: 14px; }
+}
+@media (max-width: 480px) {
+  .history-plot { padding: 16px 10px 8px; }
+  .history-chart { margin-top: 20px; }
+  .history-chart-date { font-size: .65rem; }
+  .history-plot-value { font-size: 1rem; }
 }

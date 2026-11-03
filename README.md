@@ -25,7 +25,7 @@
 
 <p align="center">
   <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/#browser"><img src="img/dashboard_lywsd02.jpg" alt="Browser sync: a connected Living room clock, the Sync clock button and live temperature, humidity and battery readings" width="1000"></a><br>
-  <sub>Browser interface with example readings. Clock settings, hourly history and the activity log are visible directly.</sub>
+  <sub>Browser interface with example readings. Clock settings, interactive temperature/humidity history and the activity log are visible directly.</sub>
 </p>
 
 <p align="center">
@@ -49,7 +49,7 @@ Use **Chrome, Edge or another compatible Chromium browser** on a Bluetooth-enabl
 Temperature, humidity and battery appear after connecting. Use the pencil beside the clock’s name to rename it.
 
 - **Clock & display settings**: time zone, 12/24-hour format, correction and automatic correction are visible directly. Click **Sync clock** to apply the time settings. Choose °C/°F and use **Save unit** to update the device’s unit. The 12-hour display is available on the LYWSD02MMC only.
-- **Hourly history**, above the log: read up to 96 hours and download a CSV.
+- **Hourly history**, above the log: explore temperature and humidity charts for up to 96 hours. Hover, tap or use the arrow keys to inspect each hourly minimum/maximum; download the full readings as CSV.
 - **Activity log**, at the bottom: follow Bluetooth connections, sync results and errors.
 - **Other devices & help**: select an experimental profile before connecting.
 - **Saved clocks**: reconnect to a previously used device. Names are saved only in this browser.

@@ -4,6 +4,7 @@
   function create({ state, elements, t, localeTag, formatNumber, deviceDisplayName, log,
                       resolveHistoryDevice, displayNameForId, shortDeviceId, refreshIcons,
                       connectToDevice, chooseDevice, removeDeviceHistory, byId }) {
+    let historyChart;
     function initializeNavigation() {
       const tabs = Array.from(document.querySelectorAll('.mode-tab'));
       function selectPanel(id, navigate = false) {
@@ -74,46 +75,29 @@
       const samples = state.protocolKind === 'pvvx';
       const title = byId('history-title');
       if (title) title.textContent = t(samples ? 'protocol.sampleHistoryTitle' : 'history.title');
-      const headings = document.querySelectorAll('#historyTableWrap th');
-      const keys = samples ? ['protocol.deviceTimestamp', 'metric.temperature', 'metric.humidity', 'protocol.batteryVoltage'] : ['history.date', 'history.tempMin', 'history.tempMax', 'history.humidity'];
-      headings.forEach((heading, index) => { heading.textContent = t(keys[index]); });
       document.querySelectorAll('#historyLimit option').forEach((option) => {
         option.textContent = samples ? t('history.count', { count: Number(option.value) }) : t(option.dataset.i18n);
       });
     }
+    function clearHistoryChart() {
+      historyChart?.clear();
+      elements.historyChart.hidden = true;
+    }
     function renderHistory() {
-      const samples = state.protocolKind === 'pvvx';
       updateHistoryLabels();
-      elements.historyTableBody.replaceChildren();
       const count = state.historyRecords.length;
       elements.historyCount.textContent = t('history.count', { count });
       elements.historyCount.hidden = count === 0;
       elements.exportHistoryBtn.disabled = count === 0;
-      elements.historyTableWrap.hidden = count === 0;
-      elements.historyEmpty.hidden = count > 0;
       if (count === 0) {
+        clearHistoryChart();
+        elements.historyEmpty.hidden = false;
         elements.historyEmpty.querySelector('p').textContent = t('history.empty');
         return;
       }
-      const dateFormatter = new Intl.DateTimeFormat(localeTag(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-      const fragment = document.createDocumentFragment();
-      state.historyRecords.forEach((record) => {
-        const row = document.createElement('tr');
-        (samples ? [
-          new Intl.DateTimeFormat(localeTag(), { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', timeZone: 'UTC' }).format(new Date(record.rawTimestamp * 1000)),
-          `${formatNumber(record.temperature)} °C`, `${formatNumber(record.humidity)} %`, `${record.batteryMv} mV`
-        ] : [
-          dateFormatter.format(new Date(record.timestamp * 1000)),
-          `${formatNumber(record.minTemperature)} °C`, `${formatNumber(record.maxTemperature)} °C`,
-          `${record.minHumidity}–${record.maxHumidity} %`
-        ]).forEach((value) => {
-          const cell = document.createElement('td');
-          cell.textContent = value;
-          row.append(cell);
-        });
-        fragment.append(row);
-      });
-      elements.historyTableBody.append(fragment);
+      historyChart ||= root.DASHBOARD_HISTORY_CHART.create({ container: elements.historyChart, t, localeTag, formatNumber });
+      const plotted = historyChart.render(state.historyRecords, state.protocolKind);
+      elements.historyEmpty.hidden = plotted;
     }
     function exportHistory() {
       if (!state.historyRecords.length) return;
@@ -194,7 +178,7 @@
       elements.knownDevicesList.append(fragment);
       refreshIcons();
     }
-    return { initializeNavigation, updateWorkspaceVisibility, renderExtraMeasurements, updateHistoryLabels, renderHistory, exportHistory, renderDeviceHistory };
+    return { initializeNavigation, updateWorkspaceVisibility, renderExtraMeasurements, updateHistoryLabels, renderHistory, clearHistoryChart, exportHistory, renderDeviceHistory };
   }
   root.DASHBOARD_VIEW = { create };
 })(window);

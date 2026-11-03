@@ -8,6 +8,7 @@ async function installBluetooth(page) {
     dataView(time).setInt8(4, Math.floor(-new Date().getTimezoneOffset() / 60));
     let unit = 0xff;
     let first = 1;
+    const historyCount = () => state.historyCount || 2;
     class Characteristic extends EventTarget {
       constructor(kind) { super(); this.kind = kind; }
       emit(value) { this.value = dataView(value); this.dispatchEvent(new Event('characteristicvaluechanged')); }
@@ -16,8 +17,8 @@ async function installBluetooth(page) {
         if (this.kind === 'unit') return dataView(Uint8Array.of(unit));
         if (this.kind === 'battery') return dataView(Uint8Array.of(87));
         const counts = new Uint8Array(8);
-        dataView(counts).setUint32(0, 2, true);
-        dataView(counts).setUint32(4, 2, true);
+        dataView(counts).setUint32(0, historyCount(), true);
+        dataView(counts).setUint32(4, historyCount(), true);
         return dataView(counts);
       }
       async writeValueWithResponse(value) {
@@ -31,13 +32,14 @@ async function installBluetooth(page) {
       async startNotifications() {
         if (this.kind === 'measurement') queueMicrotask(() => this.emit(Uint8Array.of(0xc0, 0x08, 48)));
         if (this.kind === 'history') {
-          for (let index = first; index <= 2; index++) {
+          for (let index = first; index <= historyCount(); index++) {
             const frame = new Uint8Array(14);
             const value = dataView(frame);
             value.setUint32(0, index, true);
-            value.setUint32(4, Math.floor(Date.now() / 3600000) * 3600 - index * 3600, true);
-            value.setInt16(8, 2350, true); value.setUint8(10, 60);
-            value.setInt16(11, 2100, true); value.setUint8(13, 40);
+            value.setUint32(4, Math.floor(Date.now() / 3600000) * 3600 - (historyCount() - index + 1) * 3600, true);
+            const variation = historyCount() > 2 ? Math.sin((index - 6) / 4) : 0;
+            value.setInt16(8, Math.round(2350 + variation * 160), true); value.setUint8(10, Math.round(60 - variation * 7));
+            value.setInt16(11, Math.round(2100 + variation * 120), true); value.setUint8(13, Math.round(40 - variation * 5));
             queueMicrotask(() => this.emit(frame));
           }
         }

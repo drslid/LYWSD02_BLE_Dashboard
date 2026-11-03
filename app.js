@@ -57,8 +57,7 @@
     historyEmpty: byId('historyEmpty'),
     historyLimit: byId('historyLimit'),
     historyStatus: byId('historyStatus'),
-    historyTableBody: byId('historyTableBody'),
-    historyTableWrap: byId('historyTableWrap'),
+    historyChart: byId('historyChart'),
     humidity: byId('humidity'),
     humidityBar: byId('humidityBar'),
     humTimestamp: byId('humTimestamp'),
@@ -362,8 +361,7 @@
   function resetHistory() {
     state.historyRecords = [];
     updateHistoryLabels();
-    elements.historyTableBody.replaceChildren();
-    elements.historyTableWrap.hidden = true;
+    view.clearHistoryChart();
     elements.historyEmpty.hidden = false;
     elements.historyEmpty.querySelector('p').textContent = state.device ? t('history.emptyLoaded') : t('history.emptyConnect');
     elements.historyCount.textContent = t('history.count', { count: 0 });

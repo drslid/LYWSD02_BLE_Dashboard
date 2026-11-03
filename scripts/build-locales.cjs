@@ -156,7 +156,7 @@ function renderPage(template, code) {
   assert.ok(hasStructuredData, 'Missing structured data in the template.');
 
   if (code !== 'en') {
-    html = html.replace(/\b(src|href)="((?:img\/[^"<>]+)|(?:styles\.css|i18n\.js|ble-transport\.js|ble-devices\.js|dashboard-storage\.js|dashboard-view\.js|dashboard-connection\.js|app\.js|site\.webmanifest)(?:[?#][^"<>]*)?)"/g,
+    html = html.replace(/\b(src|href)="((?:img\/[^"<>]+)|(?:styles\.css|i18n\.js|ble-transport\.js|ble-devices\.js|dashboard-storage\.js|history-chart\.js|dashboard-view\.js|dashboard-connection\.js|app\.js|site\.webmanifest)(?:[?#][^"<>]*)?)"/g,
       (_, attribute, value) => `${attribute}="../${value}"`);
   }
   return html.replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';

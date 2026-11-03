@@ -28,7 +28,8 @@ test('connect, change settings, rename, read history and download CSV', async ({
   await page.locator('#renameForm button[type="submit"]').click();
   await expect(page.locator('#deviceLabel')).toHaveText('Salon');
   await page.locator('#loadHistoryBtn').click();
-  await expect(page.locator('#historyTableBody tr')).toHaveCount(2);
+  await expect(page.locator('#historyChart')).toHaveAttribute('data-count', '2');
+  await expect(page.locator('.history-plot svg')).toHaveCount(2);
   const downloadPromise = page.waitForEvent('download');
   await page.locator('#exportHistoryBtn').click();
   const download = await downloadPromise;
@@ -165,4 +166,48 @@ test('all clock controls stay visible and history sits directly above the bottom
   expect(await page.locator('#logs').textContent()).toContain('synchronis');
   await page.locator('#clearLogs').click();
   await expect(page.locator('#logs .log-entry')).toHaveCount(0);
+});
+
+test('history charts support keyboard, touch and inspection of real min/max ranges', async ({ page }) => {
+  await page.goto('/fr/');
+  await page.evaluate(() => { window.testBluetooth.historyCount = 24; });
+  await page.locator('#connectBtn').click();
+  await page.locator('#loadHistoryBtn').click();
+  await expect(page.locator('#historyChart')).toHaveAttribute('data-count', '24');
+  await expect(page.locator('#historyPanel table')).toHaveCount(0);
+  await expect(page.locator('.chart-range-band')).toHaveCount(2);
+  const latestDate = await page.locator('.history-chart-date').textContent();
+  const plot = page.locator('.history-plot--temperature .history-plot-canvas');
+  await plot.focus();
+  await page.keyboard.press('Home');
+  const first = await page.locator('[data-chart-value="temperature"]').textContent();
+  const firstDate = await page.locator('.history-chart-date').textContent();
+  await page.keyboard.press('End');
+  await expect(page.locator('[data-chart-value="temperature"]')).not.toHaveText(first);
+  await expect(page.locator('.history-chart-date')).not.toHaveText(firstDate);
+  const width = await plot.evaluate(node => node.clientWidth);
+  await plot.click({ position: { x: width * 0.5, y: 90 } });
+  await expect(page.locator('.chart-cursor').first()).toHaveAttribute('visibility', 'visible');
+  await expect(page.locator('.chart-cursor').last()).toHaveAttribute('visibility', 'visible');
+  await expect(page.locator('.history-chart-date')).not.toHaveText(latestDate);
+  await page.locator('#ha-tab').click();
+  await page.locator('#browser-tab').click();
+  await expect(page.locator('.history-chart-date')).toHaveText(latestDate);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('a single PVVX averaged sample renders a point without a fabricated range or UTC claim', async ({ page }) => {
+  await page.goto('/fr/');
+  await page.evaluate(() => {
+    const chart = window.DASHBOARD_HISTORY_CHART.create({ container: document.getElementById('historyChart'), t: window.LYWSD02_I18N.t, localeTag: () => 'fr', formatNumber: (value, digits) => new Intl.NumberFormat('fr', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value) });
+    chart.render([{ rawTimestamp: 3600, temperature: 0, humidity: 0, batteryMv: 2900 }], 'pvvx');
+  });
+  await expect(page.locator('#historyChart')).toHaveAttribute('data-count', '1');
+  await expect(page.locator('.history-chart-mode')).toHaveText('Moyennes enregistrées');
+  await expect(page.locator('.chart-range-band')).toHaveCount(0);
+  await expect(page.locator('.chart-point')).toHaveCount(2);
+  await expect(page.locator('[data-chart-value="temperature"]')).toHaveText('0,00 °C');
+  await expect(page.locator('.history-chart-date')).not.toHaveAttribute('datetime');
+  const paths = await page.locator('.chart-series').evaluateAll(nodes => nodes.map(node => node.getAttribute('d')));
+  expect(paths.every(path => !/NaN|Infinity/.test(path))).toBe(true);
 });

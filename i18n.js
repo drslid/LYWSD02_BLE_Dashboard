@@ -662,7 +662,11 @@
       "ui.applyHint": "Time zone, format and correction are applied with “Sync clock”.",
       "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 Bluetooth thermometer clock",
       "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC Bluetooth thermometer clock",
-      "ui.mhoAlt": "MHO-C303 Bluetooth thermometer alarm clock"
+      "ui.mhoAlt": "MHO-C303 Bluetooth thermometer alarm clock",
+      "chart.range": "Hourly minimum–maximum",
+      "chart.average": "Recorded averages",
+      "chart.hint": "Hover or tap to explore the readings.",
+      "chart.keyboard": "Use the left and right arrow keys to explore readings."
     },
     "fr": {
       "ui.title": "Synchronisez, réglez et profitez de votre horloge Xiaomi Mijia.",
@@ -704,7 +708,11 @@
       "ui.applyHint": "Le fuseau, le format et la correction s’appliquent avec « Synchroniser l’horloge ».",
       "ui.lywsd02Alt": "Horloge thermomètre Bluetooth Xiaomi Mijia LYWSD02",
       "ui.lywsd02mmcAlt": "Horloge thermomètre Bluetooth Xiaomi Mijia LYWSD02MMC",
-      "ui.mhoAlt": "Réveil thermomètre Bluetooth MHO-C303"
+      "ui.mhoAlt": "Réveil thermomètre Bluetooth MHO-C303",
+      "chart.range": "Minimum–maximum par heure",
+      "chart.average": "Moyennes enregistrées",
+      "chart.hint": "Survolez ou touchez le graphique pour consulter un relevé.",
+      "chart.keyboard": "Utilisez les flèches gauche et droite pour parcourir les relevés."
     },
     "es": {
       "ui.title": "Sincroniza, ajusta y aprovecha tu reloj Xiaomi Mijia.",
@@ -746,7 +754,11 @@
       "ui.applyHint": "La zona horaria, el formato y la corrección se aplican con «Sincronizar reloj».",
       "ui.lywsd02Alt": "Reloj termómetro Bluetooth Xiaomi Mijia LYWSD02",
       "ui.lywsd02mmcAlt": "Reloj termómetro Bluetooth Xiaomi Mijia LYWSD02MMC",
-      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303"
+      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303",
+      "chart.range": "Mínimo–máximo por hora",
+      "chart.average": "Promedios registrados",
+      "chart.hint": "Pasa el cursor o toca el gráfico para consultar una medición.",
+      "chart.keyboard": "Usa las flechas izquierda y derecha para explorar las mediciones."
     },
     "it": {
       "ui.title": "Sincronizza, regola e sfrutta il tuo orologio Xiaomi Mijia.",
@@ -788,7 +800,11 @@
       "ui.applyHint": "Fuso orario, formato e correzione si applicano con «Sincronizza orologio».",
       "ui.lywsd02Alt": "Orologio termometro Bluetooth Xiaomi Mijia LYWSD02",
       "ui.lywsd02mmcAlt": "Orologio termometro Bluetooth Xiaomi Mijia LYWSD02MMC",
-      "ui.mhoAlt": "Sveglia termometro Bluetooth MHO-C303"
+      "ui.mhoAlt": "Sveglia termometro Bluetooth MHO-C303",
+      "chart.range": "Minimo–massimo orario",
+      "chart.average": "Medie registrate",
+      "chart.hint": "Passa il puntatore o tocca il grafico per leggere una misura.",
+      "chart.keyboard": "Usa le frecce sinistra e destra per scorrere le misure."
     },
     "de": {
       "ui.title": "Xiaomi Mijia synchronisieren, einstellen und mehr herausholen.",
@@ -830,7 +846,11 @@
       "ui.applyHint": "Zeitzone, Format und Korrektur werden mit „Uhr synchronisieren“ übernommen.",
       "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 Bluetooth-Thermometeruhr",
       "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC Bluetooth-Thermometeruhr",
-      "ui.mhoAlt": "MHO-C303 Bluetooth-Thermometerwecker"
+      "ui.mhoAlt": "MHO-C303 Bluetooth-Thermometerwecker",
+      "chart.range": "Stündliches Minimum–Maximum",
+      "chart.average": "Gespeicherte Mittelwerte",
+      "chart.hint": "Mit Maus oder Berührung einzelne Messwerte ansehen.",
+      "chart.keyboard": "Mit der linken und rechten Pfeiltaste durch die Messwerte navigieren."
     },
     "ar": {
       "ui.title": "زامن واضبط ساعة Xiaomi Mijia واستفد منها أكثر.",
@@ -872,7 +892,11 @@
       "ui.applyHint": "تُطبّق المنطقة الزمنية والتنسيق والتصحيح عند مزامنة الساعة.",
       "ui.lywsd02Alt": "ساعة ومقياس حرارة بلوتوث Xiaomi Mijia LYWSD02",
       "ui.lywsd02mmcAlt": "ساعة ومقياس حرارة بلوتوث Xiaomi Mijia LYWSD02MMC",
-      "ui.mhoAlt": "منبه ومقياس حرارة بلوتوث MHO-C303"
+      "ui.mhoAlt": "منبه ومقياس حرارة بلوتوث MHO-C303",
+      "chart.range": "الحد الأدنى والأقصى لكل ساعة",
+      "chart.average": "المتوسطات المسجلة",
+      "chart.hint": "مرر المؤشر أو المس الرسم لعرض قراءة.",
+      "chart.keyboard": "استخدم سهمي اليسار واليمين لاستعراض القراءات."
     },
     "zh": {
       "ui.title": "同步、调校，充分发挥 Xiaomi Mijia 时钟的功能。",
@@ -914,7 +938,11 @@
       "ui.applyHint": "点击“同步时钟”即可应用时区、时间格式和偏移校正。",
       "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 蓝牙温湿度时钟",
       "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC 蓝牙温湿度时钟",
-      "ui.mhoAlt": "MHO-C303 蓝牙温湿度闹钟"
+      "ui.mhoAlt": "MHO-C303 蓝牙温湿度闹钟",
+      "chart.range": "每小时最小值–最大值",
+      "chart.average": "已记录的平均值",
+      "chart.hint": "悬停或轻触图表可查看各条记录。",
+      "chart.keyboard": "使用左右方向键浏览记录。"
     },
     "pt": {
       "ui.title": "Sincronize, ajuste e aproveite o seu relógio Xiaomi Mijia.",
@@ -956,7 +984,11 @@
       "ui.applyHint": "Fuso horário, formato e correção são aplicados com «Sincronizar relógio».",
       "ui.lywsd02Alt": "Relógio termómetro Bluetooth Xiaomi Mijia LYWSD02",
       "ui.lywsd02mmcAlt": "Relógio termómetro Bluetooth Xiaomi Mijia LYWSD02MMC",
-      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303"
+      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303",
+      "chart.range": "Mínimo–máximo por hora",
+      "chart.average": "Médias registadas",
+      "chart.hint": "Passe o cursor ou toque no gráfico para consultar uma medição.",
+      "chart.keyboard": "Use as setas esquerda e direita para percorrer as medições."
     },
     "hi": {
       "ui.title": "अपनी Xiaomi Mijia घड़ी सिंक करें, सेट करें और उससे ज़्यादा पाएँ।",
@@ -998,7 +1030,11 @@
       "ui.applyHint": "समय क्षेत्र, प्रारूप और सुधार “घड़ी सिंक करें” के साथ लागू होते हैं।",
       "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 ब्लूटूथ थर्मामीटर घड़ी",
       "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC ब्लूटूथ थर्मामीटर घड़ी",
-      "ui.mhoAlt": "MHO-C303 ब्लूटूथ थर्मामीटर अलार्म घड़ी"
+      "ui.mhoAlt": "MHO-C303 ब्लूटूथ थर्मामीटर अलार्म घड़ी",
+      "chart.range": "हर घंटे का न्यूनतम–अधिकतम",
+      "chart.average": "सहेजे गए औसत",
+      "chart.hint": "माप देखने के लिए ग्राफ़ पर कर्सर ले जाएँ या टैप करें।",
+      "chart.keyboard": "माप देखने के लिए बाएँ और दाएँ तीर कुंजियों का उपयोग करें।"
     }
   };
   Object.entries(INTERFACE_MESSAGES).forEach(([code, messages]) => Object.assign(MESSAGES[code], messages));

@@ -115,6 +115,7 @@ ble-devices.js           Experimental PVVX/CGD1 and factory sensor GATT adapters
 dashboard-connection.js  Cancellable connection lifecycle and reconnect retries
 dashboard-storage.js     Versioned local device storage
 dashboard-view.js        Device/history rendering and CSV export
+history-chart.js         Local SVG history plots, ranges and keyboard/touch inspection
 i18n.js                  Nine language catalogs and localized metadata
 styles.css               Responsive LTR/RTL interface
 site.webmanifest         Installable app metadata
@@ -197,3 +198,5 @@ These references were gathered during the device research on September 13, 2026.
 Edit `templates/index.html`, `styles.css` and the interface messages in `i18n.js`, then run `npm run build`. Both sync paths share a responsive shell; `dashboard-view.js` handles their tabs and connection-dependent visibility. Clock settings, history and logs remain directly visible in that order; only experimental profiles use a disclosure control. The three generated product assets are documented in [IMAGE_PROMPTS.md](IMAGE_PROMPTS.md).
 
 Run `npm run dev` for a local preview at `http://127.0.0.1:4173`. With the server running and Playwright Chromium installed, `npm run screenshots` refreshes the README and social previews from the actual interface using simulated BLE readings. It requires access to the existing font and icon CDNs. The shared BLE fixture is in `tests/browser/fixtures.cjs`.
+
+The hourly-history view uses `history-chart.js`, without a remote chart library. Stock firmware plots its actual hourly minimum/maximum bands; PVVX plots its recorded averaged samples with device-local time labels. It never invents an hourly mean from a stock range. Missing hours remain gaps, humidity keeps a 0–100% scale, and CSV exports retain their original values and columns. The selected reading can be inspected with a pointer, touch or arrow keys; charts resize when a panel or viewport changes.
