@@ -6,7 +6,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_ADDRESS, Platform
 from homeassistant.core import HomeAssistant
 
-from .manager import ClockSyncManager, async_remove_storage
+from .manager import ClockSyncManager
+from .storage import async_remove_storage
 
 PLATFORMS: list[Platform] = [
     Platform.BUTTON,

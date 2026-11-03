@@ -41,10 +41,10 @@ def record_statistic_id(address: str, key: str) -> str:
 
 async def async_import_records(
     hass: HomeAssistant, address: str, name: str, hours: dict[datetime, HourlyRecord]
-) -> None:
+) -> bool:
     """Add each hour's minimum and maximum; their midpoint stands for the mean the clock does not keep."""
     if not hours or "recorder" not in hass.config.components:
-        return
+        return not hours
     translations = await async_get_translations(hass, hass.config.language, "entity", {DOMAIN})
     for key, (unit, unit_class, extremes) in RECORD_STATISTICS.items():
         metadata: dict[str, Any] = {
@@ -65,3 +65,4 @@ async def async_import_records(
             low, high = extremes(record)
             statistics.append(StatisticData(start=hour, min=low, max=high, mean=(low + high) / 2))
         async_add_external_statistics(hass, cast(StatisticMetaData, metadata), statistics)
+    return True

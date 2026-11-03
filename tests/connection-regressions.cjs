@@ -70,6 +70,9 @@ function setup(t, { fakeTimers = false, clockMode = '24', protocols } = {}) {
       }
     }
   };
+  for (const file of ['dashboard-storage.js', 'dashboard-view.js', 'dashboard-connection.js']) {
+    vm.runInNewContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), context);
+  }
   // Keep the production connection logic; replace unrelated rendering and automatic startup.
   vm.runInNewContext(source.replace(initialization, `
     renderDeviceHistory = () => {};

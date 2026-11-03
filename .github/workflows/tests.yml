@@ -1,0 +1,53 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  javascript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-traces
+          path: test-results/
+          retention-days: 7
+
+  home-assistant:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - python: '3.13'
+            harness: '0.13.210'
+            usb: 'aiousbwatcher==1.1.1 pyserial==3.5'
+          - python: '3.14'
+            harness: '0.13.367'
+            usb: 'aiousbwatcher==1.1.2 serialx==1.10.0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install pytest-homeassistant-custom-component==${{ matrix.harness }} ${{ matrix.usb }}
+      - name: Install Bluetooth requirements for the tested HA version
+        run: |
+          python -c 'import json; from pathlib import Path; import homeassistant; print("\n".join(json.loads((Path(homeassistant.__file__).parent / "components/bluetooth/manifest.json").read_text())["requirements"]))' > /tmp/bluetooth-requirements.txt
+          python -m pip install -r /tmp/bluetooth-requirements.txt
+      - run: python -m pytest -q

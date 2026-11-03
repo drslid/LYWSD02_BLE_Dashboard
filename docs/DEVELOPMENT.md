@@ -27,6 +27,16 @@ node --test tests/ble-devices.test.cjs
 
 These checks simulate device switching, cancellation during connection setup, delayed Bluetooth responses and the retry limit. They do not replace validation with physical sensors.
 
+Run all JavaScript checks with `npm test` (or `node --test tests/*.test.cjs tests/connection-regressions.cjs` without installing packages). For real Chromium page/DOM coverage on desktop and an emulated Android viewport:
+
+```bash
+npm ci
+npx playwright install --with-deps chromium
+npm run test:browser
+```
+
+The browser tests exercise connection, cancellation, clock/unit writes, renaming and saved history, CSV download, the nine locale pages, RTL and the unsupported-phone fallback. Their final BLE device is simulated; they validate browser integration rather than physical radio behavior. npm dependencies are development-only; serving the committed site still needs no package installation or build. `.github/workflows/tests.yml` runs these checks and the HA matrix on pushes and pull requests.
+
 ## Update pages and translations
 
 Edit `templates/index.html` for shared markup and `i18n.js` for translations. Then regenerate the static HTML pages and sitemap with Node.js, without installing packages:
@@ -59,7 +69,7 @@ python3.14 -m venv .venv
 .venv/bin/python -m pytest
 ```
 
-This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. Install the Bluetooth requirements from that HA version's manifest as shown: the test harness alone can resolve newer Bluetooth libraries that differ from a real HA installation. The full 119-test HA suite, including the experimental profiles and recovery tests, passes on both HA 2026.9.4 and HA 2025.2.0, the minimum declared in `hacs.json`. For the latter use harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`, then install that environment's Bluetooth manifest requirements too. Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, the search and reconnections of the sync button, readings, hourly records and their statistics, daylight saving changes, restarts and translations. `test_extended_protocols.py` adds PVVX and CGD1 wire replies through both isolated command adapters and real HA entry setup.
+This pins Home Assistant 2026.9.4; the two extra packages are requirements of the `usb` integration loaded by Bluetooth. Install the Bluetooth requirements from that HA version's manifest as shown: the test harness alone can resolve newer Bluetooth libraries that differ from a real HA installation. The HA suite, including the experimental profiles and recovery tests, is checked against both HA 2026.9.4 and HA 2025.2.0, the minimum declared in `hacs.json`. For the latter use harness `0.13.210` with Python 3.13, `aiousbwatcher==1.1.1` and `pyserial==3.5`, then install that environment's Bluetooth manifest requirements too. Tests cover the time and settings values, schedules and cron validation, discovery and options flows, settings entities, clocks out of range or heard only by passive proxies, repair issues, failed syncs, the search and reconnections of the sync button, readings, hourly records and their statistics, daylight saving changes, restarts and translations. `test_extended_protocols.py` adds PVVX and CGD1 wire replies through both isolated command adapters and real HA entry setup.
 
 Home Assistant does not call integrations back for every advertisement: identical advertisements are skipped, and when a passive proxy owns a device, a connectable proxy can make it reachable silently. The integration therefore never waits for an advertisement alone. It retries on timers and looks the clock up at each attempt; advertisements only shorten the wait.
 
@@ -67,7 +77,13 @@ A clock counts as reachable only while a connectable adapter or proxy still list
 
 Since v1.4.0, an independent minute check repairs missed schedule callbacks and missing retry timers while preserving intentional retry backoff and the selected manual/weekly/monthly frequency. At an exact deadline it captures the due run before replacing its timer, so callback ordering cannot skip the sync. One mutex coalesces calls for the same entry; a separate global lock covers Bluetooth work only. Disconnect and stock notification cleanup each have a five-second limit, including when cleanup runs after a readings timeout. Completed time writes remain successful if disconnect cleanup fails. Storage and statistics imports run outside the radio lock, each with a fifteen-second bound. Status sensor attributes expose the current session's last attempt, error, next retry and pending/in-progress flags. `test_sync_recovery.py` exercises these failure paths through real HA entries and simulated clocks.
 
-Each sync writes the time first, under the 60-second limit of a sync. The readings that follow have their own limit and never fail a sync: a reading that fails keeps its last value, and records left unread are read at the next sync. `tests/home_assistant/test_records.py` checks the statistics with a real recorder, which these tests start before Home Assistant.
+In v1.5.0, `manifest.json` depends on the complete `bluetooth` integration so Bluetooth setup precedes clock setup. `discovery.py` checks live connectable routes and prefers a free proxy when the preferred route is busy. A failed connection also requests active discovery; subscriptions and polling continue if active-scan requests fail or are unsupported. Initial background retry delays are 30 seconds, 2, 5, 15 and then 60 minutes. Forced syncs share a 60-second write/search budget across attempts and use one connector attempt per reconnect.
+
+`transport.py` bounds preliminary time/count/unit reads to three seconds and connection setup to 25 seconds, inside the sync deadline. It verifies the stock clock after writing when readable, rejecting a discrepancy over five seconds; unavailable read-back remains acknowledged-only. A completed write updates Last sync immediately before optional readings (limited to 30 seconds). `storage.py` preserves the existing versioned key and persists pending statistics together with the advanced record cursor before import. Import failures are retried every minute without BLE work, including after restart, with the already corrected record hours preserved. Status attributes and downloadable `diagnostics.py` expose verification, routes and the backlog; pairing tokens are redacted.
+
+When BLE Monitor and native HA Bluetooth share one local adapter, compare their scan modes before changing stored device addresses. BLE Monitor can keep receiving raw HCI packets while BlueZ/HA discovers no devices at all. Align native Bluetooth to Active scanning and BLE Monitor to `active_scan: true`; YAML settings require an HA restart. Do not infer reachability from BLE Monitor's last reading or inject its cached device into HA's connection routes. Its raw scanner and HA's connectable route table are separate. The [BLE Monitor FAQ](https://custom-components.github.io/ble_monitor/faq#conflicts-with-other-components-using-the-same-bt-interface) documents this coexistence limitation.
+
+Each sync writes the time under the 60-second limit of a sync. The readings that follow have their own limit and never fail a sync: a reading that fails keeps its last value, and records left unread are read at the next sync. `tests/home_assistant/test_records.py` checks the statistics with a real recorder, which these tests start before Home Assistant.
 
 Home Assistant 2026.3 and later read the integration icon from `custom_components/lywsd02_sync/brand/`. Confirm Bluetooth behavior with a physical clock before publishing a release.
 
@@ -93,8 +109,12 @@ scripts/build-locales.cjs Static page and sitemap generator
 index.html               Generated English page
 fr/, es/, it/, de/       Generated French, Spanish, Italian and German pages
 ar/, zh/, pt/, hi/       Generated Arabic, Chinese, Portuguese and Hindi pages
-app.js                   Bluetooth, reconnect, history and device persistence
+app.js                   UI controller, settings and measurements
+ble-transport.js         Serialized command channel, deadlines and cancellation
 ble-devices.js           Experimental PVVX/CGD1 and factory sensor GATT adapters
+dashboard-connection.js  Cancellable connection lifecycle and reconnect retries
+dashboard-storage.js     Versioned local device storage
+dashboard-view.js        Device/history rendering and CSV export
 i18n.js                  Nine language catalogs and localized metadata
 styles.css               Responsive LTR/RTL interface
 site.webmanifest         Installable app metadata
@@ -171,3 +191,9 @@ For most users, passive ESPHome/Home Assistant monitoring, clock synchronization
 - [fildunsky LYWSD02MMC widget](https://github.com/fildunsky/LYWSD02MMC-widget)
 
 These references were gathered during the device research on September 13, 2026. Check the upstream projects for later changes.
+
+## Interface previews
+
+Edit `templates/index.html`, `styles.css` and the interface messages in `i18n.js`, then run `npm run build`. Both sync paths share a responsive shell; `dashboard-view.js` handles their tabs and connection-dependent visibility. Advanced settings and history use native disclosure controls.
+
+Run `npm run dev` for a local preview at `http://127.0.0.1:4173`. With the server running and Playwright Chromium installed, `npm run screenshots` refreshes the README and social previews from the actual interface using simulated BLE readings. It requires access to the existing font and icon CDNs. The shared BLE fixture is in `tests/browser/fixtures.cjs`.

@@ -3,23 +3,13 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Mapping
-from dataclasses import astuple, dataclass, field
-from datetime import datetime, timedelta
 import logging
+from collections.abc import Mapping
+from datetime import datetime, timedelta
 from typing import Any
 
-from bleak import BleakClient
-from bleak.backends.characteristic import BleakGATTCharacteristic
 from bleak.backends.device import BLEDevice
-from bleak.exc import BleakError
-from bleak_retry_connector import (
-    BLEAK_RETRY_EXCEPTIONS,
-    BleakClientWithServiceCache,
-    close_stale_connections_by_address,
-    establish_connection,
-)
-
+from bleak_retry_connector import BLEAK_RETRY_EXCEPTIONS
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
@@ -30,70 +20,39 @@ from homeassistant.helpers.event import (
     async_track_point_in_time,
     async_track_time_change,
 )
-from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 from homeassistant.util.hass_dict import HassKey
 
 from .const import (
-    BATTERY_CHARACTERISTIC,
-    BACKGROUND_SCAN_INTERVAL,
-    BACKGROUND_SCAN_DURATION,
-    CLEANUP_TIMEOUT,
     CLOCK_FORMATS,
-    FORMAT_24H,
     CONF_CLOCK_FORMAT,
     CONF_CORRECTION,
     CONF_PROTOCOL,
-    CONF_PAIRING_TOKEN,
     CONF_UNIT,
     DOMAIN,
-    FORCE_POLL_INTERVAL,
     FORCE_RECONNECT_DELAYS,
     FORCE_TIMEOUT,
+    FORMAT_24H,
     ISSUE_NO_CONNECTABLE_ADAPTER,
     ISSUE_PASSIVE_ONLY,
     MAX_RECORDS,
     POST_SYNC_TIMEOUT,
-    MEASUREMENT_CHARACTERISTIC,
-    MEASUREMENT_TIMEOUT,
-    READINGS_TIMEOUT,
-    RECORD_COUNT_CHARACTERISTIC,
-    RECORD_IDLE_TIMEOUT,
-    RECORD_INDEX_CHARACTERISTIC,
-    RECORDS_CHARACTERISTIC,
     REPORT_MISSING_AFTER,
     RETRY_DELAYS,
     SEARCH_INTERVAL,
     STATUS_FAILED,
     STATUS_SYNCED,
     STATUS_WAITING,
-    SYNC_TIMEOUT,
-    TIME_CHARACTERISTIC,
-    UNIT_CHARACTERISTIC,
 )
-from .protocol import (
-    HourlyRecord,
-    clock_drift,
-    clock_offset,
-    decode_battery,
-    decode_measurement,
-    decode_record,
-    decode_record_count,
-    decode_unit,
-    encode_clock_format,
-    encode_record_index,
-    encode_time,
-    encode_unit,
-    record_hour,
-    utc_offset_minutes,
-)
+from .discovery import ClockDiscovery
+from .protocol import HourlyRecord, record_hour, utc_offset_minutes
 from .records import async_import_records
-from .extended_protocols import Pvvx, Cgd1
 from .schedule import cron_expression, next_run, previous_run
+from .storage import ClockSyncStorage
+from .transport import ClockSession, ClockTransport
 
 _LOGGER = logging.getLogger(__name__)
 
-STORAGE_VERSION = 1
 # One Bluetooth session at a time keeps proxy connection slots free.
 SYNC_LOCK: HassKey[asyncio.Lock] = HassKey(f"{DOMAIN}_sync_lock")
 TROUBLESHOOTING_URL = "https://github.com/drslid/LYWSD02_BLE_Dashboard#if-a-clock-is-not-synchronized"
@@ -110,15 +69,6 @@ MISSING_MESSAGES: dict[str | None, str] = {
         "%s cannot be synchronized: no Bluetooth adapter or proxy of Home Assistant can connect to devices"
     ),
 }
-
-
-def _store(hass: HomeAssistant, entry_id: str) -> Store[dict[str, Any]]:
-    return Store(hass, STORAGE_VERSION, f"{DOMAIN}.{entry_id}")
-
-
-async def async_remove_storage(hass: HomeAssistant, entry_id: str) -> None:
-    """Delete the saved sync state of a removed entry."""
-    await _store(hass, entry_id).async_remove()
 
 
 def device_settings(options: Mapping[str, Any]) -> dict[str, Any]:
@@ -140,22 +90,6 @@ class _ConnectionFailed(Exception):
     def __init__(self, error: Exception) -> None:
         super().__init__(error)
         self.error = error
-
-
-@dataclass
-class _Session:
-    """What one connection wrote to the clock and read from it."""
-
-    unit: str | None
-    drift: float | None = None
-    offset: float | None = None
-    newest_record: int | None = None
-    stored_records: int = 0
-    clock_time: datetime | None = None
-    battery: int | None = None
-    temperature: float | None = None
-    humidity: float | None = None
-    records: dict[int, HourlyRecord] = field(default_factory=dict)
 
 
 class ClockSyncManager:
@@ -193,18 +127,20 @@ class ClockSyncManager:
         self._failures = 0
         self._missing_since: datetime | None = None
         self._missing_reported = False
-        self._format_warned = False
         self._stopped = False
         self._issue_id = f"unreachable_{entry.entry_id}"
         self._task: asyncio.Task[None] | None = None
         self._sync_lock = asyncio.Lock()
-        self._scan_task: asyncio.Task[None] | None = None
-        self._last_scan: datetime | None = None
         self._unsub_schedule: CALLBACK_TYPE | None = None
         self._unsub_retry: CALLBACK_TYPE | None = None
         self._unsub_advertisements: CALLBACK_TYPE | None = None
         self._listeners: list[CALLBACK_TYPE] = []
-        self._store = _store(hass, entry.entry_id)
+        self._store = ClockSyncStorage(hass, entry.entry_id)
+        self._discovery = ClockDiscovery(hass, entry, address, lambda: self._stopped)
+        self._transport = ClockTransport(hass, entry, address, self._async_reachable_device, self._async_clock_written)
+        self.clock_verified: bool | None = None
+        self._pending_records: dict[datetime, HourlyRecord] = {}
+        self._import_task: asyncio.Task[None] | None = None
 
     @property
     def clock_formats(self) -> list[str]:
@@ -215,22 +151,7 @@ class ClockSyncManager:
 
     async def async_start(self) -> None:
         """Restore the last sync, then follow the schedule, the settings and the UTC offset."""
-        if stored := await self._store.async_load():
-            self.last_sync = dt_util.parse_datetime(stored["last_sync"])
-            self.drift = stored.get("drift")
-            self.unit = stored.get("unit")
-            if clock_time := stored.get("clock_time"):
-                self.clock_time = dt_util.parse_datetime(clock_time)
-            self.battery = stored.get("battery")
-            self.temperature = stored.get("temperature")
-            self.humidity = stored.get("humidity")
-            self.recent = {
-                datetime.fromisoformat(hour): HourlyRecord(*values) for hour, *values in stored.get("recent", [])
-            }
-            self._next_record = stored.get("next_record", 0)
-            self._synced_offset = stored.get("offset")
-            self._applied = stored.get("applied")
-            self.status = STATUS_SYNCED
+        await self._store.async_restore(self)
         self.entry.async_on_unload(
             async_track_time_change(self.hass, self._async_check_sync, second=2)
         )
@@ -242,6 +163,8 @@ class ClockSyncManager:
         # A setting changed while the clock was out of reach is applied after a restart too.
         if self.last_sync is None or missed or self._applied != device_settings(self.entry.options):
             self.async_request_sync()
+        else:
+            self._async_retry_record_import()
 
     @callback
     def async_add_listener(self, update_callback: CALLBACK_TYPE) -> CALLBACK_TYPE:
@@ -287,6 +210,7 @@ class ClockSyncManager:
         self._pending = True
         self._syncing += 1
         self._async_cancel_retry()
+        self._async_listen()
         deadline = self.hass.loop.time() + FORCE_TIMEOUT
         reconnect_delays = iter(FORCE_RECONNECT_DELAYS if force else ())
         try:
@@ -295,7 +219,7 @@ class ClockSyncManager:
                     async with self._sync_lock:
                         # Settings changed during a connection are written by one more connection.
                         while self._pending:
-                            await self._async_attempt()
+                            await self._async_attempt(deadline if force else None)
                     return
                 except _NotHeard:
                     if not force or not await self._async_search(deadline):
@@ -311,51 +235,24 @@ class ClockSyncManager:
             self._async_notify()
 
     async def _async_search(self, deadline: float) -> bool:
-        """Look for the clock until an adapter that can connect hears it; return False at the deadline."""
-        loop = self.hass.loop
-        if loop.time() >= deadline or not bluetooth.async_scanner_count(self.hass, connectable=True):
-            return False
+        self._async_listen()
         if self.status != STATUS_WAITING:
             self.status = STATUS_WAITING
             self._async_notify()
-        scan: asyncio.Task[None] | None = None
-        # Older Home Assistant lacks it; adapters in automatic mode scan passively and can miss the clock.
-        if request_active_scan := getattr(bluetooth, "async_request_active_scan", None):
-            scan = self.entry.async_create_background_task(
-                self.hass,
-                request_active_scan(self.hass, deadline - loop.time()),
-                f"{DOMAIN} scan {self.address}",
-            )
-        try:
-            while self._async_reachable_device() is None:
-                remaining = deadline - loop.time()
-                if remaining <= 0 or self._stopped:
-                    return False
-                await asyncio.sleep(min(remaining, FORCE_POLL_INTERVAL))
-        finally:
-            if scan:
-                scan.cancel()
-        return True
+        return await self._discovery.async_search(deadline)
 
     @callback
     def _async_reachable_device(self) -> BLEDevice | None:
-        """Return the clock if an adapter or proxy that can connect hears it now."""
-        # Home Assistant remembers a clock for minutes after its adapters stopped hearing it.
-        devices = bluetooth.async_scanner_devices_by_address(self.hass, self.address, connectable=True)
-        if not devices:
-            return None
-        preferred = bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
-        # The preferred route may still be cached after its scanner forgot the clock.
-        if preferred is not None and any(route.ble_device is preferred for route in devices):
-            return preferred
-        return max(devices, key=lambda route: route.advertisement.rssi).ble_device
+        return self._discovery.reachable_device()
 
-    async def _async_attempt(self) -> None:
+    async def _async_attempt(self, deadline: float | None = None) -> None:
         try:
             # Only radio work occupies the shared queue. Disk/recorder work is per entry.
             async with self.hass.data.setdefault(SYNC_LOCK, asyncio.Lock()):
                 if self._stopped:
                     raise _NotHeard
+                if deadline is not None and self.hass.loop.time() >= deadline:
+                    raise TimeoutError("The sync deadline expired while waiting for Bluetooth")
                 self.last_attempt = dt_util.utcnow()
                 ble_device = self._async_reachable_device()
                 if ble_device is None:
@@ -363,7 +260,10 @@ class ClockSyncManager:
                 self._async_found()
                 self._async_notify()
                 settings = device_settings(self.entry.options)
-                session = await self._async_write_clock(ble_device, settings)
+                session = await self._transport.async_write_clock(
+                    ble_device, settings, deadline,
+                    next_record=self._next_record, previous_unit=self.unit,
+                )
         except _NotHeard:
             raise
         except (*BLEAK_RETRY_EXCEPTIONS, TimeoutError) as err:
@@ -373,7 +273,7 @@ class ClockSyncManager:
             _LOGGER.exception("Unexpected error while synchronizing %s", self.name)
             raise _ConnectionFailed(err) from err
         now = dt_util.now()
-        self.last_sync = now
+        self.last_sync = session.written_at or now
         self.last_error = None
         self.drift = session.drift
         self.unit = session.unit
@@ -381,8 +281,8 @@ class ClockSyncManager:
             # A reading that failed this time keeps its last value.
             if (value := getattr(session, reading)) is not None:
                 setattr(self, reading, value)
-        hours = self._async_place_records(session, now)
-        self._synced_offset = utc_offset_minutes(now)
+        self._pending_records.update(self._async_place_records(session, now))
+        self._synced_offset = utc_offset_minutes(self.last_sync)
         self._applied = settings
         self._failures = 0
         self._pending = settings != device_settings(self.entry.options)
@@ -390,33 +290,66 @@ class ClockSyncManager:
         if not self._pending:
             self._async_stop_listening()
         self._async_notify()
+        await self._async_save_state()
+        await self._async_flush_records()
+
+    async def _async_save_state(self) -> None:
         try:
             async with asyncio.timeout(POST_SYNC_TIMEOUT):
-                await self._store.async_save(
-                    {
-                        "last_sync": now.isoformat(),
-                        "drift": session.drift,
-                        "offset": self._synced_offset,
-                        "unit": session.unit,
-                        "applied": settings,
-                        "clock_time": self.clock_time.isoformat() if self.clock_time else None,
-                        "battery": self.battery,
-                        "temperature": self.temperature,
-                        "humidity": self.humidity,
-                        "recent": [[hour.isoformat(), *astuple(record)] for hour, record in self.recent.items()],
-                        "next_record": self._next_record,
-                    }
-                )
+                await self._store.async_save_state(self)
         except Exception:
             _LOGGER.exception("Could not save the completed synchronization of %s", self.name)
+
+    async def _async_flush_records(self) -> None:
+        if not self._pending_records:
+            return
+        batch = dict(self._pending_records)
         try:
             async with asyncio.timeout(POST_SYNC_TIMEOUT):
-                await async_import_records(self.hass, self.address, self.name, hours)
+                imported = await async_import_records(self.hass, self.address, self.name, batch)
         except Exception:
-            _LOGGER.exception("Could not import records after synchronizing %s", self.name)
+            _LOGGER.exception("Could not import records for %s; retaining them for retry", self.name)
+            return
+        if imported is False:
+            return
+        for hour, record in batch.items():
+            if self._pending_records.get(hour) == record:
+                del self._pending_records[hour]
+        self._async_notify()
+        await self._async_save_state()
 
     @callback
-    def _async_place_records(self, session: _Session, now: datetime) -> dict[datetime, HourlyRecord]:
+    def _async_retry_record_import(self) -> None:
+        if self._stopped or not self._pending_records or self._syncing:
+            return
+        if self._import_task is not None and not self._import_task.done():
+            return
+
+        async def retry() -> None:
+            async with self._sync_lock:
+                await self._async_flush_records()
+
+        self._import_task = self.entry.async_create_background_task(
+            self.hass, retry(), f"{DOMAIN} records {self.address}",
+        )
+
+    @callback
+    def _async_clock_written(self, session: ClockSession) -> None:
+        """Expose the completed write while optional readings are still arriving."""
+        self.last_sync = session.written_at
+        self.clock_verified = session.verified
+        if session.hardware is not None:
+            self._pvvx_hardware = session.hardware
+        self.drift = session.drift
+        self.unit = session.unit
+        if session.clock_time is not None:
+            self.clock_time = session.clock_time
+        self.status = STATUS_SYNCED
+        self.last_error = None
+        self._async_notify()
+
+    @callback
+    def _async_place_records(self, session: ClockSession, now: datetime) -> dict[datetime, HourlyRecord]:
         """Return the new records by the UTC hour they cover, and keep those of the last 24 hours."""
         if session.records:
             self._next_record = max(session.records) + 1
@@ -431,173 +364,6 @@ class ClockSyncManager:
         since = dt_util.as_utc(now).replace(minute=0, second=0, microsecond=0) - timedelta(hours=24)
         self.recent = {hour: record for hour, record in (self.recent | hours).items() if hour >= since}
         return hours
-
-    async def _async_write_clock(self, ble_device: BLEDevice, settings: Mapping[str, Any]) -> _Session:
-        """Connect once to set the time and display settings, then read what the clock measured."""
-        deadline = self.hass.loop.time() + SYNC_TIMEOUT
-        async with asyncio.timeout_at(deadline):
-            await close_stale_connections_by_address(self.address)
-            client = await establish_connection(
-                BleakClientWithServiceCache, ble_device, self.name, max_attempts=3,
-                ble_device_callback=lambda: self._async_reachable_device() or ble_device,
-            )
-        try:
-            protocol = self.entry.data.get(CONF_PROTOCOL, "stock")
-            if protocol != "stock":
-                if protocol not in ("pvvx", "cgd1"):
-                    raise ValueError("Unsupported device protocol")
-                adapter = Pvvx(client) if protocol == "pvvx" else Cgd1(client, self.entry.data.get(CONF_PAIRING_TOKEN, ""))
-                try:
-                    async with asyncio.timeout_at(deadline):
-                        await adapter.open()
-                        if isinstance(adapter, Pvvx):
-                            self._pvvx_hardware = adapter.hardware
-                        reading = await adapter.synchronize(dt_util.now(), settings)
-                    try:
-                        async with asyncio.timeout(READINGS_TIMEOUT):
-                            await adapter.readings(reading)
-                    except Exception:
-                        _LOGGER.debug("Optional readings unavailable for %s", self.name)
-                    return _Session(**vars(reading))
-                finally:
-                    await adapter.close()
-            async with asyncio.timeout_at(deadline):
-                session = await self._async_set_clock(client, settings)
-            await self._async_read_clock(client, session)
-        finally:
-            try:
-                async with asyncio.timeout(CLEANUP_TIMEOUT):
-                    await client.disconnect()
-            except Exception as err:
-                _LOGGER.warning("%s Bluetooth disconnect did not complete; continuing the queue: %s", self.name, err or type(err).__name__)
-        return session
-
-    async def _async_set_clock(self, client: BleakClient, settings: Mapping[str, Any]) -> _Session:
-        """Write the time and display settings; return what was read on the way."""
-        session = _Session(unit=settings[CONF_UNIT])
-        correction = settings[CONF_CORRECTION]
-        try:
-            value = await client.read_gatt_char(TIME_CHARACTERISTIC)
-            now = dt_util.now()
-            session.drift = round(clock_drift(value, now) - correction * 60, 1)
-            # Records carry the time the clock kept before this sync.
-            session.offset = clock_offset(value, now)
-            session.newest_record, session.stored_records = decode_record_count(
-                await client.read_gatt_char(RECORD_COUNT_CHARACTERISTIC)
-            )
-        except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
-            # The write below still corrects a clock whose value cannot be read.
-            pass
-        await client.write_gatt_char(
-            TIME_CHARACTERISTIC, encode_time(dt_util.now(), correction), response=True
-        )
-        if session.unit is not None:
-            await client.write_gatt_char(UNIT_CHARACTERISTIC, encode_unit(session.unit), response=True)
-        else:
-            try:
-                session.unit = decode_unit(await client.read_gatt_char(UNIT_CHARACTERISTIC))
-            except (*BLEAK_RETRY_EXCEPTIONS, ValueError):
-                # Only shown in Home Assistant; the clock is already on time.
-                session.unit = self.unit
-        if settings[CONF_CLOCK_FORMAT] is not None:
-            await self._async_write_clock_format(client, settings[CONF_CLOCK_FORMAT])
-        return session
-
-    async def _async_read_clock(self, client: BleakClient, session: _Session) -> None:
-        """Read the time shown, battery, measurement and new records; failures only cost readings."""
-        try:
-            async with asyncio.timeout(READINGS_TIMEOUT):
-                for read in (
-                    self._async_read_time_shown,
-                    self._async_read_battery,
-                    self._async_read_measurement,
-                    self._async_read_records,
-                ):
-                    try:
-                        await read(client, session)
-                    except (*BLEAK_RETRY_EXCEPTIONS, ValueError) as err:
-                        _LOGGER.debug("%s could not complete %s: %s", self.name, read.__name__, err)
-                    except Exception:
-                        _LOGGER.exception("Unexpected error while reading %s", self.name)
-        except TimeoutError:
-            _LOGGER.debug("%s took more than %s s to send its readings", self.name, READINGS_TIMEOUT)
-
-    async def _async_read_time_shown(self, client: BleakClient, session: _Session) -> None:
-        value = await client.read_gatt_char(TIME_CHARACTERISTIC)
-        now = dt_util.now()
-        session.clock_time = (now + timedelta(seconds=round(clock_drift(value, now)))).replace(microsecond=0)
-
-    async def _async_read_battery(self, client: BleakClient, session: _Session) -> None:
-        session.battery = decode_battery(await client.read_gatt_char(BATTERY_CHARACTERISTIC))
-
-    async def _async_read_measurement(self, client: BleakClient, session: _Session) -> None:
-        measured: asyncio.Future[bytearray] = self.hass.loop.create_future()
-
-        def _measured(_characteristic: BleakGATTCharacteristic, data: bytearray) -> None:
-            if not measured.done():
-                measured.set_result(data)
-
-        await client.start_notify(MEASUREMENT_CHARACTERISTIC, _measured)
-        try:
-            async with asyncio.timeout(MEASUREMENT_TIMEOUT):
-                session.temperature, session.humidity = decode_measurement(await measured)
-        finally:
-            await self._async_stop_notify(client, MEASUREMENT_CHARACTERISTIC)
-
-    async def _async_stop_notify(self, client: BleakClient, characteristic: str) -> None:
-        """A stuck notification cleanup must not extend an expired readings deadline."""
-        try:
-            async with asyncio.timeout(CLEANUP_TIMEOUT):
-                await client.stop_notify(characteristic)
-        except Exception as err:
-            _LOGGER.debug("%s could not stop notifications on %s: %s", self.name, characteristic, err)
-
-    async def _async_read_records(self, client: BleakClient, session: _Session) -> None:
-        if session.offset is None or session.newest_record is None:
-            return
-        newest = session.newest_record
-        # A clock whose numbering went back, after a reset, is read from its oldest record again.
-        first = self._next_record if self._next_record <= newest + 1 else 0
-        first = max(first, newest - min(session.stored_records, MAX_RECORDS) + 1)
-        if first > newest:
-            return
-        received = asyncio.Event()
-
-        def _recorded(_characteristic: BleakGATTCharacteristic, data: bytearray) -> None:
-            try:
-                record = decode_record(data)
-            except ValueError:
-                return
-            # Records after the newest one were stamped after this sync set the time.
-            if first <= record.index <= newest:
-                session.records[record.index] = record
-            received.set()
-
-        await client.write_gatt_char(RECORD_INDEX_CHARACTERISTIC, encode_record_index(first), response=True)
-        await client.start_notify(RECORDS_CHARACTERISTIC, _recorded)
-        try:
-            # The clock sends them oldest first and stops after the newest one.
-            while newest not in session.records:
-                received.clear()
-                async with asyncio.timeout(RECORD_IDLE_TIMEOUT):
-                    await received.wait()
-        finally:
-            await self._async_stop_notify(client, RECORDS_CHARACTERISTIC)
-
-    async def _async_write_clock_format(self, client: BleakClient, clock_format: str) -> None:
-        try:
-            await client.write_gatt_char(
-                TIME_CHARACTERISTIC, encode_clock_format(clock_format), response=True
-            )
-        except BleakError as err:
-            # The plain LYWSD02 rejects this command; its time is already set.
-            if not self._format_warned:
-                self._format_warned = True
-                _LOGGER.warning(
-                    "%s did not accept the 12/24 h setting (%s); only the LYWSD02MMC supports it",
-                    self.name,
-                    err,
-                )
 
     @callback
     def _async_missing(self) -> HomeAssistantError:
@@ -666,6 +432,8 @@ class ClockSyncManager:
         self._failures += 1
         self.last_error = str(err) or type(err).__name__
         self.status = STATUS_FAILED
+        self._async_listen()
+        self._async_request_background_scan()
         self._async_schedule_retry(RETRY_DELAYS[min(self._failures, len(RETRY_DELAYS)) - 1])
         self._async_notify()
         return HomeAssistantError(
@@ -744,8 +512,9 @@ class ClockSyncManager:
         self._async_cancel_schedule()
         self._async_cancel_retry()
         self._async_stop_listening()
-        if self._scan_task and not self._scan_task.done():
-            self._scan_task.cancel()
+        self._discovery.stop()
+        if self._import_task is not None:
+            self._import_task.cancel()
         ir.async_delete_issue(self.hass, DOMAIN, self._issue_id)
 
     @callback
@@ -753,6 +522,7 @@ class ClockSyncManager:
         """Catch missed runs, lost retry timers and timezone changes once a minute."""
         if self._stopped:
             return
+        self._async_retry_record_import()
         now = dt_util.now()
         scheduled_due = (
             self._expression is not None and self.next_sync is not None
@@ -780,28 +550,7 @@ class ClockSyncManager:
 
     @callback
     def _async_request_background_scan(self) -> None:
-        """Search on automatic adapters too, without scanning continuously."""
-        request = getattr(bluetooth, "async_request_active_scan", None)
-        now = dt_util.utcnow()
-        if (
-            request is None or self._stopped
-            or not bluetooth.async_scanner_count(self.hass, connectable=True)
-            or (self._scan_task and not self._scan_task.done())
-            or (self._last_scan is not None and now - self._last_scan < BACKGROUND_SCAN_INTERVAL)
-        ):
-            return
-        self._last_scan = now
-
-        async def scan() -> None:
-            try:
-                async with asyncio.timeout(BACKGROUND_SCAN_DURATION + CLEANUP_TIMEOUT):
-                    await request(self.hass, BACKGROUND_SCAN_DURATION)
-            except Exception as err:
-                _LOGGER.debug("Active discovery unavailable for %s: %s", self.name, err)
-
-        self._scan_task = self.entry.async_create_background_task(
-            self.hass, scan(), f"{DOMAIN} discovery {self.address}"
-        )
+        self._discovery.request_scan()
 
     @property
     def sync_diagnostics(self) -> dict[str, Any]:
@@ -812,6 +561,9 @@ class ClockSyncManager:
             "next_retry": self.next_retry.isoformat() if self.next_retry else None,
             "pending": self._pending,
             "in_progress": bool(self._syncing),
+            "clock_verified": self.clock_verified,
+            "pending_record_imports": len(self._pending_records),
+            "bluetooth_routes": self._discovery.diagnostics(),
         }
 
     @callback

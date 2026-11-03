@@ -3,26 +3,28 @@
 from __future__ import annotations
 
 import asyncio
-from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
 import logging
 import struct
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from bleak.exc import BleakError
 from freezegun.api import FrozenDateTimeFactory
-import pytest
-
 from homeassistant.components import bluetooth
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_ADDRESS, CONF_MODEL, STATE_UNKNOWN
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
 from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import issue_registry as ir
 from homeassistant.util import dt as dt_util
-from pytest_homeassistant_custom_component.common import MockConfigEntry, async_fire_time_changed
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry,
+    async_fire_time_changed,
+)
 
 from custom_components.lywsd02_sync.const import (
     BATTERY_CHARACTERISTIC,
@@ -265,11 +267,11 @@ async def test_failed_sync_retries_on_a_growing_delay(
     assert hass.states.get(STATUS).state == "failed"
 
     proxy.hear()
-    await later(hass, freezer, timedelta(minutes=4, seconds=59))
+    await later(hass, freezer, RETRY_DELAYS[0] - timedelta(seconds=1))
     assert ble.connections == 1
     await later(hass, freezer, timedelta(seconds=1))
     assert ble.connections == 2
-    await later(hass, freezer, timedelta(minutes=14, seconds=59))
+    await later(hass, freezer, RETRY_DELAYS[1] - timedelta(seconds=1))
     assert ble.connections == 2
 
     ble.connect_error = None
@@ -812,7 +814,7 @@ async def test_readings_that_fail_keep_their_last_value(
     clock.unreadable = {BATTERY_CHARACTERISTIC}
     clock.measurement = None
 
-    with patch("custom_components.lywsd02_sync.manager.MEASUREMENT_TIMEOUT", 0):
+    with patch("custom_components.lywsd02_sync.transport.MEASUREMENT_TIMEOUT", 0):
         await press(hass)
 
     assert len(clock.writes) == 2

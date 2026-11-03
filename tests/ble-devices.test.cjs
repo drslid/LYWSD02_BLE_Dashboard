@@ -118,6 +118,43 @@ test('closing a command session rejects waiting commands even when the GATT writ
   await Promise.resolve(); channel.close();
   await assert.rejects(operation, /session closed/);
 });
+test('a reply does not disable the deadline of a stuck GATT write', async () => {
+  const characteristic = new Characteristic(() => {
+    characteristic.emit([1]);
+    return new Promise(() => {});
+  });
+  const channel = new Channel(characteristic, 10);
+  await channel.start();
+  try { await assert.rejects(channel.request([1], () => true), /timed out/); }
+  finally { channel.close(); }
+});
+test('closing a channel cancels a stuck write even after its reply arrived', async () => {
+  const characteristic = new Characteristic(() => {
+    characteristic.emit([1]);
+    return new Promise(() => {});
+  });
+  const channel = new Channel(characteristic);
+  await channel.start();
+  const operation = channel.request([1], () => true);
+  await Promise.resolve();
+  channel.close();
+  await assert.rejects(operation, /session closed/);
+});
+for (const kind of ['pvvx', 'cgd1']) {
+  test(`${kind}: simultaneous unit and format changes both survive`, async () => {
+    const fake = kind === 'pvvx' ? pvvxFixture({ hardware: 49 }) : cgd1Fixture();
+    const adapter = kind === 'pvvx' ? new Pvvx(fake.server, () => {}) : new Cgd1(fake.server, () => {}, '12'.repeat(16));
+    try {
+      await adapter.open();
+      await Promise.all([adapter.configure({ unit: 'F' }), adapter.configure({ format: '12' })]);
+      assert.equal(await adapter.unit(), 'F');
+      if (kind === 'pvvx') {
+        const config = await adapter.configuration();
+        assert.ok(config[2] & 0x20);
+      } else assert.ok(fake.config[5] & 2);
+    } finally { adapter.close(); }
+  });
+}
 test('CGD1 authenticates with the existing token, preserves alarms/settings and verifies timezone writes', async () => {
   const fake = cgd1Fixture(); const before = fake.config.slice();
   const adapter = new Cgd1(fake.server, () => {}, '12'.repeat(16));

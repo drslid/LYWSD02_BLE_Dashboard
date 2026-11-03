@@ -1,0 +1,15 @@
+{
+  "name": "lywsd02-ble-dashboard",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-locales.cjs",
+    "check": "node scripts/build-locales.cjs --check",
+    "test": "node --test tests/*.test.cjs tests/connection-regressions.cjs",
+    "test:browser": "playwright test",
+    "dev": "python3 -m http.server 4173 --bind 127.0.0.1",
+    "screenshots": "node scripts/capture-readme.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

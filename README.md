@@ -4,68 +4,48 @@
   <img src="img/logo.png" alt="LYWSD02 BLE Dashboard" width="88" height="88">
 </p>
 
-<h1 align="center">📡 LYWSD02 BLE Dashboard 🌡️</h1>
+<h1 align="center">LYWSD02 Clock Sync</h1>
+
+<p align="center">Keep your LYWSD02, LYWSD02MMC or MHO-C303 on time.</p>
+
+| Sync from your browser | Automate with Home Assistant |
+| --- | --- |
+| Connect a nearby clock and set its time in a few clicks. | Install the integration once and let it sync your clocks automatically. |
+| **[Open the dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/#browser)** | **[Set up Home Assistant](https://drslid.github.io/LYWSD02_BLE_Dashboard/#home-assistant)** |
 
 <p align="center">
-  <strong>Keep your LYWSD02, LYWSD02MMC or MHO-C303 on time.</strong><br>
-  Update its clock, choose your display settings and check your room’s temperature — straight from your browser, or automatically with Home Assistant.
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/#browser"><img src="img/dashboard_lywsd02.jpg" alt="Browser sync: a connected Living room clock, the Sync clock button and live temperature, humidity and battery readings" width="1000"></a><br>
+  <sub>Browser interface with example readings. Display settings and history stay collapsed until needed.</sub>
 </p>
 
 <p align="center">
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">
-    <img src="https://img.shields.io/badge/OPEN_THE_DASHBOARD-008f91?style=for-the-badge&amp;logo=bluetooth&amp;logoColor=white" alt="Open the LYWSD02 dashboard">
-  </a>
-  <a href="#home-assistant">
-    <img src="https://img.shields.io/badge/HOME_ASSISTANT_·_HACS-0f3d44?style=for-the-badge&amp;logo=homeassistant&amp;logoColor=white" alt="Keep your clocks on time with Home Assistant">
-  </a>
+  <a href="#getting-started">Browser sync</a> ·
+  <a href="#home-assistant">Home Assistant</a> ·
+  <a href="#compatible-devices">Compatible devices</a> ·
+  <a href="#connection-help">Connection help</a> ·
+  <a href="#languages">Languages</a>
 </p>
-
-<p align="center">
-  💻 Use your computer · 📦 No app to install · 🔒 No account · 🌍 9 languages
-</p>
-
-<p align="center">
-  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/stargazers"><img src="https://img.shields.io/github/stars/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=0f3d44" alt="GitHub stars"></a>
-  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/network/members"><img src="https://img.shields.io/github/forks/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=0f3d44" alt="GitHub forks"></a>
-  <a href="https://github.com/drslid/LYWSD02_BLE_Dashboard/issues"><img src="https://img.shields.io/github/issues/drslid/LYWSD02_BLE_Dashboard?style=for-the-badge&amp;color=e76552" alt="GitHub issues"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-0f3d44?style=for-the-badge" alt="MIT license"></a>
-</p>
-
-<p align="center">
-  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/">
-    <img src="img/dashboard_lywsd02.jpg" alt="Current LYWSD02 dashboard showing a connected Living room sensor, clock settings, temperature, humidity, battery and hourly history" width="1000">
-  </a><br>
-  <sub>Dashboard preview with example readings.</sub>
-</p>
-
-<p align="center">
-  <a href="#getting-started">📋 Getting started</a> ·
-  <a href="#features">✨ Features</a> ·
-  <a href="#compatible-devices">📡 Compatible devices</a> ·
-  <a href="#home-assistant">🏠 Home Assistant</a> ·
-  <a href="#languages">🌍 Languages</a> ·
-  <a href="#multiple-sensors">📡 Multiple sensors</a> ·
-  <a href="#connection-help">💬 Connection help</a>
-</p>
-
----
 
 <a id="getting-started"></a>
 
-## 📋 Update your device in a few clicks
+## Sync from your browser
 
-You need an **LYWSD02**, **LYWSD02MMC** or **MHO-C303** and a **Bluetooth-enabled Windows, Mac or Linux computer**. Open the dashboard in **Chrome, Edge or a compatible Chromium browser**; Bluetooth availability also depends on your operating system and adapter. See [compatible devices](#compatible-devices) for validation details.
+Use **Chrome, Edge or another compatible Chromium browser** on a Bluetooth-enabled computer or Android device. Keep the clock nearby.
 
-1. **Open [the dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/)** and turn on your computer’s Bluetooth. Keep the sensor nearby.
-2. **Click “Find a sensor”** and select your clock in the browser’s device list.
-3. **Update the clock.** Choose your time zone, then click **“Sync clock”**. The 12-hour display is only available on the LYWSD02MMC; the plain LYWSD02 always shows 24 hours.
-4. **Set the temperature unit.** Select **°C** or **°F**, then click **“Save unit”** to apply it to the device.
+1. Open [the dashboard](https://drslid.github.io/LYWSD02_BLE_Dashboard/#browser) and choose **From this browser**.
+2. Click **Connect a clock**, then select your device in the Bluetooth list.
+3. Click **Sync clock**. Your computer’s time zone is selected automatically, and a confirmation appears when complete.
 
-Your temperature, humidity and battery level appear once connected. Click **“Rename”** to give the sensor a familiar name, such as *Living room* or *Bedroom*.
+Temperature, humidity and battery appear after connecting. Use the pencil beside the clock’s name to rename it.
 
-> ⏰ Automatic clock correction is enabled by default: it corrects drift greater than 10 seconds when you connect. Turn it off if you prefer to synchronize manually.
+- **Display settings**: choose °C/°F and save the unit; select 12/24 h and click **Sync clock** to apply it. The 12-hour display is available on the LYWSD02MMC only.
+- **Hourly history**: read up to 96 hours and download a CSV.
+- **Advanced settings & help**: change the time zone or correction, configure automatic reconnection, select experimental profiles, or open the activity log.
+- **Saved clocks**: reconnect to a previously used device. Names are saved only in this browser.
 
-> 📱 Visiting from your phone? The site provides a link to copy and open on your computer. Safari and Firefox cannot connect through this dashboard.
+Automatic correction is enabled by default: drift over 10 seconds is corrected when you connect. You can turn it off under **Advanced settings & help**.
+
+Phones without Web Bluetooth can still use the **Home Assistant** tab. Browser sync requires a compatible browser; Safari and Firefox cannot connect. Android layout and interaction are covered by browser tests; physical BLE validation remains device-specific.
 
 <a id="features"></a>
 
@@ -111,7 +91,7 @@ The MHO-C303 shares the time, measurement and history characteristics used by th
 
 ### Experimental devices and firmware
 
-Version **1.4.0** adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Select the matching **Device / firmware** profile before connecting in the browser. The existing stock profile remains the default.
+Version **1.4.0** adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Before connecting in the browser, open **Advanced settings & help** and select the matching **Device / firmware** profile. The existing stock profile remains the default.
 
 | Device / firmware | Browser dashboard | Home Assistant |
 | --- | --- | --- |
@@ -127,6 +107,11 @@ See the [complete research for all 20 ESPHome models, commands and limitations](
 <a id="home-assistant"></a>
 
 ## 🏠 Keep every clock on time with Home Assistant
+
+<p align="center">
+  <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/#home-assistant"><img src="img/home-assistant-setup.jpg" alt="Home Assistant tab with three installation steps: install with HACS, restart Home Assistant, add a clock" width="1000"></a><br>
+  <sub>A separate setup tab keeps Home Assistant installation apart from browser sync.</sub>
+</p>
 
 The **LYWSD02 Clock Sync** integration sets your **LYWSD02, LYWSD02MMC and MHO-C303** clocks from Home Assistant: right away when you add them, then every night at 04:00. After a daylight saving change, clocks are corrected within the hour, even without a schedule. Each sync also brings back what the clock measured: temperature, humidity, battery and its hourly records. Every setting is on the device page; there is nothing to write in YAML.
 
@@ -145,7 +130,7 @@ That’s it: each clock is synchronized immediately.
 
 ### Updating an existing Home Assistant installation
 
-[Version 1.4.0](https://github.com/drslid/LYWSD02_BLE_Dashboard/releases/tag/v1.4.0) adds recovery for missed scheduled syncs, bounded Bluetooth cleanup and experimental PVVX/CGD1 profiles. In **HACS → LYWSD02 Clock Sync**, refresh the repository information if needed, download **v1.4.0**, then **restart Home Assistant**. Existing devices, schedules, entity IDs and statistics are preserved.
+**[v1.5.0](https://github.com/drslid/LYWSD02_BLE_Dashboard/releases/tag/v1.5.0)** improves Bluetooth startup and discovery, limits optional reads so they cannot block clock sync, verifies the written time when readable, and retries failed statistics imports after a restart. Update through **HACS → LYWSD02 Clock Sync → Update**, then **restart Home Assistant**. Existing devices, schedules, entity IDs and statistics are preserved.
 
 > Without HACS, copy `custom_components/lywsd02_sync` into the `custom_components` folder of your Home Assistant configuration, then restart.
 
@@ -173,7 +158,9 @@ Whatever you choose:
 - **A clock out of range** is looked for every minute and synchronized as soon as an adapter can reach it.
 - **A missed scheduled run** is checked again every minute; retry delays are preserved after a failed connection. Manual, weekly and monthly schedules keep their chosen frequency.
 - **Clocks scheduled at the same time** use a shared Bluetooth queue, one connection at a time. Notification cleanup and disconnects have a five-second deadline, so a stuck cleanup cannot hold all the other clocks indefinitely. Disk writes and statistics imports run outside this queue.
-- **A failed connection** is retried after 5, 15, 30 and then 60 minutes.
+- **A failed connection** is retried after 30 seconds, 2, 5, 15 and then 60 minutes. Manual sync also reconnects after short delays while refreshing discovery.
+- **Optional readings cannot consume the time-write deadline.** Each preliminary clock/history read has a three-second limit. After writing, a readable clock must agree with the requested time within five seconds; an ignored write triggers a retry. A write-only clock is marked as acknowledged without inventing a verified read-back.
+- **Successful writes appear immediately**, while the remaining measurements/history finish loading for up to 30 seconds. Failed statistics imports are saved and retried every minute, including after restarting HA, without reconnecting to the clock.
 
 ### What you get
 
@@ -202,8 +189,9 @@ The settings are entities too, so automations can change them. The clock uses th
   - *No Bluetooth adapter can connect*: add a Bluetooth adapter, or an ESPHome proxy with `active: true`.
   - Without a repair, the clock is out of range: move it closer to an adapter or proxy.
 - **Failed, retrying:** a proxy may be out of connection slots. Home Assistant retries by itself; the **Sync clock** button reconnects a few times, then shows the exact error.
-- **Last sync still says last week:** this timestamp is the last successful operation, not the last attempt. On the **Sync status** sensor, inspect `last_attempt`, `last_error`, `next_retry`, `pending` and `in_progress`. These describe the current HA session. The schedule is rechecked every minute. Missing clocks also trigger a ten-second active scan at most every five minutes on HA versions with that API; proxies configured only to listen still need `active: true` to connect.
+- **Last sync still says last week:** this timestamp is the last successful write, not the last attempt. On the **Sync status** sensor, inspect `last_attempt`, `last_error`, `next_retry`, `pending`, `in_progress` and `bluetooth_routes`. `clock_verified` distinguishes a measured read-back from an acknowledged-only write; `pending_record_imports` counts hours waiting for the recorder. Download integration diagnostics to retain the current state without its pairing token. The schedule is rechecked every minute. Missing clocks and connection failures trigger a ten-second active scan at most every five minutes on HA versions with that API; proxies configured only to listen still need `active: true` to connect.
 - **The browser works but HA does not:** the dashboard connects through your computer's Bluetooth; HA needs an adapter or active proxy within range of the clock. Disconnect the dashboard before testing HA so an open browser session does not compete for the device's BLE connection.
+- **Passive BLE Monitor updates normally, but clock sync cannot find any clocks:** check whether both integrations share one USB adapter. BLE Monitor controls the raw HCI scan separately from HA Bluetooth. Configure HA Bluetooth for **Active** scanning and set `active_scan: true` under `ble_monitor:` too, then restart HA after saving a backup. Opposing active/passive modes can prevent HA from receiving advertisements even when BLE Monitor still hears the clocks. See the [BLE Monitor explanation of shared-adapter conflicts](https://custom-components.github.io/ble_monitor/faq#conflicts-with-other-components-using-the-same-bt-interface). If sharing remains unreliable, dedicate separate adapters to the two scanners.
 - **12 h has no effect:** only the LYWSD02MMC supports it. A plain LYWSD02 stays in 24 h and its time is still set.
 
 <a id="languages"></a>
@@ -230,7 +218,7 @@ Arabic includes a right-to-left layout.
 
 ## 📡 Have more than one sensor?
 
-Connect each sensor once and give it a name with **“Rename”**. Your **Device history** keeps its name, last connection and latest readings, so you can recognize it next time.
+Connect each sensor once and use the pencil beside its name to rename it. Open **Saved clocks** to find its name and last connection, then reconnect.
 
 - **Reconnect** connects directly to a saved sensor when your browser allows it.
 - **Select again** opens the browser’s device list. The dashboard checks that you chose the saved sensor before connecting.

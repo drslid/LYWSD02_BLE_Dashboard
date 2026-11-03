@@ -14,64 +14,12 @@
     if (!Number.isFinite(temperature) || temperature < -80 || temperature > 150 || !Number.isFinite(humidity) || humidity < 0 || humidity > 100) throw fail('Invalid sensor measurement');
     return { temperature, humidity };
   }
-  async function write(characteristic, bytes) {
-    if (characteristic.properties?.writeWithoutResponse && !characteristic.properties.write && typeof characteristic.writeValueWithoutResponse === 'function') return characteristic.writeValueWithoutResponse(bytes);
-    if (typeof characteristic.writeValueWithResponse === 'function') return characteristic.writeValueWithResponse(bytes);
-    return characteristic.writeValue(bytes);
-  }
-  class Channel {
-    constructor(characteristic, timeout = 8000, writeCharacteristic = characteristic) {
-      this.characteristic = characteristic;
-      this.writeCharacteristic = writeCharacteristic;
-      this.timeout = timeout;
-      this.listeners = new Set();
-      this.closed = false;
-      this.pending = null;
-      this.queue = Promise.resolve();
-      this.onValue = (event) => {
-        const frame = asBytes(event.target.value);
-        for (const listener of this.listeners) listener(frame);
-        if (this.pending?.accept(frame)) this.pending.resolve(frame);
-      };
-    }
-    async start() {
-      if (this.closed) throw new Error('Bluetooth session closed');
-      this.characteristic.addEventListener('characteristicvaluechanged', this.onValue);
-      try {
-        await this.characteristic.startNotifications();
-        if (this.closed) throw new Error('Bluetooth session closed');
-      }
-      catch (error) { this.close(); throw error; }
-    }
-    request(payload, accept, timeout = this.timeout) {
-      const run = async () => {
-        if (this.closed) throw new Error('Bluetooth session closed');
-        let timer;
-        const response = new Promise((resolve, reject) => {
-          this.pending = { accept, resolve, reject };
-          timer = setTimeout(() => reject(new Error('Bluetooth command timed out')), timeout);
-        });
-        // Attach a rejection handler before a potentially slow GATT write.
-        void response.catch(() => {});
-        try {
-          const [, frame] = await Promise.all([write(this.writeCharacteristic, new Uint8Array(payload)), response]);
-          return frame;
-        } finally { clearTimeout(timer); this.pending = null; }
-      };
-      const operation = this.queue.then(run);
-      this.queue = operation.catch(() => {});
-      return operation;
-    }
-    close() {
-      this.closed = true;
-      this.characteristic.removeEventListener('characteristicvaluechanged', this.onValue);
-      this.pending?.reject(new Error('Bluetooth session closed'));
-      this.listeners.clear();
-    }
-  }
+  const { Channel, SerialQueue, write } = typeof module === 'object' && module.exports
+    ? require('./ble-transport.js') : root.BLE_TRANSPORT;
   class Pvvx {
     constructor(server, emit) {
       this.server = server; this.emit = emit; this.kind = 'pvvx';
+      this.settingsQueue = new SerialQueue();
       this.capabilities = { time: false, unit: false, format: false, history: false };
     }
     async open() {
@@ -126,7 +74,8 @@
       return frame;
     }
     async unit() { return ((await this.configuration())[2] & 0x10) ? 'F' : 'C'; }
-    async configure({ unit = null, format = null }) {
+    configure(options) { return this.settingsQueue.run(() => this.configureSettings(options)); }
+    async configureSettings({ unit = null, format = null }) {
       if (unit !== null && !['C', 'F'].includes(unit)) throw fail('Invalid temperature unit');
       const config = await this.configuration();
       const flags = config[2];
@@ -159,11 +108,12 @@
         return [...records.values()].sort((a, b) => a.index - b.index);
       } finally { this.channel.listeners.delete(listener); }
     }
-    close() { this.closed = true; this.channel?.close(); }
+    close() { this.closed = true; this.settingsQueue.close(); this.channel?.close(); }
   }
   class Cgd1 {
     constructor(server, emit, token) {
       this.server = server; this.emit = emit; this.token = token; this.kind = 'cgd1'; this.model = 'CGD1';
+      this.settingsQueue = new SerialQueue();
       this.capabilities = { time: true, unit: true, format: true, history: false };
     }
     async open() {
@@ -194,7 +144,8 @@
     }
     settings() { return this.request(this.data, [1, 2], (f) => f.length === 20 && f[0] === 0x13 && [1, 2].includes(f[1])); }
     async unit() { return ((await this.settings())[5] & 4) ? 'F' : 'C'; }
-    async configure({ unit = null, format = null, offset = null }) {
+    configure(options) { return this.settingsQueue.run(() => this.configureSettings(options)); }
+    async configureSettings({ unit = null, format = null, offset = null }) {
       if (unit !== null && !['C', 'F'].includes(unit)) throw fail('Invalid temperature unit');
       if (format !== null && !['12', '24'].includes(format)) throw fail('Invalid clock format');
       const before = await this.settings(); const next = before.slice(); next[1] = 1;
@@ -233,6 +184,7 @@
     }
     close() {
       this.closed = true;
+      this.settingsQueue.close();
       this.auth?.close(); this.data?.close();
       this.measurement?.removeEventListener('characteristicvaluechanged', this.onMeasurement);
     }

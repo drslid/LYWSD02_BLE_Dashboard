@@ -58,7 +58,7 @@ for (const code of codes) {
       const expected = (MESSAGES[code][key] ?? MESSAGES.en[key]).replace('{count}', '0');
       assert.equal(decode(content), expected, `${code}.${key}`);
     }
-    for (const key of ['hero.title', 'hero.lead', 'mobile.title', 'settings.title', 'history.title']) {
+    for (const key of ['ui.title', 'ui.lead', 'ui.browser', 'ui.haTitle', 'history.title']) {
       assert.ok(decode(html).includes(MESSAGES[code][key] ?? MESSAGES.en[key]), `${key} must exist without JS`);
     }
     assert.doesNotMatch(html, /\{count\}|<!-- LANGUAGE_LINKS -->/);
@@ -83,7 +83,7 @@ for (const code of codes) {
     const pageUrl = new URL(canonical(code));
     const languageLinks = tags(html, 'a').filter((tag) => tag.hreflang);
     const languageNavigation = tags(html, 'nav').filter((tag) => tag.class === 'language-links');
-    assert.equal(languageNavigation.length, 2, 'Both mobile and desktop must expose the language links');
+    assert.equal(languageNavigation.length, 1, 'A single responsive footer exposes the language links');
     for (const nav of languageNavigation) assert.equal(nav['aria-label'], MESSAGES[code]['header.language']);
     for (const other of codes) {
       const link = languageLinks.find((tag) => tag.hreflang === LOCALES[other].hreflang);
@@ -126,16 +126,16 @@ test('the sitemap lists canonical pages with reciprocal language references and 
 
 test('HTML generation escapes translation text and rejects nested markup in translated elements', () => {
   const template = read('templates/index.html');
-  const original = MESSAGES.en['hero.title'];
+  const original = MESSAGES.en['ui.title'];
   try {
-    MESSAGES.en['hero.title'] = 'Sensor <script>alert("x")</script> & "quotes"';
+    MESSAGES.en['ui.title'] = 'Sensor <script>alert("x")</script> & "quotes"';
     const html = renderPage(template, 'en');
     assert.ok(html.includes('Sensor &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp; &quot;quotes&quot;'));
     assert.ok(!html.includes('<script>alert("x")</script>'));
   } finally {
-    MESSAGES.en['hero.title'] = original;
+    MESSAGES.en['ui.title'] = original;
   }
-  assert.throws(() => renderPage(template.replace('data-i18n="hero.title">', 'data-i18n="hero.title"><b>nested</b>'), 'en'),
+  assert.throws(() => renderPage(template.replace('data-i18n="ui.title">', 'data-i18n="ui.title"><b>nested</b>'), 'en'),
     /only text/);
 });
 
@@ -148,27 +148,34 @@ test('each page loads only the font families of its own script', () => {
   }
 });
 
-test('every page offers the Home Assistant integration from desktop and phone', () => {
+test('every page offers one responsive Home Assistant installation flow', () => {
   const { domain } = JSON.parse(read('custom_components/lywsd02_sync/manifest.json'));
   const hacs = 'https://my.home-assistant.io/redirect/hacs_repository/?owner=drslid&repository=LYWSD02_BLE_Dashboard&category=integration';
   for (const code of codes) {
     const html = read(pagePath(code));
     const links = tags(html, 'a').map((tag) => tag.href);
-    assert.equal(links.filter((href) => href === hacs).length, 2, `${code}: desktop and phone HACS buttons`);
+    assert.equal(links.filter((href) => href === hacs).length, 1, `${code}: a single HACS button`);
     assert.ok(links.includes(`https://my.home-assistant.io/redirect/config_flow_start/?domain=${domain}`), code);
-    assert.ok(links.includes('#home-assistant') && /\sid="home-assistant"/.test(html), `${code}: header link and section`);
+    assert.ok(/aria-controls="home-assistant-panel"/.test(html) && /\sid="home-assistant-panel"/.test(html), `${code}: HA tab and panel`);
   }
 });
 
-test('the Home Assistant section comes right after the introduction', () => {
+test('browser and Home Assistant have separate accessible panels with browser selected initially', () => {
   for (const code of codes) {
-    const dashboard = read(pagePath(code)).split('<main id="dashboard">')[1];
-    const sections = [...dashboard.matchAll(/<section\b[^>]*class="([^"]+)"/g)].map(([, classes]) => classes.split(' ')[0]);
-    assert.deepEqual(sections.slice(0, 3), ['intro', 'ha-panel', 'compatibility-notice'], code);
+    const html = read(pagePath(code));
+    const tabs = tags(html, 'button').filter((tag) => tag.role === 'tab');
+    assert.deepEqual(tabs.map((tab) => [tab['aria-controls'], tab['aria-selected'], tab.tabindex]),
+      [['browser-panel', 'true', '0'], ['home-assistant-panel', 'false', '-1']], code);
+    assert.deepEqual(tags(html, 'section').filter((tag) => tag.role === 'tabpanel').map((panel) => panel.id),
+      ['browser-panel', 'home-assistant-panel'], code);
+    assert.match(html, /id="home-assistant-panel"[^>]*\shidden/);
+    for (const panel of ['clockWorkspace', 'displaySettings', 'historyPanel', 'knownDevices']) {
+      assert.match(html, new RegExp(`id="${panel}"[^>]*\\shidden`));
+    }
   }
 });
 
-test('every locale names the compatible models and credits the MHO-C303 contribution', () => {
+test('every locale names compatible models and the README credits the MHO-C303 contribution', () => {
   for (const code of codes) {
     const html = read(pagePath(code));
     assert.match(SEO[code].title, /MHO-C303/);
@@ -178,7 +185,7 @@ test('every locale names the compatible models and credits the MHO-C303 contribu
       assert.ok(MESSAGES[code]['ha.lead'].includes(model), `${code}: HA ${model}`);
     }
     assert.ok(html.includes(MESSAGES[code]['compatibility.note']));
-    assert.equal(tags(html, 'a').filter((tag) => tag.href === 'https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1').length, 2);
+    assert.ok(read('README.md').includes('https://github.com/drslid/LYWSD02_BLE_Dashboard/pull/1'));
     const translation = JSON.parse(read(`custom_components/lywsd02_sync/translations/${code === 'zh' ? 'zh-Hans' : code}.json`));
     assert.match(translation.config.step.user.description, /MHO-C303/);
     assert.match(translation.config.abort.no_devices_found, /MHO-C303/);

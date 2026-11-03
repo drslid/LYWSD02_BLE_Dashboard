@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import Any
 
-from PIL import Image
 import pytest
+from PIL import Image
 
 from custom_components.lywsd02_sync.const import (
     CLOCK_FORMATS,
@@ -54,6 +54,7 @@ def test_hacs_can_install_the_integration() -> None:
     for key in ("domain", "documentation", "issue_tracker", "codeowners", "name", "version"):
         assert manifest[key], key
     assert manifest["domain"] == DOMAIN
+    assert "bluetooth" in manifest["dependencies"]
     assert manifest["bluetooth"] == [
         {"local_name": "LYWSD02*", "connectable": True},
         {"local_name": "MHO-C303*", "connectable": True},

@@ -3,20 +3,19 @@
 from __future__ import annotations
 
 import asyncio
+import struct
 from collections.abc import AsyncGenerator, Callable
 from inspect import signature
-import struct
 from typing import Any
 from unittest.mock import AsyncMock, patch
 
+import pytest
 from bleak.backends.client import BaseBleakClient
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
 from bleak.exc import BleakError
 from bluetooth_data_tools import monotonic_time_coarse
 from habluetooth import BaseHaRemoteScanner, HaBluetoothConnector
-import pytest
-
 from homeassistant.components import bluetooth
 from homeassistant.components.bluetooth import BluetoothServiceInfoBleak
 from homeassistant.core import HomeAssistant
@@ -210,8 +209,8 @@ async def ble(hass: HomeAssistant, clock: FakeClock) -> AsyncGenerator[Bluetooth
     assert await async_setup_component(hass, "bluetooth", {})
     harness = BluetoothHarness(hass, clock)
     with (
-        patch("custom_components.lywsd02_sync.manager.establish_connection", side_effect=harness.connect),
-        patch("custom_components.lywsd02_sync.manager.close_stale_connections_by_address", AsyncMock()),
+        patch("custom_components.lywsd02_sync.transport.establish_connection", side_effect=harness.connect),
+        patch("custom_components.lywsd02_sync.transport.close_stale_connections_by_address", AsyncMock()),
     ):
         yield harness
     harness.close()

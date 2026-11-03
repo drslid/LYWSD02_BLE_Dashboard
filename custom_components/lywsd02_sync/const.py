@@ -67,14 +67,18 @@ SEARCH_INTERVAL: Final = timedelta(minutes=1)
 BACKGROUND_SCAN_INTERVAL: Final = timedelta(minutes=5)
 BACKGROUND_SCAN_DURATION: Final = 10
 RETRY_DELAYS: Final = (
+    timedelta(seconds=30),
+    timedelta(minutes=2),
     timedelta(minutes=5),
     timedelta(minutes=15),
-    timedelta(minutes=30),
     timedelta(hours=1),
 )
 # Proxies can take a few minutes to report the clock after Home Assistant starts.
 REPORT_MISSING_AFTER: Final = timedelta(minutes=5)
 SYNC_TIMEOUT: Final = 60
+CONNECT_TIMEOUT: Final = 25
+# Optional pre-sync reads must leave time to actually set the clock.
+GATT_READ_TIMEOUT: Final = 3
 # Backend cleanup must not hold the shared connection queue indefinitely.
 CLEANUP_TIMEOUT: Final = 5
 POST_SYNC_TIMEOUT: Final = 15
@@ -85,7 +89,7 @@ FORCE_RECONNECT_DELAYS: Final = (2, 5, 10)
 # How often (seconds) the sync button looks the clock up while searching for it.
 FORCE_POLL_INTERVAL: Final = 1
 # Reading the clock after its time is set may take this long (seconds), a week of records included.
-READINGS_TIMEOUT: Final = 60
+READINGS_TIMEOUT: Final = 30
 # Once notifications are on, the clock sends a measurement every few seconds.
 MEASUREMENT_TIMEOUT: Final = 10
 # The clock is done sending records when it stays silent this long (seconds).
