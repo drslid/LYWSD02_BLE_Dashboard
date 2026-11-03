@@ -16,68 +16,68 @@
   };
 
   const SEO = {
-    en: {
-      imageAlt: 'Xiaomi Mijia LYWSD02 Bluetooth dashboard preview',
-      title: 'LYWSD02 / MHO-C303 time sync and Bluetooth dashboard',
-      description: "Sync LYWSD02 and MHO-C303 clocks by Bluetooth or Home Assistant. Read temperature, humidity, battery and hourly history locally, without cloud services.",
-      ogTitle: 'Sync and get more from your LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: Live measurements, clock sync, display settings and internal history through local Web Bluetooth.'
+    "en": {
+      "imageAlt": "Xiaomi Mijia LYWSD02 Bluetooth dashboard preview",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303 clock sync",
+      "description": "Sync Xiaomi Mijia LYWSD02, LYWSD02MMC and MHO-C303 clocks. Read live measurements, correct clock drift and export sensor history via Bluetooth or Home Assistant.",
+      "ogTitle": "Sync, tune & get more from your Xiaomi Mijia clock.",
+      "ogDescription": "Sync Xiaomi Mijia LYWSD02, LYWSD02MMC and MHO-C303 clocks. Read live measurements, correct clock drift and export sensor history via Bluetooth or Home Assistant."
     },
-    fr: {
-      imageAlt: 'Aperçu du tableau de bord Bluetooth Xiaomi Mijia LYWSD02',
-      title: 'Régler l’heure du LYWSD02 / MHO-C303 : dashboard Bluetooth',
-      description: "Synchronisez vos LYWSD02 et MHO-C303 par Bluetooth ou Home Assistant. Température, humidité, batterie et historique horaire en local, sans cloud.",
-      ogTitle: 'Synchronisez et exploitez pleinement votre LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: Mesures en direct, horloge, réglages d’affichage et historique interne via Web Bluetooth local.'
+    "fr": {
+      "imageAlt": "Aperçu du tableau de bord Bluetooth Xiaomi Mijia LYWSD02",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303 : synchroniser",
+      "description": "Synchronisez les Xiaomi Mijia LYWSD02, LYWSD02MMC et MHO-C303. Mesures en direct, correction de la dérive et historique via Bluetooth ou Home Assistant.",
+      "ogTitle": "Synchronisez, réglez et profitez de votre horloge Xiaomi Mijia.",
+      "ogDescription": "Synchronisez les Xiaomi Mijia LYWSD02, LYWSD02MMC et MHO-C303. Mesures en direct, correction de la dérive et historique via Bluetooth ou Home Assistant."
     },
-    es: {
-      imageAlt: 'Vista previa del panel Bluetooth Xiaomi Mijia LYWSD02',
-      title: 'Ajustar la hora del LYWSD02 / MHO-C303: panel Bluetooth',
-      description: "Sincroniza LYWSD02 y MHO-C303 por Bluetooth o Home Assistant. Consulta temperatura, humedad, batería e historial horario localmente, sin nube.",
-      ogTitle: 'Sincroniza y aprovecha al máximo tu LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: Mediciones en directo, reloj, ajustes de pantalla e historial interno mediante Web Bluetooth local.'
+    "es": {
+      "imageAlt": "Vista previa del panel Bluetooth Xiaomi Mijia LYWSD02",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303: sincronizar",
+      "description": "Sincroniza Xiaomi Mijia LYWSD02, LYWSD02MMC y MHO-C303. Mediciones en directo, corrección del reloj e historial por Bluetooth o Home Assistant.",
+      "ogTitle": "Sincroniza, ajusta y aprovecha tu reloj Xiaomi Mijia.",
+      "ogDescription": "Sincroniza Xiaomi Mijia LYWSD02, LYWSD02MMC y MHO-C303. Mediciones en directo, corrección del reloj e historial por Bluetooth o Home Assistant."
     },
-    it: {
-      imageAlt: 'Anteprima della dashboard Bluetooth Xiaomi Mijia LYWSD02',
-      title: 'Impostare l’ora del LYWSD02 / MHO-C303: dashboard Bluetooth',
-      description: "Sincronizza LYWSD02 e MHO-C303 via Bluetooth o Home Assistant. Temperatura, umidità, batteria e storico orario in locale, senza cloud.",
-      ogTitle: 'Sincronizza e sfrutta al meglio LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: Misure in tempo reale, orologio, impostazioni display e storico interno tramite Web Bluetooth locale.'
+    "it": {
+      "imageAlt": "Anteprima della dashboard Bluetooth Xiaomi Mijia LYWSD02",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303: sincronizza",
+      "description": "Sincronizza Xiaomi Mijia LYWSD02, LYWSD02MMC e MHO-C303. Misure in diretta, correzione dell’ora e storico via Bluetooth o Home Assistant.",
+      "ogTitle": "Sincronizza, regola e sfrutta il tuo orologio Xiaomi Mijia.",
+      "ogDescription": "Sincronizza Xiaomi Mijia LYWSD02, LYWSD02MMC e MHO-C303. Misure in diretta, correzione dell’ora e storico via Bluetooth o Home Assistant."
     },
-    de: {
-      imageAlt: 'Vorschau des Bluetooth-Dashboards für Xiaomi Mijia LYWSD02',
-      title: 'LYWSD02 / MHO-C303 Uhrzeit einstellen: Bluetooth-Dashboard',
-      description: "LYWSD02 und MHO-C303 per Bluetooth oder Home Assistant synchronisieren. Temperatur, Luftfeuchte, Batterie und Stundenverlauf lokal lesen, ohne Cloud.",
-      ogTitle: 'LYWSD02 / MHO-C303 synchronisieren und optimal nutzen',
-      ogDescription: 'LYWSD02 / MHO-C303: Live-Messwerte, Uhrzeit, Anzeigeeinstellungen und interner Verlauf über lokales Web Bluetooth.'
+    "de": {
+      "imageAlt": "Vorschau des Bluetooth-Dashboards für Xiaomi Mijia LYWSD02",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303 synchronisieren",
+      "description": "Xiaomi Mijia LYWSD02, LYWSD02MMC und MHO-C303 synchronisieren. Live-Messwerte, Uhrkorrektur und Sensorverlauf per Bluetooth oder Home Assistant.",
+      "ogTitle": "Xiaomi Mijia synchronisieren, einstellen und mehr herausholen.",
+      "ogDescription": "Xiaomi Mijia LYWSD02, LYWSD02MMC und MHO-C303 synchronisieren. Live-Messwerte, Uhrkorrektur und Sensorverlauf per Bluetooth oder Home Assistant."
     },
-    ar: {
-      imageAlt: 'معاينة لوحة تحكم بلوتوث Xiaomi Mijia LYWSD02',
-      title: 'ضبط وقت LYWSD02 / MHO-C303: لوحة تحكم بلوتوث',
-      description: "زامن LYWSD02 وMHO-C303 عبر البلوتوث أو Home Assistant. اقرأ الحرارة والرطوبة والبطارية والسجل بالساعة محليًا دون سحابة.",
-      ogTitle: 'زامن جهاز LYWSD02 / MHO-C303 واستفد منه بالكامل',
-      ogDescription: 'LYWSD02 / MHO-C303: قياسات مباشرة ومزامنة الساعة وإعدادات الشاشة والسجل الداخلي عبر Web Bluetooth محلي.'
+    "ar": {
+      "imageAlt": "معاينة لوحة تحكم بلوتوث Xiaomi Mijia LYWSD02",
+      "title": "مزامنة Xiaomi Mijia LYWSD02 وLYWSD02MMC وMHO-C303",
+      "description": "زامن ساعات Xiaomi Mijia LYWSD02 وLYWSD02MMC وMHO-C303. قياسات مباشرة وتصحيح انحراف الساعة وسجل المستشعر عبر البلوتوث أو Home Assistant.",
+      "ogTitle": "زامن واضبط ساعة Xiaomi Mijia واستفد منها أكثر.",
+      "ogDescription": "زامن ساعات Xiaomi Mijia LYWSD02 وLYWSD02MMC وMHO-C303. قياسات مباشرة وتصحيح انحراف الساعة وسجل المستشعر عبر البلوتوث أو Home Assistant."
     },
-    zh: {
-      imageAlt: 'Xiaomi Mijia LYWSD02 蓝牙控制面板预览',
-      title: 'LYWSD02 / MHO-C303 时间同步与蓝牙控制面板',
-      description: "通过蓝牙或 Home Assistant 同步 LYWSD02 和 MHO-C303 时钟。本地读取温度、湿度、电量及每小时历史记录，无需云服务。",
-      ogTitle: '同步并充分使用你的 LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: 通过本地 Web Bluetooth 查看实时数据、同步时钟、调整显示并读取内部历史。'
+    "zh": {
+      "imageAlt": "Xiaomi Mijia LYWSD02 蓝牙控制面板预览",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303 时间同步",
+      "description": "同步 Xiaomi Mijia LYWSD02、LYWSD02MMC 和 MHO-C303 时钟。通过蓝牙或 Home Assistant 读取实时温湿度、校正时钟漂移并导出历史记录。",
+      "ogTitle": "同步、调校，充分发挥 Xiaomi Mijia 时钟的功能。",
+      "ogDescription": "同步 Xiaomi Mijia LYWSD02、LYWSD02MMC 和 MHO-C303 时钟。通过蓝牙或 Home Assistant 读取实时温湿度、校正时钟漂移并导出历史记录。"
     },
-    pt: {
-      imageAlt: 'Pré-visualização do painel Bluetooth Xiaomi Mijia LYWSD02',
-      title: 'Acertar a hora do LYWSD02 / MHO-C303: painel Bluetooth',
-      description: "Sincronize LYWSD02 e MHO-C303 por Bluetooth ou Home Assistant. Temperatura, humidade, bateria e histórico horário locais, sem cloud.",
-      ogTitle: 'Sincronize e aproveite melhor o LYWSD02 / MHO-C303',
-      ogDescription: 'LYWSD02 / MHO-C303: Medições em direto, relógio, definições do ecrã e histórico interno através de Web Bluetooth local.'
+    "pt": {
+      "imageAlt": "Pré-visualização do painel Bluetooth Xiaomi Mijia LYWSD02",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303: sincronizar",
+      "description": "Sincronize Xiaomi Mijia LYWSD02, LYWSD02MMC e MHO-C303. Medições em direto, correção da hora e histórico por Bluetooth ou Home Assistant.",
+      "ogTitle": "Sincronize, ajuste e aproveite o seu relógio Xiaomi Mijia.",
+      "ogDescription": "Sincronize Xiaomi Mijia LYWSD02, LYWSD02MMC e MHO-C303. Medições em direto, correção da hora e histórico por Bluetooth ou Home Assistant."
     },
-    hi: {
-      imageAlt: 'Xiaomi Mijia LYWSD02 ब्लूटूथ डैशबोर्ड का पूर्वावलोकन',
-      title: 'LYWSD02 / MHO-C303 का समय सेट करें: ब्लूटूथ डैशबोर्ड',
-      description: "LYWSD02 और MHO-C303 घड़ियाँ ब्लूटूथ या Home Assistant से सिंक करें। तापमान, नमी, बैटरी और प्रति घंटा इतिहास स्थानीय रूप से पढ़ें, बिना क्लाउड।",
-      ogTitle: 'अपने LYWSD02 / MHO-C303 को सिंक करें और पूरा उपयोग करें',
-      ogDescription: 'LYWSD02 / MHO-C303: स्थानीय Web Bluetooth से लाइव माप, घड़ी सिंक, डिस्प्ले सेटिंग और आंतरिक इतिहास।'
+    "hi": {
+      "imageAlt": "Xiaomi Mijia LYWSD02 ब्लूटूथ डैशबोर्ड का पूर्वावलोकन",
+      "title": "Xiaomi Mijia LYWSD02 / LYWSD02MMC / MHO-C303 घड़ी सिंक",
+      "description": "Xiaomi Mijia LYWSD02, LYWSD02MMC और MHO-C303 घड़ियाँ सिंक करें। ब्लूटूथ या Home Assistant से लाइव माप पढ़ें, समय अंतर ठीक करें और इतिहास निर्यात करें।",
+      "ogTitle": "अपनी Xiaomi Mijia घड़ी सिंक करें, सेट करें और उससे ज़्यादा पाएँ।",
+      "ogDescription": "Xiaomi Mijia LYWSD02, LYWSD02MMC और MHO-C303 घड़ियाँ सिंक करें। ब्लूटूथ या Home Assistant से लाइव माप पढ़ें, समय अंतर ठीक करें और इतिहास निर्यात करें।"
     }
   };
 
@@ -623,8 +623,8 @@
   // Concise copy for the two main user journeys.
   const INTERFACE_MESSAGES = {
     "en": {
-      "ui.title": "Your clocks, on time.",
-      "ui.lead": "Sync now, or let Home Assistant take care of it.",
+      "ui.title": "Sync, tune & get more from your Xiaomi Mijia clock.",
+      "ui.lead": "Read live measurements, correct clock drift and retrieve the records stored inside your sensor.",
       "ui.choose": "Choose how to sync",
       "ui.browser": "From this browser",
       "ui.browserHint": "Connect and sync in a few clicks",
@@ -636,7 +636,7 @@
       "ui.savedClocks": "Saved clocks",
       "ui.display": "Display settings",
       "ui.formatHint": "Applied with “Sync clock”. 12 h: LYWSD02MMC only.",
-      "ui.advanced": "Advanced settings & help",
+      "ui.advanced": "Other devices & help",
       "ui.clockSettings": "Clock",
       "ui.otherDevices": "Other devices",
       "ui.local": "Local Bluetooth connection. No account needed.",
@@ -654,11 +654,19 @@
       "ui.syncing": "Syncing…",
       "ui.synced": "Clock synchronized.",
       "ui.unitSaved": "Temperature unit saved.",
-      "ui.measurementsUpdated": "Measurements updated."
+      "ui.measurementsUpdated": "Measurements updated.",
+      "ui.methods": "LYWSD02, LYWSD02MMC & MHO-C303. From your browser or automatically with Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Bluetooth clocks & sensors",
+      "ui.alarmClock": "Bluetooth alarm clock",
+      "ui.clockControls": "Clock & display settings",
+      "ui.applyHint": "Time zone, format and correction are applied with “Sync clock”.",
+      "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 Bluetooth thermometer clock",
+      "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC Bluetooth thermometer clock",
+      "ui.mhoAlt": "MHO-C303 Bluetooth thermometer alarm clock"
     },
     "fr": {
-      "ui.title": "Vos horloges, à l’heure.",
-      "ui.lead": "Synchronisez maintenant, ou laissez Home Assistant s’en charger.",
+      "ui.title": "Synchronisez, réglez et profitez de votre horloge Xiaomi Mijia.",
+      "ui.lead": "Consultez les mesures en direct, corrigez la dérive de l’horloge et récupérez les relevés enregistrés dans votre capteur.",
       "ui.choose": "Choisir comment synchroniser",
       "ui.browser": "Depuis ce navigateur",
       "ui.browserHint": "Connectez et synchronisez en quelques clics",
@@ -670,7 +678,7 @@
       "ui.savedClocks": "Horloges enregistrées",
       "ui.display": "Réglages de l’affichage",
       "ui.formatHint": "Appliqué avec « Synchroniser ». 12 h : LYWSD02MMC uniquement.",
-      "ui.advanced": "Réglages avancés et aide",
+      "ui.advanced": "Autres appareils et aide",
       "ui.clockSettings": "Horloge",
       "ui.otherDevices": "Autres appareils",
       "ui.local": "Connexion Bluetooth locale. Aucun compte nécessaire.",
@@ -688,11 +696,19 @@
       "ui.syncing": "Synchronisation…",
       "ui.synced": "Horloge synchronisée.",
       "ui.unitSaved": "Unité de température enregistrée.",
-      "ui.measurementsUpdated": "Mesures actualisées."
+      "ui.measurementsUpdated": "Mesures actualisées.",
+      "ui.methods": "LYWSD02, LYWSD02MMC et MHO-C303. Depuis votre navigateur ou automatiquement avec Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Horloges et capteurs Bluetooth",
+      "ui.alarmClock": "Réveil Bluetooth",
+      "ui.clockControls": "Horloge et affichage",
+      "ui.applyHint": "Le fuseau, le format et la correction s’appliquent avec « Synchroniser l’horloge ».",
+      "ui.lywsd02Alt": "Horloge thermomètre Bluetooth Xiaomi Mijia LYWSD02",
+      "ui.lywsd02mmcAlt": "Horloge thermomètre Bluetooth Xiaomi Mijia LYWSD02MMC",
+      "ui.mhoAlt": "Réveil thermomètre Bluetooth MHO-C303"
     },
     "es": {
-      "ui.title": "Tus relojes, en hora.",
-      "ui.lead": "Sincroniza ahora o deja que Home Assistant se encargue.",
+      "ui.title": "Sincroniza, ajusta y aprovecha tu reloj Xiaomi Mijia.",
+      "ui.lead": "Consulta mediciones en directo, corrige la desviación del reloj y recupera los registros guardados en tu sensor.",
       "ui.choose": "Elige cómo sincronizar",
       "ui.browser": "Desde este navegador",
       "ui.browserHint": "Conecta y sincroniza en unos clics",
@@ -704,7 +720,7 @@
       "ui.savedClocks": "Relojes guardados",
       "ui.display": "Ajustes de pantalla",
       "ui.formatHint": "Se aplica con «Sincronizar reloj». 12 h: solo LYWSD02MMC.",
-      "ui.advanced": "Ajustes avanzados y ayuda",
+      "ui.advanced": "Otros dispositivos y ayuda",
       "ui.clockSettings": "Reloj",
       "ui.otherDevices": "Otros dispositivos",
       "ui.local": "Conexión Bluetooth local. Sin cuenta.",
@@ -722,11 +738,19 @@
       "ui.syncing": "Sincronizando…",
       "ui.synced": "Reloj sincronizado.",
       "ui.unitSaved": "Unidad de temperatura guardada.",
-      "ui.measurementsUpdated": "Mediciones actualizadas."
+      "ui.measurementsUpdated": "Mediciones actualizadas.",
+      "ui.methods": "LYWSD02, LYWSD02MMC y MHO-C303. Desde tu navegador o automáticamente con Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Relojes y sensores Bluetooth",
+      "ui.alarmClock": "Despertador Bluetooth",
+      "ui.clockControls": "Reloj y pantalla",
+      "ui.applyHint": "La zona horaria, el formato y la corrección se aplican con «Sincronizar reloj».",
+      "ui.lywsd02Alt": "Reloj termómetro Bluetooth Xiaomi Mijia LYWSD02",
+      "ui.lywsd02mmcAlt": "Reloj termómetro Bluetooth Xiaomi Mijia LYWSD02MMC",
+      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303"
     },
     "it": {
-      "ui.title": "I tuoi orologi, puntuali.",
-      "ui.lead": "Sincronizza ora o lascia fare a Home Assistant.",
+      "ui.title": "Sincronizza, regola e sfrutta il tuo orologio Xiaomi Mijia.",
+      "ui.lead": "Leggi le misure in diretta, correggi la deriva dell’orologio e recupera i dati memorizzati nel sensore.",
       "ui.choose": "Scegli come sincronizzare",
       "ui.browser": "Da questo browser",
       "ui.browserHint": "Connetti e sincronizza in pochi clic",
@@ -738,7 +762,7 @@
       "ui.savedClocks": "Orologi salvati",
       "ui.display": "Impostazioni schermo",
       "ui.formatHint": "Applicato con «Sincronizza orologio». 12 h: solo LYWSD02MMC.",
-      "ui.advanced": "Impostazioni avanzate e aiuto",
+      "ui.advanced": "Altri dispositivi e aiuto",
       "ui.clockSettings": "Orologio",
       "ui.otherDevices": "Altri dispositivi",
       "ui.local": "Connessione Bluetooth locale. Nessun account.",
@@ -756,11 +780,19 @@
       "ui.syncing": "Sincronizzazione…",
       "ui.synced": "Orologio sincronizzato.",
       "ui.unitSaved": "Unità di temperatura salvata.",
-      "ui.measurementsUpdated": "Misure aggiornate."
+      "ui.measurementsUpdated": "Misure aggiornate.",
+      "ui.methods": "LYWSD02, LYWSD02MMC e MHO-C303. Dal browser o automaticamente con Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Orologi e sensori Bluetooth",
+      "ui.alarmClock": "Sveglia Bluetooth",
+      "ui.clockControls": "Orologio e schermo",
+      "ui.applyHint": "Fuso orario, formato e correzione si applicano con «Sincronizza orologio».",
+      "ui.lywsd02Alt": "Orologio termometro Bluetooth Xiaomi Mijia LYWSD02",
+      "ui.lywsd02mmcAlt": "Orologio termometro Bluetooth Xiaomi Mijia LYWSD02MMC",
+      "ui.mhoAlt": "Sveglia termometro Bluetooth MHO-C303"
     },
     "de": {
-      "ui.title": "Deine Uhren, pünktlich.",
-      "ui.lead": "Jetzt synchronisieren oder Home Assistant übernehmen lassen.",
+      "ui.title": "Xiaomi Mijia synchronisieren, einstellen und mehr herausholen.",
+      "ui.lead": "Live-Messwerte lesen, die Uhrabweichung korrigieren und die im Sensor gespeicherten Aufzeichnungen abrufen.",
       "ui.choose": "Synchronisierung wählen",
       "ui.browser": "In diesem Browser",
       "ui.browserHint": "Mit wenigen Klicks verbinden und synchronisieren",
@@ -772,7 +804,7 @@
       "ui.savedClocks": "Gespeicherte Uhren",
       "ui.display": "Anzeigeeinstellungen",
       "ui.formatHint": "Wird mit „Uhr synchronisieren“ angewendet. 12 h: nur LYWSD02MMC.",
-      "ui.advanced": "Erweiterte Einstellungen und Hilfe",
+      "ui.advanced": "Andere Geräte und Hilfe",
       "ui.clockSettings": "Uhr",
       "ui.otherDevices": "Andere Geräte",
       "ui.local": "Lokale Bluetooth-Verbindung. Kein Konto nötig.",
@@ -790,11 +822,19 @@
       "ui.syncing": "Synchronisierung…",
       "ui.synced": "Uhr synchronisiert.",
       "ui.unitSaved": "Temperatureinheit gespeichert.",
-      "ui.measurementsUpdated": "Messwerte aktualisiert."
+      "ui.measurementsUpdated": "Messwerte aktualisiert.",
+      "ui.methods": "LYWSD02, LYWSD02MMC und MHO-C303. Im Browser oder automatisch mit Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Bluetooth-Uhren und Sensoren",
+      "ui.alarmClock": "Bluetooth-Wecker",
+      "ui.clockControls": "Uhr und Anzeige",
+      "ui.applyHint": "Zeitzone, Format und Korrektur werden mit „Uhr synchronisieren“ übernommen.",
+      "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 Bluetooth-Thermometeruhr",
+      "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC Bluetooth-Thermometeruhr",
+      "ui.mhoAlt": "MHO-C303 Bluetooth-Thermometerwecker"
     },
     "ar": {
-      "ui.title": "ساعاتك على الوقت الصحيح.",
-      "ui.lead": "زامن الآن أو دع Home Assistant يتولى الأمر.",
+      "ui.title": "زامن واضبط ساعة Xiaomi Mijia واستفد منها أكثر.",
+      "ui.lead": "اقرأ القياسات المباشرة، وصحح انحراف الساعة، واسترجع السجلات المخزنة داخل المستشعر.",
       "ui.choose": "اختر طريقة المزامنة",
       "ui.browser": "من هذا المتصفح",
       "ui.browserHint": "اتصل وزامن ببضع نقرات",
@@ -806,7 +846,7 @@
       "ui.savedClocks": "الساعات المحفوظة",
       "ui.display": "إعدادات الشاشة",
       "ui.formatHint": "يطبق عند مزامنة الساعة. تنسيق 12 ساعة لـ LYWSD02MMC فقط.",
-      "ui.advanced": "إعدادات متقدمة ومساعدة",
+      "ui.advanced": "أجهزة أخرى ومساعدة",
       "ui.clockSettings": "الساعة",
       "ui.otherDevices": "أجهزة أخرى",
       "ui.local": "اتصال بلوتوث محلي. لا حاجة لحساب.",
@@ -824,11 +864,19 @@
       "ui.syncing": "جارٍ المزامنة…",
       "ui.synced": "تمت مزامنة الساعة.",
       "ui.unitSaved": "حُفظت وحدة الحرارة.",
-      "ui.measurementsUpdated": "تم تحديث القياسات."
+      "ui.measurementsUpdated": "تم تحديث القياسات.",
+      "ui.methods": "LYWSD02 وLYWSD02MMC وMHO-C303. من المتصفح أو تلقائيًا مع Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · ساعات ومستشعرات بلوتوث",
+      "ui.alarmClock": "منبه بلوتوث",
+      "ui.clockControls": "الساعة والشاشة",
+      "ui.applyHint": "تُطبّق المنطقة الزمنية والتنسيق والتصحيح عند مزامنة الساعة.",
+      "ui.lywsd02Alt": "ساعة ومقياس حرارة بلوتوث Xiaomi Mijia LYWSD02",
+      "ui.lywsd02mmcAlt": "ساعة ومقياس حرارة بلوتوث Xiaomi Mijia LYWSD02MMC",
+      "ui.mhoAlt": "منبه ومقياس حرارة بلوتوث MHO-C303"
     },
     "zh": {
-      "ui.title": "让时钟准时。",
-      "ui.lead": "立即同步，或交给 Home Assistant 自动完成。",
+      "ui.title": "同步、调校，充分发挥 Xiaomi Mijia 时钟的功能。",
+      "ui.lead": "读取实时测量数据，校正时钟漂移，并获取传感器内保存的历史记录。",
       "ui.choose": "选择同步方式",
       "ui.browser": "通过此浏览器",
       "ui.browserHint": "连接后，只需几步即可同步",
@@ -840,7 +888,7 @@
       "ui.savedClocks": "已保存的时钟",
       "ui.display": "显示设置",
       "ui.formatHint": "点击“同步时钟”后生效。12 小时制仅适用于 LYWSD02MMC。",
-      "ui.advanced": "高级设置与帮助",
+      "ui.advanced": "其他设备与帮助",
       "ui.clockSettings": "时钟",
       "ui.otherDevices": "其他设备",
       "ui.local": "本地蓝牙连接，无需账户。",
@@ -858,11 +906,19 @@
       "ui.syncing": "正在同步…",
       "ui.synced": "时钟已同步。",
       "ui.unitSaved": "温度单位已保存。",
-      "ui.measurementsUpdated": "测量数据已更新。"
+      "ui.measurementsUpdated": "测量数据已更新。",
+      "ui.methods": "适用于 LYWSD02、LYWSD02MMC 和 MHO-C303。通过浏览器操作，或交给 Home Assistant 自动同步。",
+      "ui.brandLine": "Xiaomi Mijia · 蓝牙时钟与传感器",
+      "ui.alarmClock": "蓝牙闹钟",
+      "ui.clockControls": "时钟与显示设置",
+      "ui.applyHint": "点击“同步时钟”即可应用时区、时间格式和偏移校正。",
+      "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 蓝牙温湿度时钟",
+      "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC 蓝牙温湿度时钟",
+      "ui.mhoAlt": "MHO-C303 蓝牙温湿度闹钟"
     },
     "pt": {
-      "ui.title": "Os seus relógios, certos.",
-      "ui.lead": "Sincronize agora ou deixe o Home Assistant tratar disso.",
+      "ui.title": "Sincronize, ajuste e aproveite o seu relógio Xiaomi Mijia.",
+      "ui.lead": "Leia medições em direto, corrija o desvio do relógio e recupere os registos guardados no sensor.",
       "ui.choose": "Escolher como sincronizar",
       "ui.browser": "Neste navegador",
       "ui.browserHint": "Ligue e sincronize em poucos cliques",
@@ -874,7 +930,7 @@
       "ui.savedClocks": "Relógios guardados",
       "ui.display": "Definições do ecrã",
       "ui.formatHint": "Aplicado com «Sincronizar relógio». 12 h: apenas LYWSD02MMC.",
-      "ui.advanced": "Definições avançadas e ajuda",
+      "ui.advanced": "Outros dispositivos e ajuda",
       "ui.clockSettings": "Relógio",
       "ui.otherDevices": "Outros dispositivos",
       "ui.local": "Ligação Bluetooth local. Sem conta.",
@@ -892,11 +948,19 @@
       "ui.syncing": "A sincronizar…",
       "ui.synced": "Relógio sincronizado.",
       "ui.unitSaved": "Unidade de temperatura guardada.",
-      "ui.measurementsUpdated": "Medições atualizadas."
+      "ui.measurementsUpdated": "Medições atualizadas.",
+      "ui.methods": "LYWSD02, LYWSD02MMC e MHO-C303. No navegador ou automaticamente com Home Assistant.",
+      "ui.brandLine": "Xiaomi Mijia · Relógios e sensores Bluetooth",
+      "ui.alarmClock": "Despertador Bluetooth",
+      "ui.clockControls": "Relógio e ecrã",
+      "ui.applyHint": "Fuso horário, formato e correção são aplicados com «Sincronizar relógio».",
+      "ui.lywsd02Alt": "Relógio termómetro Bluetooth Xiaomi Mijia LYWSD02",
+      "ui.lywsd02mmcAlt": "Relógio termómetro Bluetooth Xiaomi Mijia LYWSD02MMC",
+      "ui.mhoAlt": "Despertador termómetro Bluetooth MHO-C303"
     },
     "hi": {
-      "ui.title": "आपकी घड़ियाँ, सही समय पर।",
-      "ui.lead": "अभी सिंक करें या Home Assistant को करने दें।",
+      "ui.title": "अपनी Xiaomi Mijia घड़ी सिंक करें, सेट करें और उससे ज़्यादा पाएँ।",
+      "ui.lead": "लाइव माप पढ़ें, घड़ी का समय अंतर ठीक करें और सेंसर में सहेजे गए रिकॉर्ड प्राप्त करें।",
       "ui.choose": "सिंक करने का तरीका चुनें",
       "ui.browser": "इस ब्राउज़र से",
       "ui.browserHint": "कुछ क्लिक में कनेक्ट और सिंक करें",
@@ -908,7 +972,7 @@
       "ui.savedClocks": "सेव की गई घड़ियाँ",
       "ui.display": "डिस्प्ले सेटिंग",
       "ui.formatHint": "“घड़ी सिंक करें” के साथ लागू। 12 घंटे: केवल LYWSD02MMC।",
-      "ui.advanced": "उन्नत सेटिंग और सहायता",
+      "ui.advanced": "अन्य डिवाइस और सहायता",
       "ui.clockSettings": "घड़ी",
       "ui.otherDevices": "अन्य डिवाइस",
       "ui.local": "स्थानीय ब्लूटूथ कनेक्शन। खाते की जरूरत नहीं।",
@@ -926,7 +990,15 @@
       "ui.syncing": "सिंक हो रहा है…",
       "ui.synced": "घड़ी सिंक हो गई।",
       "ui.unitSaved": "तापमान इकाई सेव हो गई।",
-      "ui.measurementsUpdated": "माप अपडेट हो गए।"
+      "ui.measurementsUpdated": "माप अपडेट हो गए।",
+      "ui.methods": "LYWSD02, LYWSD02MMC और MHO-C303। ब्राउज़र से या Home Assistant के साथ अपने आप।",
+      "ui.brandLine": "Xiaomi Mijia · ब्लूटूथ घड़ियाँ और सेंसर",
+      "ui.alarmClock": "ब्लूटूथ अलार्म घड़ी",
+      "ui.clockControls": "घड़ी और डिस्प्ले",
+      "ui.applyHint": "समय क्षेत्र, प्रारूप और सुधार “घड़ी सिंक करें” के साथ लागू होते हैं।",
+      "ui.lywsd02Alt": "Xiaomi Mijia LYWSD02 ब्लूटूथ थर्मामीटर घड़ी",
+      "ui.lywsd02mmcAlt": "Xiaomi Mijia LYWSD02MMC ब्लूटूथ थर्मामीटर घड़ी",
+      "ui.mhoAlt": "MHO-C303 ब्लूटूथ थर्मामीटर अलार्म घड़ी"
     }
   };
   Object.entries(INTERFACE_MESSAGES).forEach(([code, messages]) => Object.assign(MESSAGES[code], messages));
@@ -982,13 +1054,13 @@
       if (app) {
         app.url = localizedUrl(locale);
         app.inLanguage = LOCALES[locale].tag;
-        app.name = SEO[locale].ogTitle;
+        app.name = 'Xiaomi Mijia Clock Sync';
         app.description = SEO[locale].description;
       }
       if (site) {
         site.url = localizedUrl(locale);
         site.inLanguage = LOCALES[locale].tag;
-        site.name = SEO[locale].ogTitle;
+        site.name = 'Xiaomi Mijia Clock Sync';
       }
       element.textContent = JSON.stringify(graph);
     } catch {

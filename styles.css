@@ -86,12 +86,6 @@ h1 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.2; font-weight: 800; ma
 .button-spinner { display: none; width: 16px; height: 16px; border: 2px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
 .is-loading .button-spinner { display: inline-block; }
 .is-loading > svg { display: none; }
-.clock-illustration { width: 214px; padding: 12px 13px 18px; position: relative; border: 1px solid #e0e6de; border-radius: 18px; background: linear-gradient(150deg, #f8f9f6, #e9eee6); box-shadow: 0 12px 20px -14px #25452a55, inset 0 1px white; flex-shrink: 0; transform: rotate(-5deg); margin-inline-end: 22px; }
-.clock-screen { padding: 12px 12px 14px; border-radius: 8px; background: #dfe7d8; color: #52705a; border: 1px solid #d1daca; box-shadow: inset 0 1px 4px #2741270a; font-family: 'JetBrains Mono', monospace; text-align: center; }
-.clock-screen > span { font-size: 2.65rem; letter-spacing: -.08em; display: block; }
-.clock-screen > small { font-size: .7rem; letter-spacing: .1em; }
-.clock-foot { position: absolute; bottom: -5px; width: 50px; height: 4px; background: #d5ddd0; inset-inline-start: calc(50% - 25px); border-radius: 0 0 4px 4px; }
-.connection-card.is-connected .clock-illustration { display: none; }
 .connection-card.is-connected .connection-main { min-height: auto; padding: 20px 0 24px; }
 .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); padding: 24px 0; }
 .metric-card { padding-inline: 22px; border-inline-start: 1px solid var(--line); }
@@ -136,7 +130,6 @@ select { max-width: 100%; }
 .segmented-control span { display: inline-flex; justify-content: center; min-width: 66px; padding: 8px 16px; border-radius: 6px; font-size: .8rem; cursor: pointer; color: var(--muted); }
 .segmented-control input:checked + span { background: white; box-shadow: 0 1px 4px #173b3a15; color: var(--brand); font-weight: 800; }
 .segmented-control input:focus-visible + span { outline: 3px solid #65a99e; outline-offset: 1px; }
-#unitSettings .button { margin-inline-start: 12px; }
 .checkbox-control { display: flex; align-items: start; gap: 9px; font-size: .75rem; line-height: 1.6; }
 .checkbox-control input { accent-color: var(--brand); margin: 3px 0 0; width: 15px; height: 15px; flex-shrink: 0; }
 .range-field { display: flex; align-items: center; gap: 16px; }
@@ -228,10 +221,6 @@ th { color: var(--muted); font-size: .7rem; font-weight: 600; }
   .mode-check { display: none; }
   .connection-card { padding: 20px 22px 0; }
   .connection-main { min-height: 220px; gap: 16px; }
-  .clock-illustration { width: 150px; padding: 10px 10px 14px; margin-inline-end: 6px; border-radius: 14px; }
-  .clock-screen { padding: 10px 6px; }
-  .clock-screen > span { font-size: 1.85rem; }
-  .clock-screen > small { font-size: .5rem; }
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 24px; }
   .metric-card { padding-inline: 16px; }
   .metric-card:nth-child(odd) { border-inline-start: 0; padding-inline-start: 0; }
@@ -263,7 +252,6 @@ th { color: var(--muted); font-size: .7rem; font-weight: 600; }
   .connection-main { min-height: 210px; padding-top: 24px; }
   h2 { font-size: 1.4rem; }
   .connection-copy p { font-size: .8rem; }
-  .clock-illustration { display: none; }
   .main-actions { gap: 8px; margin-top: 20px; }
   .button { padding: 10px 14px; font-size: .75rem; }
   .status-pill { font-size: .6rem; }
@@ -295,8 +283,6 @@ html[lang="ar"] { font-family: 'Noto Sans Arabic', Manrope, sans-serif; }
 html[lang^="zh"] { font-family: 'Noto Sans SC', Manrope, sans-serif; }
 html[lang="hi"] { font-family: 'Noto Sans Devanagari', Manrope, sans-serif; }
 .metrics:has(#clockMetric[hidden]) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-#unitSettings { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-#unitSettings .button { margin: 0; }
 .log-entry[data-type="error"] { color: var(--red); }
 .log-entry[data-type="warning"] { color: var(--amber); }
 .log-entry[data-type="success"] .log-entry__dot { background: var(--green); }
@@ -308,3 +294,121 @@ html[lang="hi"] { font-family: 'Noto Sans Devanagari', Manrope, sans-serif; }
 .footer-languages > summary::after { content: ' +'; color: var(--brand); }
 .footer-languages[open] > summary::after { content: ' −'; }
 .footer-languages .language-links { padding-top: 12px; }
+/* Product visuals and an open workspace for clock settings, records and logs. */
+.intro { display: grid; grid-template-columns: 1.12fr 1fr; gap: 32px; align-items: center; }
+.intro h1 { font-size: clamp(1.9rem, 3.5vw, 2.65rem); margin: 14px 0; line-height: 1.17; }
+.intro .intro-lead { font-size: .9rem; color: var(--muted); line-height: 1.8; }
+.intro .intro-methods { color: var(--brand); font-size: .73rem; line-height: 1.8; margin-top: 14px; }
+.intro .eyebrow { font-size: .6rem; line-height: 1.8; }
+.device-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.device-card { min-width: 0; margin: 0; border-radius: 15px; padding: 12px 8px 16px; border: 1px solid #d4e6df; overflow: hidden; }
+.device-card--mint { background: #e6f3ed; }
+.device-card--peach { background: #fff0e7; border-color: #f3dfd1; }
+.device-card--blue { background: #e9effc; border-color: #dce3f4; }
+.device-card img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: contain; mix-blend-mode: multiply; }
+.device-card figcaption { text-align: center; margin-top: 12px; }
+.device-card strong { display: block; font-size: .75rem; font-weight: 800; letter-spacing: -.03em; }
+.device-card figcaption span { display: block; font-size: .56rem; color: var(--muted); margin-top: 6px; line-height: 1.5; }
+.mode-tab[data-mode="home-assistant"][aria-selected="true"] { border-color: #267caa; background: #edf5fc; }
+.mode-tab[data-mode="home-assistant"][aria-selected="true"] .mode-icon { background: #267caa; }
+.mode-tab[data-mode="home-assistant"] .mode-check { color: #267caa; }
+.connection-card { border-top: 3px solid var(--brand); }
+.connection-main { min-height: 178px; padding: 22px 0 26px; }
+.connection-card.is-connected .connection-main { padding-bottom: 20px; }
+.metrics { gap: 12px; padding: 20px 0 24px; }
+.metric-card, .metric-card:first-child { border: 0; padding: 14px 16px; border-radius: 12px; }
+.metric-card--clock { background: #e5f3eb; }
+.metric-card--temperature { background: #fff0e7; }
+.metric-card--humidity { background: #eaf2ff; }
+.metric-card--battery { background: #f2edf9; }
+.metric-card--clock .metric-label { color: #34735e; }
+.metric-card--temperature .metric-label { color: #a26034; }
+.metric-card--humidity .metric-label { color: #3c6da0; }
+.metric-card--battery .metric-label { color: #78599a; }
+.metric-card > strong { font-size: clamp(1.2rem, 2.1vw, 1.7rem); }
+.settings-panel, .history-panel, .logs-panel, .saved-panel { padding: 24px 28px; margin-top: 16px; }
+.settings-panel { border-top: 3px solid #dc9a66; }
+.history-panel { border-top: 3px solid #669dc5; }
+.logs-panel { border-top: 3px solid #7ca390; }
+.panel-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; }
+.panel-heading h2 { font-size: 1.1rem; font-weight: 800; }
+.panel-icon { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; flex-shrink: 0; }
+.panel-icon svg { width: 18px; height: 18px; }
+.panel-icon--peach { background: #fff0e7; color: #ad7143; }
+.panel-icon--blue { background: #eaf2ff; color: #4077a2; }
+.panel-icon--mint { background: #e5f3eb; color: var(--brand); }
+.panel-heading .count-badge { margin-inline-start: auto; }
+.settings-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 22px; align-items: start; }
+.timezone-field, .correction-field { grid-column: span 2; }
+.settings-toggles { grid-column: span 2; display: grid; gap: 14px; padding-top: 2px; }
+.settings-grid select, .settings-grid input[type="number"] { background: #fafbf8; min-height: 46px; }
+.settings-grid .field-group legend { margin-bottom: 10px; }
+.settings-toggles .checkbox-control { color: var(--ink); }
+.settings-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 20px; }
+.settings-footer > div:first-child { max-width: 430px; }
+.settings-footer .field-hint:first-child { margin-top: 0; }
+.settings-footer #retryMessage { font-size: .65rem; }
+.settings-actions { display: flex; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
+.settings-actions #syncBtn { order: 0; }
+.settings-panel .action-feedback { margin-top: 18px; margin-bottom: 0; }
+#knownDevicesList { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.known-device { padding-top: 12px; }
+.known-device:only-child { grid-column: 1 / -1; }
+.history-panel .history-empty { background: #f5f8fc; border-radius: 10px; margin-top: 18px; }
+.logs-panel .panel-heading { margin-bottom: 10px; }
+.logs-panel #clearLogs { margin-inline-start: auto; display: flex; align-items: center; gap: 6px; }
+.logs-panel #clearLogs svg { width: 14px; height: 14px; }
+.logs-panel .logs { min-height: 120px; max-height: 260px; background: #f7faf7; border: 1px solid #eaf0e8; border-radius: 10px; padding: 10px 14px; }
+.logs-panel .log-entry { padding: 9px 0; }
+.logs-panel .log-entry:first-child { border-top: 0; }
+.local-note { padding: 4px 0 10px; }
+@media (max-width: 900px) {
+  .intro { grid-template-columns: 1fr; gap: 22px; }
+  .intro h1 { max-width: 26ch; font-size: 2.35rem; }
+  .device-gallery { max-width: 600px; }
+  .device-card { padding-top: 8px; }
+  .device-card img { max-height: 112px; }
+  .device-card strong { font-size: .75rem; }
+  .device-card figcaption span { font-size: .62rem; }
+  .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .settings-footer { align-items: flex-start; flex-direction: column; gap: 18px; }
+}
+@media (max-width: 760px) {
+  .metric-card, .metric-card:first-child, .metric-card:nth-child(odd) { padding: 14px 16px; }
+  .metrics { gap: 12px; }
+  #knownDevicesList { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .intro { gap: 20px; padding: 26px 0 24px; }
+  .intro h1 { font-size: 1.8rem; }
+  .intro .intro-lead { font-size: .8rem; line-height: 1.8; }
+  .intro .intro-methods { font-size: .68rem; margin-top: 10px; }
+  .intro .eyebrow { font-size: .52rem; }
+  .device-gallery { gap: 7px; }
+  .device-card { padding: 6px 4px 12px; border-radius: 11px; }
+  .device-card img { height: 68px; }
+  .device-card figcaption { margin-top: 6px; }
+  .device-card strong { font-size: .65rem; letter-spacing: -.04em; }
+  .device-card figcaption span { font-size: .5rem; margin-top: 4px; }
+  .connection-main { min-height: 180px; }
+  .metric-card, .metric-card:first-child, .metric-card:nth-child(odd) { padding: 12px; }
+  .metric-card > strong { font-size: 1.25rem; }
+  .metric-label { gap: 5px; font-size: .62rem; }
+  .metric-label > svg { width: 13px; height: 13px; }
+  .metric-label .icon-button { margin-inline-start: 0; }
+  .settings-panel, .history-panel, .logs-panel, .saved-panel { padding: 20px 18px; }
+  .panel-heading { gap: 10px; margin-bottom: 20px; }
+  .panel-heading h2 { font-size: .95rem; }
+  .settings-grid { gap: 24px 16px; }
+  .settings-grid .segmented-control span { min-width: 44px; padding: 8px 10px; }
+  .settings-grid .field-group legend { font-size: .7rem; }
+  .settings-grid .checkbox-control { font-size: .7rem; }
+  .settings-actions { width: 100%; gap: 8px; }
+  .settings-actions .button { flex: 1; }
+  .logs-panel .logs { padding: 8px 10px; }
+}
+
+@media (min-width: 761px) {
+  .connection-card.is-connected .connection-copy { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+  .connection-card.is-connected .main-actions { margin-top: 0; flex-shrink: 0; }
+}

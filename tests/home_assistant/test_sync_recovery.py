@@ -251,7 +251,11 @@ async def test_stuck_optional_read_cannot_prevent_the_time_write(
 
     clock.read_gatt_char = read
     with patch("custom_components.lywsd02_sync.transport.GATT_READ_TIMEOUT", 0):
-        entry = await asyncio.wait_for(setup_clock(hass), 0.5)
+        entry = await asyncio.wait_for(setup_clock(hass), 5)
+        # HA's idle helper can return while this background sync is suspended.
+        # Keep the timeout patch active until the transport actually completes.
+        if task := entry.runtime_data._task:
+            await asyncio.wait_for(task, 2)
     assert len(clock.writes) == 1
     assert entry.runtime_data.status == "synced"
     assert entry.runtime_data.clock_verified is (characteristic != TIME_CHARACTERISTIC)

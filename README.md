@@ -4,9 +4,19 @@
   <img src="img/logo.png" alt="LYWSD02 BLE Dashboard" width="88" height="88">
 </p>
 
-<h1 align="center">LYWSD02 Clock Sync</h1>
+<h1 align="center">Xiaomi Mijia Clock Sync</h1>
 
-<p align="center">Keep your LYWSD02, LYWSD02MMC or MHO-C303 on time.</p>
+<p align="center"><strong>Sync, tune &amp; get more from your LYWSD02, LYWSD02MMC and MHO-C303.</strong><br>Read live measurements, correct clock drift and retrieve the records stored inside your sensor.</p>
+
+<table>
+  <tr>
+    <td align="center"><img src="img/devices/generated/xiaomi-mijia-lywsd02.webp" alt="Xiaomi Mijia LYWSD02 Bluetooth thermometer clock" width="220"><br><strong>LYWSD02</strong></td>
+    <td align="center"><img src="img/devices/generated/xiaomi-mijia-lywsd02mmc.webp" alt="Xiaomi Mijia LYWSD02MMC Bluetooth thermometer clock" width="220"><br><strong>LYWSD02MMC</strong></td>
+    <td align="center"><img src="img/devices/generated/mho-c303.webp" alt="MHO-C303 Bluetooth thermometer alarm clock" width="220"><br><strong>MHO-C303</strong></td>
+  </tr>
+</table>
+
+<sub>AI product illustrations, based on device references. [Image credits and prompts](docs/IMAGE_PROMPTS.md).</sub>
 
 | Sync from your browser | Automate with Home Assistant |
 | --- | --- |
@@ -15,7 +25,7 @@
 
 <p align="center">
   <a href="https://drslid.github.io/LYWSD02_BLE_Dashboard/#browser"><img src="img/dashboard_lywsd02.jpg" alt="Browser sync: a connected Living room clock, the Sync clock button and live temperature, humidity and battery readings" width="1000"></a><br>
-  <sub>Browser interface with example readings. Display settings and history stay collapsed until needed.</sub>
+  <sub>Browser interface with example readings. Clock settings, hourly history and the activity log are visible directly.</sub>
 </p>
 
 <p align="center">
@@ -38,12 +48,13 @@ Use **Chrome, Edge or another compatible Chromium browser** on a Bluetooth-enabl
 
 Temperature, humidity and battery appear after connecting. Use the pencil beside the clock’s name to rename it.
 
-- **Display settings**: choose °C/°F and save the unit; select 12/24 h and click **Sync clock** to apply it. The 12-hour display is available on the LYWSD02MMC only.
-- **Hourly history**: read up to 96 hours and download a CSV.
-- **Advanced settings & help**: change the time zone or correction, configure automatic reconnection, select experimental profiles, or open the activity log.
+- **Clock & display settings**: time zone, 12/24-hour format, correction and automatic correction are visible directly. Click **Sync clock** to apply the time settings. Choose °C/°F and use **Save unit** to update the device’s unit. The 12-hour display is available on the LYWSD02MMC only.
+- **Hourly history**, above the log: read up to 96 hours and download a CSV.
+- **Activity log**, at the bottom: follow Bluetooth connections, sync results and errors.
+- **Other devices & help**: select an experimental profile before connecting.
 - **Saved clocks**: reconnect to a previously used device. Names are saved only in this browser.
 
-Automatic correction is enabled by default: drift over 10 seconds is corrected when you connect. You can turn it off under **Advanced settings & help**.
+Automatic correction is enabled by default: drift over 10 seconds is corrected when you connect. You can turn it off in **Clock & display settings**.
 
 Phones without Web Bluetooth can still use the **Home Assistant** tab. Browser sync requires a compatible browser; Safari and Firefox cannot connect. Android layout and interaction are covered by browser tests; physical BLE validation remains device-specific.
 
@@ -67,15 +78,7 @@ The connection is local. Measurements and saved sensor names stay in your browse
 
 ## 📡 Compatible devices
 
-<table>
-  <tr>
-    <td align="center"><img src="img/devices/lywsd02.jpg" alt="LYWSD02 thermometer clock" width="220"><br><strong>LYWSD02</strong></td>
-    <td align="center"><img src="img/lywsd02-product.webp" alt="LYWSD02MMC thermometer clock" width="220"><br><strong>LYWSD02MMC</strong></td>
-    <td align="center"><img src="img/devices/mho-c303.jpg" alt="MHO-C303 thermometer alarm clock" width="220"><br><strong>MHO-C303</strong></td>
-  </tr>
-</table>
 
-<sub>LYWSD02 and MHO-C303 photos: ESPHome documentation, CC BY-NC-SA 4.0. [Photo credits](docs/ASSET_CREDITS.md).</sub>
 
 The compatibility below applies to **original firmware**. Installing custom firmware such as PVVX changes the protocol, even on the same physical model.
 
@@ -91,7 +94,7 @@ The MHO-C303 shares the time, measurement and history characteristics used by th
 
 ### Experimental devices and firmware
 
-Version **1.4.0** adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Before connecting in the browser, open **Advanced settings & help** and select the matching **Device / firmware** profile. The existing stock profile remains the default.
+Version **1.4.0** adds separate BLE profiles based on published protocols. **These additions pass simulated tests but have not been tested on physical devices.** Before connecting in the browser, open **Other devices & help** and select the matching **Device / firmware** profile. The existing stock profile remains the default.
 
 | Device / firmware | Browser dashboard | Home Assistant |
 | --- | --- | --- |

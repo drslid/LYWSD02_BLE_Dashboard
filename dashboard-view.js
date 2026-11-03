@@ -43,12 +43,12 @@
       show('connectIntro', !connected);
       show('connectedIdentity', connected);
       show('clockWorkspace', connected);
-      show('syncBtn', connected);
+      show('syncBtn', true);
       show('clockMetric', connected && (!capabilities || capabilities.time) && state.protocolKind !== 'cgd1');
-      show('displaySettings', connected && (!capabilities || capabilities.unit || capabilities.format));
-      show('unitSettings', !capabilities || capabilities.unit);
-      show('formatSettings', !capabilities ? /LYWSD02MMC/i.test(state.device?.name || '') : capabilities.format);
-      show('historyPanel', (connected || state.historyRecords.length > 0) && (!capabilities || capabilities.history));
+      show('displaySettings', true);
+      show('unitSettings', true);
+      show('formatSettings', true);
+      show('historyPanel', true);
       byId('connectionCard')?.classList.toggle('is-connected', connected);
       elements.connectBtn.classList.toggle('button--primary', !connected);
       elements.connectBtn.classList.toggle('button--secondary', connected);

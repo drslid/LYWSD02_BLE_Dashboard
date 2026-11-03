@@ -119,7 +119,7 @@ test('the sitemap lists canonical pages with reciprocal language references and 
     assert.deepEqual(tags(entry, 'xhtml:link').map((tag) => [tag.hreflang, tag.href]),
       [...codes.map((code) => [LOCALES[code].hreflang, canonical(code)]), ['x-default', BASE_URL]]);
     const images = [...entry.matchAll(/<image:loc>([^<]+)<\/image:loc>/g)].map(([, image]) => image);
-    assert.equal(images.length, 3);
+    assert.equal(images.length, 5);
     for (const image of images) assert.ok(fs.existsSync(path.join(ROOT, image.slice(BASE_URL.length))), image);
   }
 });
@@ -169,7 +169,7 @@ test('browser and Home Assistant have separate accessible panels with browser se
     assert.deepEqual(tags(html, 'section').filter((tag) => tag.role === 'tabpanel').map((panel) => panel.id),
       ['browser-panel', 'home-assistant-panel'], code);
     assert.match(html, /id="home-assistant-panel"[^>]*\shidden/);
-    for (const panel of ['clockWorkspace', 'displaySettings', 'historyPanel', 'knownDevices']) {
+    for (const panel of ['clockWorkspace', 'knownDevices']) {
       assert.match(html, new RegExp(`id="${panel}"[^>]*\\shidden`));
     }
   }
@@ -180,6 +180,13 @@ test('every locale names compatible models and the README credits the MHO-C303 c
     const html = read(pagePath(code));
     assert.match(SEO[code].title, /MHO-C303/);
     assert.match(SEO[code].description, /MHO-C303/);
+    assert.match(SEO[code].title, /Xiaomi Mijia/);
+    assert.match(SEO[code].description, /Xiaomi Mijia/);
+    assert.match(MESSAGES[code]['ui.title'], /Xiaomi Mijia/);
+    const products = tags(html, 'img').filter((tag) => tag.src.includes('/generated/'));
+    assert.equal(products.length, 3);
+    for (const product of products) assert.ok(product.alt && product.width && product.height);
+
     for (const model of ['LYWSD02', 'LYWSD02MMC', 'MHO-C303']) {
       assert.ok(MESSAGES[code]['compatibility.models'].includes(model), `${code}: ${model}`);
       assert.ok(MESSAGES[code]['ha.lead'].includes(model), `${code}: HA ${model}`);

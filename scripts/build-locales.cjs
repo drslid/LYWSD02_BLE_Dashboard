@@ -139,7 +139,7 @@ function renderPage(template, code) {
       for (const item of [app, site]) {
         item.url = url;
         item.inLanguage = config.tag;
-        item.name = seo.ogTitle;
+        item.name = 'Xiaomi Mijia Clock Sync';
         item.description = seo.description;
       }
       app.featureList = [
@@ -171,7 +171,7 @@ function renderSitemap() {
     `    <loc>${canonicalUrl(code)}</loc>`,
     `    <lastmod>${CONTENT_MODIFIED}</lastmod>`,
     ...alternates,
-    ...['img/og-dashboard.jpg', 'img/lywsd02-product.webp', 'img/dashboard_lywsd02.jpg'].map((image) =>
+    ...['img/og-dashboard.jpg', 'img/devices/generated/xiaomi-mijia-lywsd02.webp', 'img/devices/generated/xiaomi-mijia-lywsd02mmc.webp', 'img/devices/generated/mho-c303.webp', 'img/dashboard_lywsd02.jpg'].map((image) =>
       `    <image:image><image:loc>${new URL(image, BASE_URL).href}</image:loc></image:image>`),
     '  </url>'
   ].join('\n'));

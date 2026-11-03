@@ -16,7 +16,6 @@ test('connect, change settings, rename, read history and download CSV', async ({
   await expect(page.locator('#status')).toHaveAttribute('data-state', 'connected');
   await expect(page.locator('#temperature')).toContainText('22,40');
   await expect(page.locator('#battery')).toHaveText('87 %');
-  await page.locator('#displaySettings > summary').click();
   await page.locator('input[name="unit"][value="F"]').check();
   await page.locator('#unitBtn').click();
   await expect(page.locator('#temperature')).toContainText('72,32');
@@ -28,7 +27,6 @@ test('connect, change settings, rename, read history and download CSV', async ({
   await page.locator('#deviceAlias').fill('Salon');
   await page.locator('#renameForm button[type="submit"]').click();
   await expect(page.locator('#deviceLabel')).toHaveText('Salon');
-  await page.locator('#historyPanel > summary').click();
   await page.locator('#loadHistoryBtn').click();
   await expect(page.locator('#historyTableBody tr')).toHaveCount(2);
   const downloadPromise = page.waitForEvent('download');
@@ -42,7 +40,6 @@ test('connect, change settings, rename, read history and download CSV', async ({
   await page.locator('#connectBtn').click();
   await expect(page.locator('#status')).toHaveAttribute('data-state', 'disconnected');
   await page.reload();
-  await page.locator('#knownDevices > summary').click();
   await expect(page.locator('#knownDevicesList')).toContainText('Salon');
   expect(errors).toEqual([]);
 });
@@ -73,7 +70,6 @@ test('all nine locale pages load their scripts and Arabic keeps its RTL layout',
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await page.locator('#browser-tab').click();
     await page.locator('#connectBtn').click();
-    await page.locator('#displaySettings > summary').click();
     await page.locator('#advancedSettings > summary').click();
     await expect(page.locator('#temperature')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -111,6 +107,9 @@ test('the two modes support deep links, keyboard navigation and browser history'
   await expect(page.locator('#browser-tab')).toBeFocused();
   await expect(page.locator('#browser-panel')).toBeVisible();
   await expect(page.locator('#clockWorkspace')).toBeHidden();
+  await expect(page.locator('#displaySettings')).toBeVisible();
+  await expect(page.locator('#historyPanel')).toBeVisible();
+  await expect(page.locator('#logsPanel')).toBeVisible();
   await expect(page.locator('#knownDevices')).toBeHidden();
   await expect(page.locator('#advancedSettings')).not.toHaveAttribute('open');
   await page.goBack();
@@ -138,4 +137,32 @@ test('sync failures are visible without opening the log and a retry clears the e
   await page.locator('#syncBtn').click();
   await expect(page.locator('#actionFeedback')).toHaveText('Horloge synchronisée.');
   await expect(page.locator('#actionFeedback')).toHaveAttribute('data-kind', 'success');
+});
+
+
+test('all clock controls stay visible and history sits directly above the bottom log', async ({ page }) => {
+  await page.goto('/fr/');
+  for (const id of ['timezone', 'formatSettings', 'offsetMinutesRange', 'autoSyncClock', 'historyPanel', 'logsPanel']) {
+    await expect(page.locator(`#${id}`)).toBeVisible();
+    expect(await page.locator(`#${id}`).evaluate(node => node.closest('details'))).toBeNull();
+  }
+  expect(await page.locator('#browser-panel').evaluate(panel => Array.from(panel.children).slice(-2).map(node => node.id)))
+    .toEqual(['historyPanel', 'logsPanel']);
+  await expect(page.locator('.device-gallery img')).toHaveCount(3);
+  for (const image of await page.locator('.device-gallery img').all()) {
+    await expect(image).toBeVisible();
+    expect(await image.evaluate(node => node.complete && node.naturalWidth > 0)).toBe(true);
+  }
+  await page.locator('#connectBtn').click();
+  await expect(page.locator('#timezone')).toBeEnabled();
+  await page.locator('#timezone').selectOption('120');
+  await page.locator('#offsetMinutes').fill('5');
+  await expect(page.locator('#offsetOutput')).toHaveText('+5 min');
+  await page.locator('#syncBtn').click();
+  await expect(page.locator('#actionFeedback')).toHaveText('Horloge synchronisée.');
+  const payload = await page.evaluate(() => window.testBluetooth.writes.filter(write => write.kind === 'time' && write.bytes.length === 5).at(-1).bytes);
+  expect(payload[4]).toBe(2);
+  expect(await page.locator('#logs').textContent()).toContain('synchronis');
+  await page.locator('#clearLogs').click();
+  await expect(page.locator('#logs .log-entry')).toHaveCount(0);
 });

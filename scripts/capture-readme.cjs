@@ -26,6 +26,8 @@ const baseURL = process.env.DASHBOARD_PREVIEW_URL || 'http://127.0.0.1:4173';
     await page.locator('#renameForm button[type="submit"]').click();
     await page.locator('#syncBtn').click();
     await expect(page.locator('#actionFeedback')).toHaveText('Clock synchronized.');
+    await page.locator('#loadHistoryBtn').click();
+    await expect(page.locator('#historyTableBody tr')).toHaveCount(2);
     await page.screenshot({ path: path.join(root, 'img/dashboard_lywsd02.jpg'), fullPage: true, type: 'jpeg', quality: 88, animations: 'disabled' });
     await page.locator('#ha-tab').click();
     await page.screenshot({ path: path.join(root, 'img/home-assistant-setup.jpg'), fullPage: true, type: 'jpeg', quality: 88, animations: 'disabled' });

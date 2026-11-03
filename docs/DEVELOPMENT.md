@@ -194,6 +194,6 @@ These references were gathered during the device research on September 13, 2026.
 
 ## Interface previews
 
-Edit `templates/index.html`, `styles.css` and the interface messages in `i18n.js`, then run `npm run build`. Both sync paths share a responsive shell; `dashboard-view.js` handles their tabs and connection-dependent visibility. Advanced settings and history use native disclosure controls.
+Edit `templates/index.html`, `styles.css` and the interface messages in `i18n.js`, then run `npm run build`. Both sync paths share a responsive shell; `dashboard-view.js` handles their tabs and connection-dependent visibility. Clock settings, history and logs remain directly visible in that order; only experimental profiles use a disclosure control. The three generated product assets are documented in [IMAGE_PROMPTS.md](IMAGE_PROMPTS.md).
 
 Run `npm run dev` for a local preview at `http://127.0.0.1:4173`. With the server running and Playwright Chromium installed, `npm run screenshots` refreshes the README and social previews from the actual interface using simulated BLE readings. It requires access to the existing font and icon CDNs. The shared BLE fixture is in `tests/browser/fixtures.cjs`.
