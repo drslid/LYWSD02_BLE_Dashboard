@@ -160,8 +160,13 @@ class ClockSyncManager:
         missed = self._expression is not None and self.last_sync is not None and (
             previous_run(self._expression, dt_util.now()) > self.last_sync
         )
-        # A setting changed while the clock was out of reach is applied after a restart too.
-        if self.last_sync is None or missed or self._applied != device_settings(self.entry.options):
+        # Resume an interrupted retry or settings change after restart.
+        if (
+            self.last_sync is None
+            or missed
+            or self.last_error is not None
+            or self._applied != device_settings(self.entry.options)
+        ):
             self.async_request_sync()
         else:
             self._async_retry_record_import()
@@ -223,13 +228,19 @@ class ClockSyncManager:
                     return
                 except _NotHeard:
                     if not force or not await self._async_search(deadline):
-                        raise self._async_missing() from None
+                        previous = (self.status, self.last_error)
+                        error = self._async_missing()
+                        if previous != (self.status, self.last_error):
+                            await self._async_save_state()
+                        raise error from None
                 except _ConnectionFailed as failure:
                     delay = next(reconnect_delays, None)
                     if delay is None or self._stopped or self.hass.loop.time() + delay >= deadline:
-                        raise self._async_failed(failure.error) from failure.error
+                        error = self._async_failed(failure.error)
+                        await self._async_save_state()
+                        raise error from failure.error
                     _LOGGER.debug("Reconnecting to %s in %s s: %s", self.name, delay, failure.error)
-                    await asyncio.sleep(delay)
+                    await self._discovery.async_retry_delay(delay)
         finally:
             self._syncing -= 1
             self._async_notify()
@@ -298,7 +309,7 @@ class ClockSyncManager:
             async with asyncio.timeout(POST_SYNC_TIMEOUT):
                 await self._store.async_save_state(self)
         except Exception:
-            _LOGGER.exception("Could not save the completed synchronization of %s", self.name)
+            _LOGGER.exception("Could not save the synchronization state of %s", self.name)
 
     async def _async_flush_records(self) -> None:
         if not self._pending_records:

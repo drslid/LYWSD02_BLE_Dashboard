@@ -125,18 +125,21 @@ class ClockTransport:
             _LOGGER.debug(
                 "Stale connection cleanup unavailable for %s: %s", self.name, err
             )
-        async with asyncio.timeout_at(
-            min(deadline, self.hass.loop.time() + CONNECT_TIMEOUT)
-        ):
-            client = await establish_connection(
-                BleakClientWithServiceCache,
-                ble_device,
-                self.name,
-                max_attempts=1 if forced else 3,
-                ble_device_callback=lambda: (
-                    self._async_reachable_device() or ble_device
-                ),
-            )
+        try:
+            async with asyncio.timeout_at(
+                min(deadline, self.hass.loop.time() + CONNECT_TIMEOUT)
+            ):
+                client = await establish_connection(
+                    BleakClientWithServiceCache,
+                    ble_device,
+                    self.name,
+                    max_attempts=1 if forced else 3,
+                    ble_device_callback=lambda: (
+                        self._async_reachable_device() or ble_device
+                    ),
+                )
+        except TimeoutError as err:
+            raise TimeoutError("Timed out opening the Bluetooth connection") from err
         try:
             protocol = self.entry.data.get(CONF_PROTOCOL, "stock")
             if protocol != "stock":
@@ -172,6 +175,8 @@ class ClockTransport:
             session.written_at = dt_util.now()
             self._on_written(session)
             await self._async_read_clock(client, session)
+        except TimeoutError as err:
+            raise TimeoutError("Bluetooth connected, but the clock operation timed out") from err
         finally:
             try:
                 async with asyncio.timeout(CLEANUP_TIMEOUT):

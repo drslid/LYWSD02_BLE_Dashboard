@@ -98,6 +98,16 @@ class ClockDiscovery:
         finally:
             scan.cancel()
 
+    async def async_retry_delay(self, delay: float) -> None:
+        """Refresh advertisements during a reconnect delay, even if a route is cached."""
+        scan = self.entry.async_create_background_task(
+            self.hass, self._async_scan(delay), f"{DOMAIN} retry scan {self.address}"
+        )
+        try:
+            await asyncio.sleep(delay)
+        finally:
+            scan.cancel()
+
     def request_scan(self) -> None:
         now = dt_util.utcnow()
         if (

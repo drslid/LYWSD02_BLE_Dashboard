@@ -36,6 +36,7 @@ from custom_components.lywsd02_sync.const import (
     RETRY_DELAYS,
     SEARCH_INTERVAL,
 )
+from custom_components.lywsd02_sync.manager import ClockSyncManager
 from custom_components.lywsd02_sync.protocol import HourlyRecord
 
 from .conftest import ADDRESS, TITLE, BluetoothHarness, FakeClock
@@ -370,20 +371,22 @@ async def test_button_fails_at_once_without_an_adapter_that_can_connect(
 async def test_button_reconnects_when_the_clock_drops_the_connection(
     hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
 ) -> None:
-    """The clock can drop a connection before the time is written: the button connects again."""
+    """The button refreshes discovery before reconnecting, even with a cached route."""
     ble.proxy().hear()
     await setup_clock(hass)
-    clock.drops = 2
+    clock.drops = len(FORCE_RECONNECT_DELAYS)
 
-    pressing = await start_press(hass)
-    assert ble.connections == 2
-    await elapse(hass, freezer, FORCE_RECONNECT_DELAYS[0])
-    assert ble.connections == 3
-    await elapse(hass, freezer, FORCE_RECONNECT_DELAYS[1])
-    await pressing
+    with patch.object(bluetooth, "async_request_active_scan", new_callable=AsyncMock, create=True) as scan:
+        pressing = await start_press(hass)
+        for attempt, delay in enumerate(FORCE_RECONNECT_DELAYS, start=2):
+            assert ble.connections == attempt
+            assert scan.await_args.args == (hass, delay)
+            await elapse(hass, freezer, delay)
+        await pressing
+    assert scan.await_count == len(FORCE_RECONNECT_DELAYS)
 
-    assert ble.connections == 4
-    assert clock.disconnects == 4
+    assert ble.connections == 2 + len(FORCE_RECONNECT_DELAYS)
+    assert clock.disconnects == ble.connections
     assert len(clock.writes) == 2
     assert hass.states.get(STATUS).state == "synced"
 
@@ -413,6 +416,60 @@ async def test_button_reports_a_failed_sync(
     await later(hass, freezer, timedelta(seconds=1))
     assert len(clock.writes) == 2
     assert hass.states.get(STATUS).state == "synced"
+
+
+@pytest.mark.parametrize(
+    ("stage", "message"),
+    [
+        ("connect", "Timed out opening the Bluetooth connection"),
+        ("write", "Bluetooth connected, but the clock operation timed out"),
+    ],
+)
+async def test_timeout_identifies_the_failed_bluetooth_stage(
+    hass: HomeAssistant, ble: BluetoothHarness, clock: FakeClock, stage: str, message: str
+) -> None:
+    """Connection and GATT timeouts produce different diagnostics."""
+    ble.proxy().hear()
+    entry = await setup_clock(hass)
+    target, attribute, replacement = (
+        (ble, "connect_error", TimeoutError()) if stage == "connect"
+        else (clock, "write_gatt_char", AsyncMock(side_effect=TimeoutError()))
+    )
+    with patch.object(target, attribute, replacement), pytest.raises(HomeAssistantError) as failure:
+        await entry.runtime_data.async_sync()
+    assert failure.value.translation_placeholders == {"name": TITLE, "error": message}
+    assert len(clock.writes) == 1
+    assert clock.disconnects == (1 if stage == "connect" else 2)
+
+
+async def test_reload_restores_the_failed_sync_and_resumes_retries(
+    hass: HomeAssistant, freezer: FrozenDateTimeFactory, ble: BluetoothHarness, clock: FakeClock
+) -> None:
+    """The last successful sync and subsequent failure survive an integration reload."""
+    ble.proxy().hear()
+    entry = await setup_clock(hass)
+    last_sync = entry.runtime_data.last_sync
+    freezer.tick(1)
+    last_attempt = dt_util.utcnow()
+    ble.connect_error = BleakError("No free connection slot")
+    with pytest.raises(HomeAssistantError):
+        await entry.runtime_data.async_sync()
+
+    assert await hass.config_entries.async_unload(entry.entry_id)
+    with patch.object(ClockSyncManager, "async_request_sync") as retry:
+        assert await hass.config_entries.async_setup(entry.entry_id)
+        await settle(hass)
+    retry.assert_called_once_with()
+    assert hass.states.get(STATUS).state == "failed"
+    assert entry.runtime_data.last_sync == last_sync
+    assert entry.runtime_data.last_attempt == last_attempt
+    assert entry.runtime_data.last_error == "No free connection slot"
+
+    ble.connect_error = None
+    await entry.runtime_data.async_sync()
+    assert hass.states.get(STATUS).state == "synced"
+    assert entry.runtime_data.last_error is None
+    assert len(clock.writes) == 2
 
 
 async def test_unloading_ends_the_search_of_the_button(
