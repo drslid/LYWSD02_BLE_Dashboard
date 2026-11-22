@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from homeassistant.util import dt as dt_util
 
-from .const import DOMAIN, STATUS_SYNCED
+from .const import DOMAIN, STATUS_FAILED, STATUS_SYNCED, STATUS_WAITING
 from .protocol import HourlyRecord
 
 if TYPE_CHECKING:
@@ -68,7 +68,14 @@ class ClockSyncStorage:
         manager._next_record = stored.get("next_record", 0)
         manager._synced_offset = stored.get("offset")
         manager._applied = stored.get("applied")
-        if manager.last_sync is not None:
+        if last_attempt := stored.get("last_attempt"):
+            manager.last_attempt = dt_util.parse_datetime(last_attempt)
+        if (status := stored.get("status")) in (STATUS_WAITING, STATUS_FAILED) and (
+            error := stored.get("last_error")
+        ):
+            manager.status = status
+            manager.last_error = error
+        elif manager.last_sync is not None:
             manager.status = STATUS_SYNCED
 
     async def async_save_state(self, manager: ClockSyncManager) -> None:
@@ -77,6 +84,11 @@ class ClockSyncStorage:
                 "last_sync": manager.last_sync.isoformat()
                 if manager.last_sync
                 else None,
+                "last_attempt": manager.last_attempt.isoformat()
+                if manager.last_attempt
+                else None,
+                "last_error": manager.last_error,
+                "status": manager.status,
                 "drift": manager.drift,
                 "offset": manager._synced_offset,
                 "unit": manager.unit,
