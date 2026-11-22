@@ -133,7 +133,7 @@ That’s it: each clock is synchronized immediately.
 
 ### Updating an existing Home Assistant installation
 
-**[v1.5.0](https://github.com/drslid/LYWSD02_BLE_Dashboard/releases/tag/v1.5.0)** improves Bluetooth startup and discovery, limits optional reads so they cannot block clock sync, verifies the written time when readable, and retries failed statistics imports after a restart. Update through **HACS → LYWSD02 Clock Sync → Update**, then **restart Home Assistant**. Existing devices, schedules, entity IDs and statistics are preserved.
+**[v1.5.1](https://github.com/drslid/LYWSD02_BLE_Dashboard/releases/tag/v1.5.1)** refreshes Bluetooth discovery between manual reconnection attempts, identifies whether a timeout happened while connecting or during a clock operation, and preserves failed sync attempts across restarts so retries can resume. Update through **HACS → LYWSD02 Clock Sync → Update**, then **restart Home Assistant**. Existing devices, schedules, entity IDs and statistics are preserved.
 
 > Without HACS, copy `custom_components/lywsd02_sync` into the `custom_components` folder of your Home Assistant configuration, then restart.
 
